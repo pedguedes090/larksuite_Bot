@@ -1,0 +1,561 @@
+{
+  "_comment": "=== BEGINNER MONSTERS (Lv1-5) ===",
+  "slime": {
+    "id": "slime",
+    "name": "Slime Xanh",
+    "hp": 30,
+    "attack": 8,
+    "defense": 2,
+    "xpDrop": 15,
+    "type": "normal",
+    "drops": [
+      { "itemId": "gold_coin", "quantity": 5, "chance": 1.0 },
+      { "itemId": "slime_gel", "quantity": 1, "chance": 0.6 },
+      { "itemId": "health_potion", "quantity": 1, "chance": 0.3 }
+    ]
+  },
+  "goblin": {
+    "id": "goblin",
+    "name": "Yêu Tinh Xanh",
+    "hp": 50,
+    "attack": 12,
+    "defense": 5,
+    "xpDrop": 25,
+    "type": "normal",
+    "drops": [
+      { "itemId": "gold_coin", "quantity": 10, "chance": 1.0 },
+      { "itemId": "goblin_ear", "quantity": 1, "chance": 0.7 },
+      { "itemId": "rusty_dagger", "quantity": 1, "chance": 0.1 },
+      { "itemId": "cloth_shirt", "quantity": 1, "chance": 0.15 }
+    ]
+  },
+  "rat": {
+    "id": "rat",
+    "name": "Chuột Hang",
+    "hp": 20,
+    "attack": 6,
+    "defense": 1,
+    "xpDrop": 10,
+    "type": "normal",
+    "drops": [
+      { "itemId": "gold_coin", "quantity": 3, "chance": 1.0 },
+      { "itemId": "health_potion", "quantity": 1, "chance": 0.2 }
+    ]
+  },
+  "kobold": {
+    "id": "kobold",
+    "name": "Kobold Chiến Binh",
+    "hp": 70,
+    "attack": 15,
+    "defense": 8,
+    "xpDrop": 35,
+    "type": "normal",
+    "drops": [
+      { "itemId": "gold_coin", "quantity": 15, "chance": 1.0 },
+      { "itemId": "iron_ore", "quantity": 1, "chance": 0.4 },
+      { "itemId": "leather_vest", "quantity": 1, "chance": 0.2 }
+    ]
+  },
+  "wild_boar": {
+    "id": "wild_boar",
+    "name": "Heo Rừng Dữ",
+    "hp": 80,
+    "attack": 18,
+    "defense": 10,
+    "xpDrop": 40,
+    "type": "normal",
+    "drops": [
+      { "itemId": "gold_coin", "quantity": 20, "chance": 1.0 },
+      { "itemId": "wolf_pelt", "quantity": 1, "chance": 0.5 },
+      { "itemId": "bronze_axe", "quantity": 1, "chance": 0.08 }
+    ]
+  },
+
+  "_comment": "=== INTERMEDIATE MONSTERS (Lv6-10) ===",
+  "orc": {
+    "id": "orc",
+    "name": "Orc Chiến Binh",
+    "hp": 120,
+    "attack": 25,
+    "defense": 15,
+    "xpDrop": 60,
+    "type": "normal",
+    "drops": [
+      { "itemId": "gold_coin", "quantity": 30, "chance": 1.0 },
+      { "itemId": "orc_fang", "quantity": 1, "chance": 0.6 },
+      { "itemId": "iron_sword", "quantity": 1, "chance": 0.15 },
+      { "itemId": "studded_leather", "quantity": 1, "chance": 0.12 }
+    ]
+  },
+  "giant_spider": {
+    "id": "giant_spider",
+    "name": "Nhện Khổng Lồ",
+    "hp": 100,
+    "attack": 22,
+    "defense": 12,
+    "xpDrop": 55,
+    "type": "normal",
+    "specialAbility": "web_trap",
+    "drops": [
+      { "itemId": "gold_coin", "quantity": 25, "chance": 1.0 },
+      { "itemId": "spider_silk", "quantity": 2, "chance": 0.8 },
+      { "itemId": "strength_buff", "quantity": 1, "chance": 0.3 }
+    ]
+  },
+  "dire_wolf": {
+    "id": "dire_wolf",
+    "name": "Sói Khổng Lồ",
+    "hp": 150,
+    "attack": 28,
+    "defense": 18,
+    "xpDrop": 70,
+    "type": "normal",
+    "specialAbility": "pack_hunt",
+    "drops": [
+      { "itemId": "gold_coin", "quantity": 35, "chance": 1.0 },
+      { "itemId": "wolf_pelt", "quantity": 1, "chance": 0.9 },
+      { "itemId": "silver_rapier", "quantity": 1, "chance": 0.1 },
+      { "itemId": "ring_mail", "quantity": 1, "chance": 0.08 }
+    ]
+  },
+  "cave_troll": {
+    "id": "cave_troll",
+    "name": "Troll Hang Động",
+    "hp": 200,
+    "attack": 35,
+    "defense": 25,
+    "xpDrop": 90,
+    "type": "normal",
+    "specialAbility": "regeneration",
+    "drops": [
+      { "itemId": "gold_coin", "quantity": 50, "chance": 1.0 },
+      { "itemId": "magic_crystal", "quantity": 1, "chance": 0.4 },
+      { "itemId": "steel_sword", "quantity": 1, "chance": 0.12 },
+      { "itemId": "chainmail", "quantity": 1, "chance": 0.1 }
+    ]
+  },
+  "harpy": {
+    "id": "harpy",
+    "name": "Harpy Gào Thét",
+    "hp": 120,
+    "attack": 30,
+    "defense": 15,
+    "xpDrop": 65,
+    "type": "normal",
+    "specialAbility": "sonic_scream",
+    "drops": [
+      { "itemId": "gold_coin", "quantity": 40, "chance": 1.0 },
+      { "itemId": "bat_wing", "quantity": 2, "chance": 0.7 },
+      { "itemId": "enchanted_staff", "quantity": 1, "chance": 0.08 }
+    ]
+  },
+
+  "_comment": "=== UNDEAD MONSTERS (Lv8-15) ===",
+  "skeleton": {
+    "id": "skeleton",
+    "name": "Bộ Xương Chiến Binh",
+    "hp": 140,
+    "attack": 32,
+    "defense": 20,
+    "xpDrop": 75,
+    "type": "undead",
+    "drops": [
+      { "itemId": "gold_coin", "quantity": 35, "chance": 1.0 },
+      { "itemId": "skeleton_bone", "quantity": 1, "chance": 0.8 },
+      { "itemId": "flame_blade", "quantity": 1, "chance": 0.06 },
+      { "itemId": "scale_mail", "quantity": 1, "chance": 0.08 }
+    ]
+  },
+  "zombie": {
+    "id": "zombie",
+    "name": "Xác Sống",
+    "hp": 180,
+    "attack": 28,
+    "defense": 22,
+    "xpDrop": 80,
+    "type": "undead",
+    "specialAbility": "disease",
+    "drops": [
+      { "itemId": "gold_coin", "quantity": 30, "chance": 1.0 },
+      { "itemId": "ancient_scroll", "quantity": 1, "chance": 0.25 },
+      { "itemId": "defense_buff", "quantity": 1, "chance": 0.4 }
+    ]
+  },
+  "wraith": {
+    "id": "wraith",
+    "name": "Linh Hồn Ma Quỷ",
+    "hp": 160,
+    "attack": 40,
+    "defense": 15,
+    "xpDrop": 85,
+    "type": "undead",
+    "specialAbility": "phase_shift",
+    "drops": [
+      { "itemId": "gold_coin", "quantity": 45, "chance": 1.0 },
+      { "itemId": "shadow_essence", "quantity": 1, "chance": 0.5 },
+      { "itemId": "shadow_blade", "quantity": 1, "chance": 0.08 },
+      { "itemId": "enchanted_robe", "quantity": 1, "chance": 0.1 }
+    ]
+  },
+  "banshee": {
+    "id": "banshee",
+    "name": "Banshee Khóc Than",
+    "hp": 200,
+    "attack": 45,
+    "defense": 18,
+    "xpDrop": 100,
+    "type": "undead",
+    "specialAbility": "wail_of_death",
+    "drops": [
+      { "itemId": "gold_coin", "quantity": 60, "chance": 1.0 },
+      { "itemId": "shadow_essence", "quantity": 2, "chance": 0.6 },
+      { "itemId": "thunder_hammer", "quantity": 1, "chance": 0.05 },
+      { "itemId": "greater_experience_gem", "quantity": 1, "chance": 0.3 }
+    ]
+  },
+
+  "_comment": "=== ELEMENTAL MONSTERS (Lv10-18) ===",
+  "fire_elemental": {
+    "id": "fire_elemental",
+    "name": "Nguyên Tố Lửa",
+    "hp": 220,
+    "attack": 50,
+    "defense": 25,
+    "xpDrop": 110,
+    "type": "elemental",
+    "specialAbility": "fire_aura",
+    "drops": [
+      { "itemId": "gold_coin", "quantity": 70, "chance": 1.0 },
+      { "itemId": "magic_crystal", "quantity": 2, "chance": 0.7 },
+      { "itemId": "flame_blade", "quantity": 1, "chance": 0.15 },
+      { "itemId": "berserker_potion", "quantity": 1, "chance": 0.3 }
+    ]
+  },
+  "ice_elemental": {
+    "id": "ice_elemental",
+    "name": "Nguyên Tố Băng",
+    "hp": 250,
+    "attack": 45,
+    "defense": 30,
+    "xpDrop": 115,
+    "type": "elemental",
+    "specialAbility": "frost_armor",
+    "drops": [
+      { "itemId": "gold_coin", "quantity": 75, "chance": 1.0 },
+      { "itemId": "magic_crystal", "quantity": 2, "chance": 0.7 },
+      { "itemId": "mithril_sword", "quantity": 1, "chance": 0.12 },
+      { "itemId": "iron_skin_potion", "quantity": 1, "chance": 0.3 }
+    ]
+  },
+  "earth_elemental": {
+    "id": "earth_elemental",
+    "name": "Nguyên Tố Đất",
+    "hp": 300,
+    "attack": 40,
+    "defense": 40,
+    "xpDrop": 120,
+    "type": "elemental",
+    "specialAbility": "stone_skin",
+    "drops": [
+      { "itemId": "gold_coin", "quantity": 80, "chance": 1.0 },
+      { "itemId": "mithril_ore", "quantity": 1, "chance": 0.6 },
+      { "itemId": "plate_mail", "quantity": 1, "chance": 0.1 },
+      { "itemId": "super_health_potion", "quantity": 1, "chance": 0.4 }
+    ]
+  },
+  "storm_elemental": {
+    "id": "storm_elemental",
+    "name": "Nguyên Tố Giông Bão",
+    "hp": 200,
+    "attack": 55,
+    "defense": 20,
+    "xpDrop": 125,
+    "type": "elemental",
+    "specialAbility": "lightning_storm",
+    "drops": [
+      { "itemId": "gold_coin", "quantity": 85, "chance": 1.0 },
+      { "itemId": "magic_crystal", "quantity": 3, "chance": 0.8 },
+      { "itemId": "thunder_hammer", "quantity": 1, "chance": 0.15 },
+      { "itemId": "lucky_charm", "quantity": 1, "chance": 0.2 }
+    ]
+  },
+
+  "_comment": "=== DRAGON FAMILY (Lv12-25) ===",
+  "dragon_whelp": {
+    "id": "dragon_whelp",
+    "name": "Rồng Con",
+    "hp": 350,
+    "attack": 60,
+    "defense": 35,
+    "xpDrop": 180,
+    "type": "dragon",
+    "specialAbility": "fire_breath",
+    "drops": [
+      { "itemId": "gold_coin", "quantity": 120, "chance": 1.0 },
+      { "itemId": "dragon_scale", "quantity": 1, "chance": 0.4 },
+      { "itemId": "mithril_ore", "quantity": 2, "chance": 0.5 },
+      { "itemId": "dragon_blade", "quantity": 1, "chance": 0.05 },
+      { "itemId": "master_experience_gem", "quantity": 1, "chance": 0.2 }
+    ]
+  },
+  "wyvern": {
+    "id": "wyvern",
+    "name": "Wyvern Độc",
+    "hp": 400,
+    "attack": 65,
+    "defense": 30,
+    "xpDrop": 200,
+    "type": "dragon",
+    "specialAbility": "poison_breath",
+    "drops": [
+      { "itemId": "gold_coin", "quantity": 150, "chance": 1.0 },
+      { "itemId": "dragon_scale", "quantity": 2, "chance": 0.6 },
+      { "itemId": "shadow_blade", "quantity": 1, "chance": 0.12 },
+      { "itemId": "greater_mana_potion", "quantity": 2, "chance": 0.8 }
+    ]
+  },
+  "drake": {
+    "id": "drake",
+    "name": "Drake Lửa",
+    "hp": 500,
+    "attack": 70,
+    "defense": 40,
+    "xpDrop": 250,
+    "type": "dragon",
+    "specialAbility": "flame_charge",
+    "drops": [
+      { "itemId": "gold_coin", "quantity": 200, "chance": 1.0 },
+      { "itemId": "dragon_scale", "quantity": 3, "chance": 0.8 },
+      { "itemId": "dragon_scale_armor", "quantity": 1, "chance": 0.08 },
+      { "itemId": "phoenix_feather", "quantity": 1, "chance": 0.15 }
+    ]
+  },
+
+  "_comment": "=== DEMON FAMILY (Lv15-30) ===",
+  "imp": {
+    "id": "imp",
+    "name": "Imp Tinh Nghịch",
+    "hp": 300,
+    "attack": 55,
+    "defense": 25,
+    "xpDrop": 140,
+    "type": "demon",
+    "specialAbility": "teleport_strike",
+    "drops": [
+      { "itemId": "gold_coin", "quantity": 100, "chance": 1.0 },
+      { "itemId": "shadow_essence", "quantity": 1, "chance": 0.7 },
+      { "itemId": "teleport_scroll", "quantity": 1, "chance": 0.4 }
+    ]
+  },
+  "succubus": {
+    "id": "succubus",
+    "name": "Succubus Mị Hoặc",
+    "hp": 450,
+    "attack": 60,
+    "defense": 35,
+    "xpDrop": 220,
+    "type": "demon",
+    "specialAbility": "charm",
+    "drops": [
+      { "itemId": "gold_coin", "quantity": 180, "chance": 1.0 },
+      { "itemId": "shadow_essence", "quantity": 2, "chance": 0.8 },
+      { "itemId": "soul_reaper", "quantity": 1, "chance": 0.03 },
+      { "itemId": "gods_blessing", "quantity": 1, "chance": 0.15 }
+    ]
+  },
+  "demon_knight": {
+    "id": "demon_knight",
+    "name": "Kỵ Sĩ Ác Quỷ",
+    "hp": 600,
+    "attack": 75,
+    "defense": 50,
+    "xpDrop": 300,
+    "type": "demon",
+    "specialAbility": "dark_aura",
+    "drops": [
+      { "itemId": "gold_coin", "quantity": 250, "chance": 1.0 },
+      { "itemId": "demon_horn", "quantity": 1, "chance": 0.5 },
+      { "itemId": "demon_plate", "quantity": 1, "chance": 0.08 },
+      { "itemId": "elixir_of_life", "quantity": 1, "chance": 0.3 }
+    ]
+  },
+
+  "_comment": "=== MINI-BOSSES (Lv10-20) ===",
+  "goblin_king": {
+    "id": "goblin_king",
+    "name": "Vua Yêu Tinh",
+    "hp": 400,
+    "attack": 70,
+    "defense": 40,
+    "xpDrop": 400,
+    "type": "boss",
+    "specialAbility": "summon_minions",
+    "drops": [
+      { "itemId": "gold_coin", "quantity": 300, "chance": 1.0 },
+      { "itemId": "steel_sword", "quantity": 1, "chance": 0.6 },
+      { "itemId": "chainmail", "quantity": 1, "chance": 0.5 },
+      { "itemId": "experience_gem", "quantity": 2, "chance": 0.8 },
+      { "itemId": "lucky_charm", "quantity": 1, "chance": 0.4 }
+    ]
+  },
+  "orc_chieftain": {
+    "id": "orc_chieftain",
+    "name": "Tộc Trưởng Orc",
+    "hp": 600,
+    "attack": 80,
+    "defense": 50,
+    "xpDrop": 500,
+    "type": "boss",
+    "specialAbility": "berserker_rage",
+    "drops": [
+      { "itemId": "gold_coin", "quantity": 400, "chance": 1.0 },
+      { "itemId": "mithril_sword", "quantity": 1, "chance": 0.4 },
+      { "itemId": "mithril_chainmail", "quantity": 1, "chance": 0.3 },
+      { "itemId": "revival_stone", "quantity": 1, "chance": 0.3 },
+      { "itemId": "greater_experience_gem", "quantity": 2, "chance": 0.9 }
+    ]
+  },
+  "lich": {
+    "id": "lich",
+    "name": "Lich Tà Ác",
+    "hp": 700,
+    "attack": 85,
+    "defense": 45,
+    "xpDrop": 600,
+    "type": "boss",
+    "specialAbility": "death_magic",
+    "drops": [
+      { "itemId": "gold_coin", "quantity": 500, "chance": 1.0 },
+      { "itemId": "shadow_blade", "quantity": 1, "chance": 0.5 },
+      { "itemId": "enchanted_robe", "quantity": 1, "chance": 0.4 },
+      { "itemId": "master_experience_gem", "quantity": 1, "chance": 0.7 },
+      { "itemId": "phoenix_down", "quantity": 1, "chance": 0.2 }
+    ]
+  },
+  "hydra": {
+    "id": "hydra",
+    "name": "Hydra Đầu Rắn",
+    "hp": 800,
+    "attack": 90,
+    "defense": 55,
+    "xpDrop": 700,
+    "type": "boss",
+    "specialAbility": "multi_head_attack",
+    "drops": [
+      { "itemId": "gold_coin", "quantity": 600, "chance": 1.0 },
+      { "itemId": "dragon_blade", "quantity": 1, "chance": 0.3 },
+      { "itemId": "dragon_scale_armor", "quantity": 1, "chance": 0.25 },
+      { "itemId": "dragon_scale", "quantity": 5, "chance": 1.0 },
+      { "itemId": "treasure_map", "quantity": 1, "chance": 0.4 }
+    ]
+  },
+
+  "_comment": "=== WORLD BOSSES (Lv20+) ===",
+  "ancient_dragon": {
+    "id": "ancient_dragon",
+    "name": "Rồng Cổ Đại",
+    "hp": 1500,
+    "attack": 120,
+    "defense": 60,
+    "xpDrop": 1000,
+    "type": "world_boss",
+    "specialAbility": "devastation",
+    "cooldown": 24,
+    "drops": [
+      { "itemId": "gold_coin", "quantity": 1000, "chance": 1.0 },
+      { "itemId": "dragon_blade", "quantity": 1, "chance": 0.8 },
+      { "itemId": "dragon_scale_armor", "quantity": 1, "chance": 0.7 },
+      { "itemId": "dragon_scale", "quantity": 10, "chance": 1.0 },
+      { "itemId": "master_experience_gem", "quantity": 3, "chance": 1.0 },
+      { "itemId": "phoenix_down", "quantity": 2, "chance": 0.6 }
+    ]
+  },
+  "demon_lord": {
+    "id": "demon_lord",
+    "name": "Ma Vương",
+    "hp": 2000,
+    "attack": 140,
+    "defense": 70,
+    "xpDrop": 1200,
+    "type": "world_boss",
+    "specialAbility": "hell_fire",
+    "cooldown": 24,
+    "drops": [
+      { "itemId": "gold_coin", "quantity": 1500, "chance": 1.0 },
+      { "itemId": "soul_reaper", "quantity": 1, "chance": 0.6 },
+      { "itemId": "demon_plate", "quantity": 1, "chance": 0.5 },
+      { "itemId": "demon_horn", "quantity": 5, "chance": 1.0 },
+      { "itemId": "phoenix_down", "quantity": 3, "chance": 0.8 },
+      { "itemId": "key_of_mysteries", "quantity": 1, "chance": 0.7 }
+    ]
+  },
+  "celestial_guardian": {
+    "id": "celestial_guardian",
+    "name": "Thiên Thần Hộ Pháp",
+    "hp": 2500,
+    "attack": 100,
+    "defense": 90,
+    "xpDrop": 1500,
+    "type": "world_boss",
+    "specialAbility": "divine_protection",
+    "cooldown": 24,
+    "drops": [
+      { "itemId": "gold_coin", "quantity": 2000, "chance": 1.0 },
+      { "itemId": "excalibur", "quantity": 1, "chance": 0.3 },
+      { "itemId": "celestial_armor", "quantity": 1, "chance": 0.4 },
+      { "itemId": "phoenix_feather", "quantity": 3, "chance": 1.0 },
+      { "itemId": "gods_blessing", "quantity": 2, "chance": 1.0 },
+      { "itemId": "elixir_of_life", "quantity": 3, "chance": 0.9 }
+    ]
+  },
+
+  "_comment": "=== RARE ENCOUNTERS ===",
+  "mimic": {
+    "id": "mimic",
+    "name": "Rương Giả",
+    "hp": 300,
+    "attack": 80,
+    "defense": 60,
+    "xpDrop": 200,
+    "type": "special",
+    "specialAbility": "treasure_burst",
+    "drops": [
+      { "itemId": "gold_coin", "quantity": 500, "chance": 1.0 },
+      { "itemId": "treasure_map", "quantity": 1, "chance": 0.8 },
+      { "itemId": "golden_horseshoe", "quantity": 1, "chance": 0.5 },
+      { "itemId": "master_experience_gem", "quantity": 1, "chance": 0.6 }
+    ]
+  },
+  "crystal_golem": {
+    "id": "crystal_golem",
+    "name": "Golem Pha Lê",
+    "hp": 800,
+    "attack": 60,
+    "defense": 80,
+    "xpDrop": 400,
+    "type": "special",
+    "specialAbility": "crystal_barrier",
+    "drops": [
+      { "itemId": "gold_coin", "quantity": 300, "chance": 1.0 },
+      { "itemId": "magic_crystal", "quantity": 5, "chance": 1.0 },
+      { "itemId": "mithril_ore", "quantity": 3, "chance": 0.8 },
+      { "itemId": "elixir_of_life", "quantity": 1, "chance": 0.4 }
+    ]
+  },
+  "phoenix": {
+    "id": "phoenix",
+    "name": "Phượng Hoàng",
+    "hp": 1000,
+    "attack": 110,
+    "defense": 50,
+    "xpDrop": 800,
+    "type": "special",
+    "specialAbility": "rebirth",
+    "drops": [
+      { "itemId": "gold_coin", "quantity": 800, "chance": 1.0 },
+      { "itemId": "phoenix_feather", "quantity": 2, "chance": 1.0 },
+      { "itemId": "phoenix_down", "quantity": 1, "chance": 0.8 },
+      { "itemId": "excalibur", "quantity": 1, "chance": 0.1 }
+    ]
+  }
+}

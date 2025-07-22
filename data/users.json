@@ -1,12 +1,44 @@
 {
   "4548471c": {
     "userId": "4548471c",
-    "money": 1219,
+    "money": 1224,
     "joinDate": "2025-07-22T04:35:38.825Z",
-    "lastActive": "2025-07-22T06:57:25.840Z",
-    "commandCount": 37,
+    "lastActive": "2025-07-22T09:54:49.638Z",
+    "commandCount": 67,
     "lastDaily": "2025-07-22T04:35:38.826Z",
     "dailyStreak": 1,
     "role": 1
+  },
+  "test_user_123": {
+    "userId": "test_user_123",
+    "money": 1000,
+    "joinDate": "2025-07-22T09:10:41.666Z",
+    "lastActive": "2025-07-22T09:12:20.727Z",
+    "commandCount": 6,
+    "role": 0
+  },
+  "test123": {
+    "userId": "test123",
+    "money": 1000,
+    "joinDate": "2025-07-22T09:12:24.647Z",
+    "lastActive": "2025-07-22T09:12:24.648Z",
+    "commandCount": 1,
+    "role": 0
+  },
+  "test456": {
+    "userId": "test456",
+    "money": 1000,
+    "joinDate": "2025-07-22T09:13:26.016Z",
+    "lastActive": "2025-07-22T09:13:26.017Z",
+    "commandCount": 1,
+    "role": 0
+  },
+  "test789": {
+    "userId": "test789",
+    "money": 1000,
+    "joinDate": "2025-07-22T09:14:01.648Z",
+    "lastActive": "2025-07-22T09:14:14.452Z",
+    "commandCount": 3,
+    "role": 0
   }
 }

@@ -1,0 +1,362 @@
+{
+  "_comment": "=== BEGINNER AREAS (Lv1-5) ===",
+  "grassy_field": {
+    "id": "grassy_field",
+    "name": "Đồng Cỏ Xanh",
+    "description": "Một cánh đồng cỏ yên bình, nơi lý tưởng cho những người mới bắt đầu hành trình.",
+    "requiredLevel": 1,
+    "type": "safe",
+    "monsterIds": ["slime", "rat"],
+    "bossOnly": false
+  },
+  "goblin_village": {
+    "id": "goblin_village",
+    "name": "Làng Yêu Tinh",
+    "description": "Một ngôi làng nhỏ bị yêu tinh chiếm đóng, cần được giải phóng.",
+    "requiredLevel": 2,
+    "type": "normal",
+    "monsterIds": ["goblin", "slime"],
+    "bossOnly": false
+  },
+  "abandoned_farm": {
+    "id": "abandoned_farm",
+    "name": "Nông Trại Bỏ Hoang",
+    "description": "Một trang trại cũ đã bị bỏ hoang, giờ là nơi trú ẩn của các sinh vật nhỏ.",
+    "requiredLevel": 3,
+    "type": "normal",
+    "monsterIds": ["rat", "wild_boar", "kobold"],
+    "bossOnly": false
+  },
+  "kobold_caves": {
+    "id": "kobold_caves",
+    "name": "Hang Động Kobold",
+    "description": "Những hang động tối tăm nơi bộ tộc Kobold sinh sống.",
+    "requiredLevel": 4,
+    "type": "normal",
+    "monsterIds": ["kobold", "giant_spider"],
+    "bossOnly": false
+  },
+  "forest_outskirts": {
+    "id": "forest_outskirts",
+    "name": "Rìa Rừng",
+    "description": "Vùng đất biên giới giữa thế giới văn minh và hoang dã.",
+    "requiredLevel": 5,
+    "type": "normal",
+    "monsterIds": ["dire_wolf", "wild_boar", "kobold"],
+    "bossOnly": false
+  },
+
+  "_comment": "=== INTERMEDIATE AREAS (Lv6-12) ===",
+  "dark_forest": {
+    "id": "dark_forest",
+    "name": "Rừng Tối",
+    "description": "Một khu rừng u ám nơi ánh sáng mặt trời khó có thể xuyên qua.",
+    "requiredLevel": 6,
+    "type": "dangerous",
+    "monsterIds": ["orc", "giant_spider", "dire_wolf"],
+    "bossOnly": false
+  },
+  "spider_nest": {
+    "id": "spider_nest",
+    "name": "Tổ Nhện Khổng Lồ",
+    "description": "Một mạng lưới tơ nhện khổng lồ nơi những con nhện dev thống trị.",
+    "requiredLevel": 7,
+    "type": "dangerous",
+    "monsterIds": ["giant_spider", "harpy"],
+    "bossOnly": false
+  },
+  "orc_stronghold": {
+    "id": "orc_stronghold",
+    "name": "Pháo Đài Orc",
+    "description": "Thành trì kiên cố của bộ tộc Orc, được bảo vệ nghiêm mật.",
+    "requiredLevel": 8,
+    "type": "dangerous",
+    "monsterIds": ["orc", "cave_troll"],
+    "bossOnly": false
+  },
+  "troll_bridge": {
+    "id": "troll_bridge",
+    "name": "Cầu Troll",
+    "description": "Một cây cầu cổ xưa được canh gác bởi những con Troll hung dữ.",
+    "requiredLevel": 9,
+    "type": "dangerous",
+    "monsterIds": ["cave_troll", "orc"],
+    "bossOnly": false
+  },
+  "haunted_mansion": {
+    "id": "haunted_mansion",
+    "name": "Biệt Thự Ma Ám",
+    "description": "Một tòa biệt thự cổ kính nơi những linh hồn bất an lang thang.",
+    "requiredLevel": 10,
+    "type": "dangerous",
+    "monsterIds": ["skeleton", "zombie", "wraith"],
+    "bossOnly": false
+  },
+  "windmill_ruins": {
+    "id": "windmill_ruins",
+    "name": "Tàn Tích Cối Xay Gió",
+    "description": "Những tàn tích của cối xay gió cổ, giờ là nơi ở của những sinh vật bay.",
+    "requiredLevel": 11,
+    "type": "dangerous",
+    "monsterIds": ["harpy", "bat"],
+    "bossOnly": false
+  },
+
+  "_comment": "=== ADVANCED AREAS (Lv12-20) ===",
+  "cursed_cemetery": {
+    "id": "cursed_cemetery",
+    "name": "Nghĩa Địa Nguyền Rủa",
+    "description": "Một nghĩa địa cổ xưa nơi những xác chết không thể yên nghỉ.",
+    "requiredLevel": 12,
+    "type": "extreme",
+    "monsterIds": ["skeleton", "zombie", "wraith", "banshee"],
+    "bossOnly": false
+  },
+  "elemental_plains": {
+    "id": "elemental_plains",
+    "name": "Đồng Bằng Nguyên Tố",
+    "description": "Vùng đất nơi các nguyên tố tự nhiên tập trung và xung đột.",
+    "requiredLevel": 13,
+    "type": "extreme",
+    "monsterIds": ["fire_elemental", "ice_elemental", "earth_elemental"],
+    "bossOnly": false
+  },
+  "storm_peaks": {
+    "id": "storm_peaks",
+    "name": "Đỉnh Núi Giông Bão",
+    "description": "Những đỉnh núi cao chọc trời, nơi giông bão không bao giờ ngừng.",
+    "requiredLevel": 14,
+    "type": "extreme",
+    "monsterIds": ["storm_elemental", "harpy"],
+    "bossOnly": false
+  },
+  "crystal_caverns": {
+    "id": "crystal_caverns",
+    "name": "Hang Động Pha Lê",
+    "description": "Những hang động lấp lánh với pha lê ma thuật quý giá.",
+    "requiredLevel": 15,
+    "type": "extreme",
+    "monsterIds": ["crystal_golem", "earth_elemental"],
+    "bossOnly": false
+  },
+  "dragon_valley": {
+    "id": "dragon_valley",
+    "name": "Thung Lũng Rồng",
+    "description": "Một thung lũng hẻo lánh nơi những con rồng trẻ sinh sống.",
+    "requiredLevel": 16,
+    "type": "extreme",
+    "monsterIds": ["dragon_whelp", "wyvern"],
+    "bossOnly": false
+  },
+  "shadow_realm": {
+    "id": "shadow_realm",
+    "name": "Cõi Bóng Tối",
+    "description": "Một thế giới song song nơi bóng tối và ánh sáng giao thoa.",
+    "requiredLevel": 17,
+    "type": "extreme",
+    "monsterIds": ["wraith", "banshee", "imp"],
+    "bossOnly": false
+  },
+  "volcanic_crater": {
+    "id": "volcanic_crater",
+    "name": "Miệng Núi Lửa",
+    "description": "Miệng của một núi lửa đang hoạt động, nơi lửa và nham thạch bốc lên.",
+    "requiredLevel": 18,
+    "type": "extreme",
+    "monsterIds": ["fire_elemental", "drake"],
+    "bossOnly": false
+  },
+
+  "_comment": "=== BOSS AREAS ===",
+  "goblin_throne_room": {
+    "id": "goblin_throne_room",
+    "name": "Phòng Ngai Vàng Yêu Tinh",
+    "description": "Nơi Vua Yêu Tinh ngự trị, được bảo vệ bởi vệ binh tinh nhuệ.",
+    "requiredLevel": 10,
+    "type": "boss_area",
+    "monsterIds": ["goblin_king"],
+    "bossOnly": true,
+    "cooldown": 6
+  },
+  "orc_war_camp": {
+    "id": "orc_war_camp",
+    "name": "Trại Chiến Orc",
+    "description": "Trại chỉ huy của Tộc Trưởng Orc, nơi kế hoạch chiến tranh được vạch ra.",
+    "requiredLevel": 12,
+    "type": "boss_area", 
+    "monsterIds": ["orc_chieftain"],
+    "bossOnly": true,
+    "cooldown": 8
+  },
+  "lich_tower": {
+    "id": "lich_tower",
+    "name": "Tháp Lich",
+    "description": "Một tháp cao chọc trời nơi Lich tà ác nghiên cứu ma thuật đen.",
+    "requiredLevel": 15,
+    "type": "boss_area",
+    "monsterIds": ["lich"],
+    "bossOnly": true,
+    "cooldown": 12
+  },
+  "hydra_swamp": {
+    "id": "hydra_swamp",
+    "name": "Đầm Lầy Hydra",
+    "description": "Một đầm lầy độc hại nơi Hydra đa đầu ẩn náu và săn mồi.",
+    "requiredLevel": 18,
+    "type": "boss_area",
+    "monsterIds": ["hydra"],
+    "bossOnly": true,
+    "cooldown": 16
+  },
+
+  "_comment": "=== WORLD BOSS AREAS ===",
+  "ancient_dragons_lair": {
+    "id": "ancient_dragons_lair",
+    "name": "Hang Ổ Rồng Cổ Đại",
+    "description": "Hang ổ của Rồng Cổ Đại, nơi hàng núi kho báu được tích trữ.",
+    "requiredLevel": 20,
+    "type": "world_boss_area",
+    "monsterIds": ["ancient_dragon"],
+    "bossOnly": true,
+    "cooldown": 24
+  },
+  "demon_citadel": {
+    "id": "demon_citadel",
+    "name": "Thành Trì Ác Quỷ",
+    "description": "Pháo đài hùng vĩ của Ma Vương, cổng dẫn đến địa ngục.",
+    "requiredLevel": 25,
+    "type": "world_boss_area",
+    "monsterIds": ["demon_lord"],
+    "bossOnly": true,
+    "cooldown": 24
+  },
+  "celestial_sanctuary": {
+    "id": "celestial_sanctuary",
+    "name": "Thánh Địa Thiên Thần",
+    "description": "Một thánh địa thiêng liêng nơi Thiên Thần Hộ Pháp ngự trị.",
+    "requiredLevel": 30,
+    "type": "world_boss_area",
+    "monsterIds": ["celestial_guardian"],
+    "bossOnly": true,
+    "cooldown": 24
+  },
+
+  "_comment": "=== SPECIAL AREAS ===",
+  "treasure_vault": {
+    "id": "treasure_vault",
+    "name": "Hầm Kho Báu",
+    "description": "Một hầm kho báu bí mật, nhưng hãy cẩn thận với những cái bẫy giả.",
+    "requiredLevel": 12,
+    "type": "random",
+    "monsterIds": ["mimic"],
+    "bossOnly": false,
+    "randomRewards": true
+  },
+  "crystal_mine": {
+    "id": "crystal_mine",
+    "name": "Mỏ Pha Lê",
+    "description": "Một mỏ pha lê cổ xưa, nơi có thể tìm thấy những viên pha lê quý giá.",
+    "requiredLevel": 15,
+    "type": "random",
+    "monsterIds": ["crystal_golem"],
+    "bossOnly": false,
+    "randomRewards": true
+  },
+  "phoenix_nest": {
+    "id": "phoenix_nest",
+    "name": "Tổ Phượng Hoàng",
+    "description": "Tổ của huyền điểu Phượng Hoàng, nơi sự tái sinh là vô tận.",
+    "requiredLevel": 20,
+    "type": "legendary",
+    "monsterIds": ["phoenix"],
+    "bossOnly": true,
+    "cooldown": 48,
+    "dailyEntry": true
+  },
+  "void_dimension": {
+    "id": "void_dimension",
+    "name": "Không Gian Hư Vô",
+    "description": "Một chiều không gian bí ẩn nơi thời gian và không gian bị bóp méo.",
+    "requiredLevel": 25,
+    "type": "legendary",
+    "monsterIds": ["wraith", "banshee", "demon_knight"],
+    "bossOnly": false,
+    "dailyEntry": true
+  },
+
+  "_comment": "=== TRAINING AREAS ===",
+  "training_grounds": {
+    "id": "training_grounds",
+    "name": "Sân Tập Luyện",
+    "description": "Nơi các chiến binh mới luyện tập kỹ năng chiến đấu cơ bản.",
+    "requiredLevel": 1,
+    "type": "safe",
+    "monsterIds": ["slime"],
+    "bossOnly": false,
+    "trainingOnly": true
+  },
+  "combat_arena": {
+    "id": "combat_arena",
+    "name": "Đấu Trường Chiến Đấu",
+    "description": "Một đấu trường nơi các chiến binh giàu kinh nghiệm thử thách bản thân.",
+    "requiredLevel": 10,
+    "type": "dangerous",
+    "monsterIds": ["orc", "cave_troll"],
+    "bossOnly": false,
+    "trainingOnly": true
+  },
+  "masters_dojo": {
+    "id": "masters_dojo",
+    "name": "Võ Đường Bậc Thầy",
+    "description": "Võ đường của các bậc thầy, nơi chỉ những chiến binh tinh nhuệ mới có thể tồn tại.",
+    "requiredLevel": 20,
+    "type": "extreme",
+    "monsterIds": ["demon_knight", "drake"],
+    "bossOnly": false,
+    "trainingOnly": true
+  },
+
+  "_comment": "=== EXPLORATION AREAS ===",
+  "mysterious_ruins": {
+    "id": "mysterious_ruins",
+    "name": "Tàn Tích Bí Ẩn",
+    "description": "Những tàn tích cổ xưa chứa đựng nhiều bí mật chưa được khám phá.",
+    "requiredLevel": 14,
+    "type": "extreme",
+    "monsterIds": ["skeleton", "wraith", "crystal_golem"],
+    "bossOnly": false,
+    "randomRewards": true
+  },
+  "forbidden_library": {
+    "id": "forbidden_library",
+    "name": "Thư Viện Cấm",
+    "description": "Một thư viện cổ xưa chứa những kiến thức bị cấm đoán.",
+    "requiredLevel": 16,
+    "type": "extreme",
+    "monsterIds": ["lich", "banshee", "imp"],
+    "bossOnly": false,
+    "dailyEntry": true
+  },
+  "dimensional_rift": {
+    "id": "dimensional_rift",
+    "name": "Vết Nứt Chiều Không",
+    "description": "Một vết nứt trong không gian dẫn đến những thế giới song song kỳ lạ.",
+    "requiredLevel": 22,
+    "type": "legendary",
+    "monsterIds": ["storm_elemental", "succubus", "phoenix"],
+    "bossOnly": false,
+    "cooldown": 12,
+    "groupRequired": true
+  },
+  "time_vortex": {
+    "id": "time_vortex",
+    "name": "Xoáy Thời Gian",
+    "description": "Một xoáy thời gian bí ẩn nơi quá khứ và tương lai gặp nhau.",
+    "requiredLevel": 28,
+    "type": "legendary",
+    "monsterIds": ["celestial_guardian", "ancient_dragon", "demon_lord"],
+    "bossOnly": false,
+    "cooldown": 24,
+    "groupRequired": true
+  }
+}

@@ -1,0 +1,374 @@
+{
+  "4548471c": {
+    "userId": "4548471c",
+    "level": 1,
+    "xp": 9,
+    "maxHp": 100,
+    "hp": 98,
+    "maxMp": 50,
+    "mp": 50,
+    "baseAttack": 10,
+    "baseDefense": 5,
+    "inventory": [
+      {
+        "itemId": "slime_gel",
+        "quantity": 1
+      }
+    ],
+    "equipment": {
+      "weapon": null,
+      "armor": null
+    },
+    "buffs": [],
+    "combatState": {
+      "inCombat": false,
+      "monsterId": null,
+      "monsterHp": 0,
+      "mapId": null
+    },
+    "cooldowns": {},
+    "dailyQuests": {
+      "lastReset": "Tue Jul 22 2025",
+      "completed": [],
+      "available": [
+        {
+          "id": "collect_items",
+          "type": "loot",
+          "count": 10,
+          "reward": {
+            "xp": 60,
+            "gold": 35
+          },
+          "description": "Thu thập 10 vật phẩm bất kỳ",
+          "progress": 2,
+          "completed": false
+        },
+        {
+          "id": "visit_maps",
+          "type": "explore",
+          "count": 3,
+          "reward": {
+            "xp": 75,
+            "gold": 40
+          },
+          "description": "Khám phá 3 bản đồ khác nhau",
+          "progress": 1,
+          "completed": false
+        },
+        {
+          "id": "kill_goblins",
+          "type": "kill",
+          "target": "goblin",
+          "count": 3,
+          "reward": {
+            "xp": 50,
+            "gold": 30
+          },
+          "description": "Tiêu diệt 3 Yêu Tinh Xanh",
+          "progress": 0,
+          "completed": false
+        }
+      ]
+    },
+    "statistics": {
+      "monstersKilled": 1,
+      "bossesKilled": 0,
+      "itemsFound": 2,
+      "questsCompleted": 0
+    }
+  },
+  "test_user_123": {
+    "userId": "test_user_123",
+    "level": 1,
+    "xp": 0,
+    "maxHp": 100,
+    "hp": 100,
+    "maxMp": 50,
+    "mp": 50,
+    "baseAttack": 10,
+    "baseDefense": 5,
+    "inventory": [],
+    "equipment": {
+      "weapon": null,
+      "armor": null
+    },
+    "buffs": [],
+    "combatState": {
+      "inCombat": false,
+      "monsterId": null,
+      "monsterHp": 0,
+      "mapId": null
+    },
+    "cooldowns": {},
+    "dailyQuests": {
+      "lastReset": "Tue Jul 22 2025",
+      "completed": [],
+      "available": [
+        {
+          "id": "visit_maps",
+          "type": "explore",
+          "count": 3,
+          "reward": {
+            "xp": 75,
+            "gold": 40
+          },
+          "description": "Khám phá 3 bản đồ khác nhau",
+          "progress": 0,
+          "completed": false
+        },
+        {
+          "id": "kill_goblins",
+          "type": "kill",
+          "target": "goblin",
+          "count": 3,
+          "reward": {
+            "xp": 50,
+            "gold": 30
+          },
+          "description": "Tiêu diệt 3 Yêu Tinh Xanh",
+          "progress": 0,
+          "completed": false
+        },
+        {
+          "id": "collect_items",
+          "type": "loot",
+          "count": 10,
+          "reward": {
+            "xp": 60,
+            "gold": 35
+          },
+          "description": "Thu thập 10 vật phẩm bất kỳ",
+          "progress": 0,
+          "completed": false
+        }
+      ]
+    },
+    "statistics": {
+      "monstersKilled": 0,
+      "bossesKilled": 0,
+      "itemsFound": 0,
+      "questsCompleted": 0
+    }
+  },
+  "test123": {
+    "userId": "test123",
+    "level": 1,
+    "xp": 0,
+    "maxHp": 100,
+    "hp": 100,
+    "maxMp": 50,
+    "mp": 50,
+    "baseAttack": 10,
+    "baseDefense": 5,
+    "inventory": [],
+    "equipment": {
+      "weapon": null,
+      "armor": null
+    },
+    "buffs": [],
+    "combatState": {
+      "inCombat": false,
+      "monsterId": null,
+      "monsterHp": 0,
+      "mapId": null
+    },
+    "cooldowns": {},
+    "dailyQuests": {
+      "lastReset": "Tue Jul 22 2025",
+      "completed": [],
+      "available": [
+        {
+          "id": "kill_monsters",
+          "type": "kill",
+          "target": "any",
+          "count": 5,
+          "reward": {
+            "xp": 100,
+            "gold": 50
+          },
+          "description": "Tiêu diệt 5 quái vật bất kỳ",
+          "progress": 0,
+          "completed": false
+        },
+        {
+          "id": "kill_goblins",
+          "type": "kill",
+          "target": "goblin",
+          "count": 3,
+          "reward": {
+            "xp": 50,
+            "gold": 30
+          },
+          "description": "Tiêu diệt 3 Yêu Tinh Xanh",
+          "progress": 0,
+          "completed": false
+        },
+        {
+          "id": "visit_maps",
+          "type": "explore",
+          "count": 3,
+          "reward": {
+            "xp": 75,
+            "gold": 40
+          },
+          "description": "Khám phá 3 bản đồ khác nhau",
+          "progress": 0,
+          "completed": false
+        }
+      ]
+    },
+    "statistics": {
+      "monstersKilled": 0,
+      "bossesKilled": 0,
+      "itemsFound": 0,
+      "questsCompleted": 0
+    }
+  },
+  "test456": {
+    "userId": "test456",
+    "level": 1,
+    "xp": 0,
+    "maxHp": 100,
+    "hp": 100,
+    "maxMp": 50,
+    "mp": 50,
+    "baseAttack": 10,
+    "baseDefense": 5,
+    "inventory": [],
+    "equipment": {
+      "weapon": null,
+      "armor": null
+    },
+    "buffs": [],
+    "combatState": {
+      "inCombat": false,
+      "monsterId": null,
+      "monsterHp": 0,
+      "mapId": null
+    },
+    "cooldowns": {},
+    "dailyQuests": {
+      "lastReset": "Tue Jul 22 2025",
+      "completed": [],
+      "available": [
+        {
+          "id": "kill_goblins",
+          "type": "kill",
+          "target": "goblin",
+          "count": 3,
+          "reward": {
+            "xp": 50,
+            "gold": 30
+          },
+          "description": "Tiêu diệt 3 Yêu Tinh Xanh",
+          "progress": 0,
+          "completed": false
+        },
+        {
+          "id": "collect_items",
+          "type": "loot",
+          "count": 10,
+          "reward": {
+            "xp": 60,
+            "gold": 35
+          },
+          "description": "Thu thập 10 vật phẩm bất kỳ",
+          "progress": 0,
+          "completed": false
+        },
+        {
+          "id": "kill_monsters",
+          "type": "kill",
+          "target": "any",
+          "count": 5,
+          "reward": {
+            "xp": 100,
+            "gold": 50
+          },
+          "description": "Tiêu diệt 5 quái vật bất kỳ",
+          "progress": 0,
+          "completed": false
+        }
+      ]
+    },
+    "statistics": {
+      "monstersKilled": 0,
+      "bossesKilled": 0,
+      "itemsFound": 0,
+      "questsCompleted": 0
+    }
+  },
+  "test789": {
+    "userId": "test789",
+    "level": 1,
+    "xp": 0,
+    "maxHp": 100,
+    "hp": 100,
+    "maxMp": 50,
+    "mp": 50,
+    "baseAttack": 10,
+    "baseDefense": 5,
+    "inventory": [],
+    "equipment": {
+      "weapon": null,
+      "armor": null
+    },
+    "buffs": [],
+    "combatState": {
+      "inCombat": false,
+      "monsterId": null,
+      "monsterHp": 0,
+      "mapId": null
+    },
+    "cooldowns": {},
+    "dailyQuests": {
+      "lastReset": "Tue Jul 22 2025",
+      "completed": [],
+      "available": [
+        {
+          "id": "collect_items",
+          "type": "loot",
+          "count": 10,
+          "reward": {
+            "xp": 60,
+            "gold": 35
+          },
+          "description": "Thu thập 10 vật phẩm bất kỳ",
+          "progress": 0,
+          "completed": false
+        },
+        {
+          "id": "visit_maps",
+          "type": "explore",
+          "count": 3,
+          "reward": {
+            "xp": 75,
+            "gold": 40
+          },
+          "description": "Khám phá 3 bản đồ khác nhau",
+          "progress": 0,
+          "completed": false
+        },
+        {
+          "id": "kill_goblins",
+          "type": "kill",
+          "target": "goblin",
+          "count": 3,
+          "reward": {
+            "xp": 50,
+            "gold": 30
+          },
+          "description": "Tiêu diệt 3 Yêu Tinh Xanh",
+          "progress": 0,
+          "completed": false
+        }
+      ]
+    },
+    "statistics": {
+      "monstersKilled": 0,
+      "bossesKilled": 0,
+      "itemsFound": 0,
+      "questsCompleted": 0
+    }
+  }
+}

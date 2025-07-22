@@ -1,0 +1,640 @@
+{
+  "gold_coin": {
+    "id": "gold_coin",
+    "name": "Đồng Vàng",
+    "description": "Tiền tệ cơ bản trong thế giới.",
+    "type": "currency",
+    "sellPrice": 1
+  },
+
+  "_comment": "=== BASIC MATERIALS ===",
+  "goblin_ear": {
+    "id": "goblin_ear",
+    "name": "Tai Yêu Tinh",
+    "description": "Một chiến lợi phẩm, có thể bán để lấy tiền.",
+    "type": "material",
+    "sellPrice": 15
+  },
+  "slime_gel": {
+    "id": "slime_gel",
+    "name": "Gel Nhầy",
+    "description": "Nguyên liệu chế tạo cơ bản.",
+    "type": "material",
+    "sellPrice": 10
+  },
+  "orc_fang": {
+    "id": "orc_fang",
+    "name": "Nanh Orc",
+    "description": "Một chiếc nanh sắc nhọn, minh chứng cho lòng dũng cảm.",
+    "type": "material",
+    "sellPrice": 35
+  },
+  "spider_silk": {
+    "id": "spider_silk",
+    "name": "Tơ Nhện",
+    "description": "Sợi tơ bền chắc, dùng để chế tạo áo giáp nhẹ.",
+    "type": "material",
+    "sellPrice": 25
+  },
+  "wolf_pelt": {
+    "id": "wolf_pelt",
+    "name": "Da Sói",
+    "description": "Da sói dày và ấm, nguyên liệu tốt cho giáp da.",
+    "type": "material",
+    "sellPrice": 40
+  },
+  "bat_wing": {
+    "id": "bat_wing",
+    "name": "Cánh Dơi",
+    "description": "Cánh dơi ma thuật, có thể dùng để chế tạo thuốc bay.",
+    "type": "material",
+    "sellPrice": 30
+  },
+  "skeleton_bone": {
+    "id": "skeleton_bone",
+    "name": "Xương Bộ Xương",
+    "description": "Xương cứng như đá, nguyên liệu chế tạo vũ khí ma thuật.",
+    "type": "material",
+    "sellPrice": 45
+  },
+  "iron_ore": {
+    "id": "iron_ore",
+    "name": "Quặng Sắt",
+    "description": "Nguyên liệu cơ bản để chế tạo vũ khí sắt.",
+    "type": "material",
+    "sellPrice": 20
+  },
+  "mithril_ore": {
+    "id": "mithril_ore",
+    "name": "Quặng Mithril",
+    "description": "Quặng hiếm có khả năng tạo ra vũ khí và giáp siêu nhẹ.",
+    "type": "material",
+    "sellPrice": 100
+  },
+  "dragon_scale": {
+    "id": "dragon_scale",
+    "name": "Vảy Rồng",
+    "description": "Vảy rồng hiếm có, nguyên liệu chế tạo huyền thoại.",
+    "type": "material",
+    "sellPrice": 500,
+    "rarity": "legendary"
+  },
+  "magic_crystal": {
+    "id": "magic_crystal",
+    "name": "Pha Lê Ma Thuật",
+    "description": "Pha lê chứa năng lượng ma thuật thuần khiết.",
+    "type": "material", 
+    "sellPrice": 150
+  },
+  "ancient_scroll": {
+    "id": "ancient_scroll",
+    "name": "Cuộn Cổ Thư",
+    "description": "Cuộn giấy cổ xưa ghi chép các phép thuật bí ẩn.",
+    "type": "material",
+    "sellPrice": 200,
+    "rarity": "rare"
+  },
+  "shadow_essence": {
+    "id": "shadow_essence",
+    "name": "Tinh Hoa Bóng Tối",
+    "description": "Năng lượng đen tối nguyên chất từ những sinh vật ma quỷ.",
+    "type": "material",
+    "sellPrice": 300,
+    "rarity": "rare"
+  },
+  "phoenix_feather": {
+    "id": "phoenix_feather",
+    "name": "Lông Phượng Hoàng",
+    "description": "Lông của huyền điểu Phượng Hoàng, mang sức mạnh hồi sinh.",
+    "type": "material",
+    "sellPrice": 800,
+    "rarity": "legendary"
+  },
+  "demon_horn": {
+    "id": "demon_horn",
+    "name": "Sừng Ác Quỷ",
+    "description": "Sừng của ác quỷ mạnh mẽ, chứa đựng sức mạnh hắc ám.",
+    "type": "material",
+    "sellPrice": 600,
+    "rarity": "legendary"
+  },
+
+  "_comment": "=== BASIC WEAPONS (Lv1-10) ===",
+  "wooden_sword": {
+    "id": "wooden_sword",
+    "name": "Kiếm Gỗ",
+    "description": "Một thanh kiếm gỗ đơn giản cho người mới bắt đầu.",
+    "type": "weapon",
+    "attackBonus": 5,
+    "buyPrice": 100,
+    "sellPrice": 30,
+    "requiredLevel": 1
+  },
+  "rusty_dagger": {
+    "id": "rusty_dagger",
+    "name": "Dao Găm Gỉ",
+    "description": "Dao găm cũ kỹ nhưng vẫn có thể gây sát thương.",
+    "type": "weapon",
+    "attackBonus": 7,
+    "buyPrice": 150,
+    "sellPrice": 45,
+    "requiredLevel": 2
+  },
+  "iron_sword": {
+    "id": "iron_sword", 
+    "name": "Kiếm Sắt",
+    "description": "Kiếm sắt rèn chắc chắn, tăng sức mạnh đáng kể.",
+    "type": "weapon",
+    "attackBonus": 12,
+    "buyPrice": 300,
+    "sellPrice": 90,
+    "requiredLevel": 3
+  },
+  "bronze_axe": {
+    "id": "bronze_axe",
+    "name": "Rìu Đồng",
+    "description": "Rìu chiến đấu nặng nề nhưng sát thương cao.",
+    "type": "weapon",
+    "attackBonus": 15,
+    "buyPrice": 400,
+    "sellPrice": 120,
+    "requiredLevel": 4
+  },
+  "silver_rapier": {
+    "id": "silver_rapier",
+    "name": "Kiếm Thọc Bạc",
+    "description": "Kiếm thọc nhẹ nhàng và nhanh chóng, đặc biệt hiệu quả với undead.",
+    "type": "weapon",
+    "attackBonus": 18,
+    "buyPrice": 550,
+    "sellPrice": 165,
+    "requiredLevel": 5
+  },
+
+  "_comment": "=== MID-TIER WEAPONS (Lv6-15) ===",
+  "steel_sword": {
+    "id": "steel_sword",
+    "name": "Kiếm Thép",
+    "description": "Kiếm thép cao cấp với lưỡi sắc bén.",
+    "type": "weapon", 
+    "attackBonus": 20,
+    "buyPrice": 700,
+    "sellPrice": 210,
+    "requiredLevel": 6
+  },
+  "enchanted_staff": {
+    "id": "enchanted_staff",
+    "name": "Cây Gậy Phù Phép",
+    "description": "Cây gậy được phù phép, tăng sức mạnh ma thuật.",
+    "type": "weapon",
+    "attackBonus": 22,
+    "buyPrice": 800,
+    "sellPrice": 240,
+    "requiredLevel": 7
+  },
+  "flame_blade": {
+    "id": "flame_blade",
+    "name": "Kiếm Lửa",
+    "description": "Kiếm được rèn trong lửa địa ngục, luôn bốc cháy.",
+    "type": "weapon",
+    "attackBonus": 25,
+    "buyPrice": 950,
+    "sellPrice": 285,
+    "requiredLevel": 8
+  },
+  "mithril_sword": {
+    "id": "mithril_sword",
+    "name": "Kiếm Mithril",
+    "description": "Kiếm được rèn từ kim loại Mithril siêu nhẹ và sắc bén.",
+    "type": "weapon",
+    "attackBonus": 28,
+    "buyPrice": 1200,
+    "sellPrice": 360,
+    "requiredLevel": 9
+  },
+  "thunder_hammer": {
+    "id": "thunder_hammer",
+    "name": "Búa Sấm Sét",
+    "description": "Búa chiến được imbue với sức mạnh sấm sét.",
+    "type": "weapon",
+    "attackBonus": 30,
+    "buyPrice": 1400,
+    "sellPrice": 420,
+    "requiredLevel": 10
+  },
+  "shadow_blade": {
+    "id": "shadow_blade",
+    "name": "Kiếm Bóng Tối",
+    "description": "Kiếm được rèn từ kim loại ma thuật, có thể ẩn mình trong bóng tối.",
+    "type": "weapon",
+    "attackBonus": 32,
+    "buyPrice": 1600,
+    "sellPrice": 480,
+    "requiredLevel": 12
+  },
+
+  "_comment": "=== HIGH-TIER WEAPONS (Lv15+) ===",
+  "dragon_blade": {
+    "id": "dragon_blade",
+    "name": "Kiếm Rồng",
+    "description": "Kiếm huyền thoại được rèn từ vảy rồng, tỏa sức mạnh kinh hoàng.",
+    "type": "weapon",
+    "attackBonus": 35,
+    "buyPrice": 2000,
+    "sellPrice": 600,
+    "requiredLevel": 15,
+    "rarity": "legendary"
+  },
+  "soul_reaper": {
+    "id": "soul_reaper",
+    "name": "Lưỡi Liềm Thần Chết",
+    "description": "Vũ khí huyền thoại có thể thu hoạch linh hồn kẻ thù.",
+    "type": "weapon",
+    "attackBonus": 40,
+    "buyPrice": 2500,
+    "sellPrice": 750,
+    "requiredLevel": 18,
+    "rarity": "legendary"
+  },
+  "excalibur": {
+    "id": "excalibur",
+    "name": "Excalibur",
+    "description": "Kiếm thánh huyền thoại, chỉ có thể được sử dụng bởi những người xứng đáng.",
+    "type": "weapon",
+    "attackBonus": 45,
+    "buyPrice": 3000,
+    "sellPrice": 900,
+    "requiredLevel": 20,
+    "rarity": "legendary"
+  },
+
+  "_comment": "=== BASIC ARMOR (Lv1-10) ===",
+  "cloth_shirt": {
+    "id": "cloth_shirt",
+    "name": "Áo Vải",
+    "description": "Áo vải đơn giản, bảo vệ cơ bản.",
+    "type": "armor",
+    "defenseBonus": 3,
+    "hpBonus": 10,
+    "buyPrice": 80,
+    "sellPrice": 24,
+    "requiredLevel": 1
+  },
+  "leather_vest": {
+    "id": "leather_vest",
+    "name": "Áo Da",
+    "description": "Áo da mềm mại nhưng bền chắc.",
+    "type": "armor",
+    "defenseBonus": 5,
+    "hpBonus": 15,
+    "buyPrice": 120,
+    "sellPrice": 36,
+    "requiredLevel": 2
+  },
+  "leather_armor": {
+    "id": "leather_armor",
+    "name": "Giáp Da",
+    "description": "Bộ giáp da linh hoạt, cân bằng giữa bảo vệ và di chuyển.",
+    "type": "armor",
+    "defenseBonus": 8,
+    "hpBonus": 25,
+    "buyPrice": 250,
+    "sellPrice": 75,
+    "requiredLevel": 3
+  },
+  "studded_leather": {
+    "id": "studded_leather",
+    "name": "Giáp Da Đinh Tán",
+    "description": "Giáp da được gia cố bằng đinh tán kim loại.",
+    "type": "armor",
+    "defenseBonus": 10,
+    "hpBonus": 30,
+    "buyPrice": 350,
+    "sellPrice": 105,
+    "requiredLevel": 4
+  },
+  "ring_mail": {
+    "id": "ring_mail",
+    "name": "Áo Xích Vòng",
+    "description": "Áo giáp làm từ những vòng kim loại nhỏ liên kết với nhau.",
+    "type": "armor",
+    "defenseBonus": 12,
+    "hpBonus": 40,
+    "buyPrice": 450,
+    "sellPrice": 135,
+    "requiredLevel": 5
+  },
+
+  "_comment": "=== MID-TIER ARMOR (Lv6-15) ===",
+  "chainmail": {
+    "id": "chainmail",
+    "name": "Áo Xích",
+    "description": "Áo xích kim loại, bảo vệ tốt khỏi các cuộc tấn công.",
+    "type": "armor",
+    "defenseBonus": 15,
+    "hpBonus": 50,
+    "buyPrice": 600,
+    "sellPrice": 180,
+    "requiredLevel": 6
+  },
+  "scale_mail": {
+    "id": "scale_mail",
+    "name": "Giáp Vảy",
+    "description": "Giáp được làm từ các mảnh kim loại chồng lên nhau như vảy cá.",
+    "type": "armor",
+    "defenseBonus": 17,
+    "hpBonus": 60,
+    "buyPrice": 750,
+    "sellPrice": 225,
+    "requiredLevel": 7
+  },
+  "banded_mail": {
+    "id": "banded_mail",
+    "name": "Giáp Dải",
+    "description": "Giáp được gia cố bằng các dải kim loại chắc chắn.",
+    "type": "armor",
+    "defenseBonus": 18,
+    "hpBonus": 65,
+    "buyPrice": 850,
+    "sellPrice": 255,
+    "requiredLevel": 8
+  },
+  "mithril_chainmail": {
+    "id": "mithril_chainmail",
+    "name": "Áo Xích Mithril",
+    "description": "Áo xích làm từ Mithril, nhẹ nhưng cực kỳ bền.",
+    "type": "armor",
+    "defenseBonus": 20,
+    "hpBonus": 75,
+    "buyPrice": 1000,
+    "sellPrice": 300,
+    "requiredLevel": 9
+  },
+  "plate_mail": {
+    "id": "plate_mail",
+    "name": "Giáp Tấm",
+    "description": "Giáp kim loại nguyên khối, bảo vệ tối đa.",
+    "type": "armor",
+    "defenseBonus": 22,
+    "hpBonus": 85,
+    "buyPrice": 1200,
+    "sellPrice": 360,
+    "requiredLevel": 10
+  },
+  "enchanted_robe": {
+    "id": "enchanted_robe",
+    "name": "Áo Choàng Phép Thuật",
+    "description": "Áo choàng được phù phép, cung cấp bảo vệ ma thuật.",
+    "type": "armor",
+    "defenseBonus": 19,
+    "hpBonus": 70,
+    "buyPrice": 1100,
+    "sellPrice": 330,
+    "requiredLevel": 12
+  },
+
+  "_comment": "=== HIGH-TIER ARMOR (Lv15+) ===",
+  "dragon_scale_armor": {
+    "id": "dragon_scale_armor",
+    "name": "Giáp Vảy Rồng",
+    "description": "Giáp huyền thoại làm từ vảy rồng cổ đại.",
+    "type": "armor",
+    "defenseBonus": 25,
+    "hpBonus": 100,
+    "buyPrice": 1800,
+    "sellPrice": 540,
+    "requiredLevel": 15,
+    "rarity": "legendary"
+  },
+  "demon_plate": {
+    "id": "demon_plate",
+    "name": "Giáp Ác Quỷ",
+    "description": "Giáp được rèn từ kim loại địa ngục, cung cấp sức mạnh hắc ám.",
+    "type": "armor",
+    "defenseBonus": 28,
+    "hpBonus": 120,
+    "buyPrice": 2200,
+    "sellPrice": 660,
+    "requiredLevel": 18,
+    "rarity": "legendary"
+  },
+  "celestial_armor": {
+    "id": "celestial_armor",
+    "name": "Giáp Thiên Thần",
+    "description": "Giáp thánh thiêng được ban tặng bởi các thiên thần.",
+    "type": "armor",
+    "defenseBonus": 30,
+    "hpBonus": 150,
+    "buyPrice": 2500,
+    "sellPrice": 750,
+    "requiredLevel": 20,
+    "rarity": "legendary"
+  },
+
+  "_comment": "=== CONSUMABLES ===",
+  "health_potion": {
+    "id": "health_potion",
+    "name": "Thuốc Hồi Máu",
+    "description": "Hồi 50 HP ngay lập tức.",
+    "type": "consumable",
+    "healAmount": 50,
+    "buyPrice": 50,
+    "sellPrice": 15
+  },
+  "greater_health_potion": {
+    "id": "greater_health_potion",
+    "name": "Thuốc Hồi Máu Cao Cấp",
+    "description": "Hồi 100 HP ngay lập tức.",
+    "type": "consumable", 
+    "healAmount": 100,
+    "buyPrice": 90,
+    "sellPrice": 27
+  },
+  "super_health_potion": {
+    "id": "super_health_potion",
+    "name": "Thuốc Hồi Máu Siêu Cấp",
+    "description": "Hồi 200 HP ngay lập tức.",
+    "type": "consumable",
+    "healAmount": 200,
+    "buyPrice": 160,
+    "sellPrice": 48
+  },
+  "mana_potion": {
+    "id": "mana_potion", 
+    "name": "Thuốc Hồi MP",
+    "description": "Hồi 30 MP để sử dụng skills.",
+    "type": "consumable",
+    "manaAmount": 30,
+    "buyPrice": 40,
+    "sellPrice": 12
+  },
+  "greater_mana_potion": {
+    "id": "greater_mana_potion",
+    "name": "Thuốc Hồi MP Cao Cấp",
+    "description": "Hồi 60 MP để sử dụng skills mạnh.",
+    "type": "consumable",
+    "manaAmount": 60,
+    "buyPrice": 70,
+    "sellPrice": 21
+  },
+  "elixir_of_life": {
+    "id": "elixir_of_life",
+    "name": "Thuốc Trường Sinh",
+    "description": "Hồi đầy HP và MP ngay lập tức.",
+    "type": "consumable",
+    "healAmount": 9999,
+    "manaAmount": 9999,
+    "buyPrice": 500,
+    "sellPrice": 150
+  },
+
+  "_comment": "=== BUFF POTIONS ===",
+  "strength_buff": {
+    "id": "strength_buff",
+    "name": "Thuốc Tăng Lực",
+    "description": "Tăng 20% sát thương trong 5 lượt chiến đấu.",
+    "type": "consumable",
+    "buffType": "attack",
+    "buffAmount": 0.2,
+    "duration": 5,
+    "buyPrice": 100,
+    "sellPrice": 30
+  },
+  "defense_buff": {
+    "id": "defense_buff",
+    "name": "Thuốc Tăng Phòng Thủ", 
+    "description": "Tăng 30% phòng thủ trong 5 lượt chiến đấu.",
+    "type": "consumable",
+    "buffType": "defense",
+    "buffAmount": 0.3,
+    "duration": 5,
+    "buyPrice": 100,
+    "sellPrice": 30
+  },
+  "berserker_potion": {
+    "id": "berserker_potion",
+    "name": "Thuốc Cuồng Chiến",
+    "description": "Tăng 50% sát thương trong 3 lượt chiến đấu.",
+    "type": "consumable",
+    "buffType": "attack",
+    "buffAmount": 0.5,
+    "duration": 3,
+    "buyPrice": 200,
+    "sellPrice": 60
+  },
+  "iron_skin_potion": {
+    "id": "iron_skin_potion",
+    "name": "Thuốc Da Sắt",
+    "description": "Tăng 60% phòng thủ trong 3 lượt chiến đấu.",
+    "type": "consumable",
+    "buffType": "defense",
+    "buffAmount": 0.6,
+    "duration": 3,
+    "buyPrice": 200,
+    "sellPrice": 60
+  },
+  "gods_blessing": {
+    "id": "gods_blessing",
+    "name": "Phước Lành Thần Linh",
+    "description": "Tăng 100% may mắn trong 10 lượt chiến đấu.",
+    "type": "consumable",
+    "buffType": "luck",
+    "buffAmount": 1.0,
+    "duration": 10,
+    "buyPrice": 800,
+    "sellPrice": 240
+  },
+
+  "_comment": "=== SPECIAL ITEMS ===",
+  "teleport_scroll": {
+    "id": "teleport_scroll",
+    "name": "Cuộn Dịch Chuyển",
+    "description": "Dịch chuyển ngay lập tức về thành phố an toàn.",
+    "type": "special",
+    "buyPrice": 200,
+    "sellPrice": 60
+  },
+  "experience_gem": {
+    "id": "experience_gem",
+    "name": "Ngọc Kinh Nghiệm",
+    "description": "Tăng 100 XP ngay lập tức.",
+    "type": "special",
+    "xpBonus": 100,
+    "buyPrice": 300,
+    "sellPrice": 90
+  },
+  "greater_experience_gem": {
+    "id": "greater_experience_gem",
+    "name": "Ngọc Kinh Nghiệm Cao Cấp",
+    "description": "Tăng 250 XP ngay lập tức.",
+    "type": "special",
+    "xpBonus": 250,
+    "buyPrice": 600,
+    "sellPrice": 180
+  },
+  "master_experience_gem": {
+    "id": "master_experience_gem",
+    "name": "Ngọc Kinh Nghiệm Bậc Thầy",
+    "description": "Tăng 500 XP ngay lập tức.",
+    "type": "special",
+    "xpBonus": 500,
+    "buyPrice": 1000,
+    "sellPrice": 300
+  },
+  "lucky_charm": {
+    "id": "lucky_charm",
+    "name": "Bùa May Mắn",
+    "description": "Tăng 50% tỷ lệ rơi vật phẩm trong 10 lượt chiến đấu.",
+    "type": "special",
+    "buffType": "luck",
+    "buffAmount": 0.5,
+    "duration": 10,
+    "buyPrice": 500,
+    "sellPrice": 150
+  },
+  "golden_horseshoe": {
+    "id": "golden_horseshoe",
+    "name": "Móng Ngựa Vàng",
+    "description": "Tăng 100% tỷ lệ rơi vật phẩm trong 5 lượt chiến đấu.",
+    "type": "special",
+    "buffType": "luck",
+    "buffAmount": 1.0,
+    "duration": 5,
+    "buyPrice": 800,
+    "sellPrice": 240
+  },
+  "revival_stone": {
+    "id": "revival_stone",
+    "name": "Đá Hồi Sinh",
+    "description": "Tự động hồi sinh với 50% HP khi chết.",
+    "type": "special",
+    "revivePercent": 0.5,
+    "buyPrice": 800,
+    "sellPrice": 240
+  },
+  "phoenix_down": {
+    "id": "phoenix_down",
+    "name": "Lông Phượng Hoàng",
+    "description": "Hồi sinh với 100% HP khi chết, cực kỳ hiếm.",
+    "type": "special",
+    "revivePercent": 1.0,
+    "buyPrice": 2000,
+    "sellPrice": 600
+  },
+  "treasure_map": {
+    "id": "treasure_map",
+    "name": "Bản Đồ Kho Báu",
+    "description": "Dẫn đường đến một kho báu bí mật.",
+    "type": "special",
+    "buyPrice": 1500,
+    "sellPrice": 450
+  },
+  "key_of_mysteries": {
+    "id": "key_of_mysteries",
+    "name": "Chìa Khóa Bí Ẩn",
+    "description": "Mở ra những khu vực bí mật trong dungeon.",
+    "type": "special",
+    "buyPrice": 1200,
+    "sellPrice": 360
+  }
+}
