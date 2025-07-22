@@ -1,0 +1,20 @@
+{
+  "name": "botlarkv3",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "setup": "node scripts/setup.js"
+  },
+  "dependencies": {
+    "@larksuiteoapi/node-sdk": "^1.27.0",
+    "express": "^4.18.2",
+    "body-parser": "^1.20.2",
+    "dotenv": "^16.3.1",
+    "fs-extra": "^11.1.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
