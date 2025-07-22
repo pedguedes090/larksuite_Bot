@@ -1,6 +1,6 @@
 # BotLark v3 🤖
 
-Bot Discord/Lark tự động với hệ thống economy và commands được tối ưu hóa.
+Bot Lark tự động với hệ thống economy và commands được tối ưu hóa.
 
 ## ✨ Tính năng
 
