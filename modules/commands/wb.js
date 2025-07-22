@@ -1070,8 +1070,380 @@ ${stats.monstersKilled >= 100 ? '⚔️ **Monster Hunter** - Tiêu diệt 100+ q
 ${stats.questsCompleted >= 50 ? '📋 **Quest Master** - Hoàn thành 50+ quest' : ''}`;
 }
 
-async function handlePvp() {
-  return "⚔️ Tính năng PvP (Player vs Player) hiện đang được phát triển và sẽ sớm ra mắt!";
+async function handlePvp({ userId, args }) {
+  const subcommand = args[1]?.toLowerCase();
+  
+  if (!subcommand) {
+    const wbUser = wbManager.getUser(userId);
+    const stats = wbUser.pvp || { wins: 0, losses: 0, totalFights: 0 };
+    
+    let statusText = '';
+    if (wbUser.pvp?.challenges?.received) {
+      const challenge = wbUser.pvp.challenges.received;
+      const timeLeft = Math.max(0, 60 - Math.floor((Date.now() - challenge.timestamp) / 1000));
+      if (timeLeft > 0) {
+        statusText = `\n🔔 **Thách đấu từ ${challenge.from}** (${timeLeft}s còn lại)\n   Dùng \`wb pvp ac\` để chấp nhận!`;
+      }
+    }
+    
+    if (wbUser.pvp?.challenges?.sent) {
+      const challenge = wbUser.pvp.challenges.sent;
+      const timeLeft = Math.max(0, 60 - Math.floor((Date.now() - challenge.timestamp) / 1000));
+      if (timeLeft > 0) {
+        statusText = `\n⏳ **Đang chờ ${challenge.to} phản hồi** (${timeLeft}s còn lại)`;
+      }
+    }
+    
+    if (wbUser.pvp?.inPvP) {
+      statusText = `\n⚔️ **Đang trong trận PvP với ${wbUser.pvp.opponent}**\n   Trận đấu đang diễn ra tự động!`;
+    }
+    
+    return `--- ⚔️ **PVP SYSTEM** ---
+💫 **Stats:** ${stats.wins}W/${stats.losses}L (${stats.totalFights} fights)${statusText}
+
+**Commands:**
+\`wb pvp <userId>\` - Thách đấu người chơi
+\`wb pvp ac\` - Chấp nhận thách đấu (auto combat)
+\`wb pvp decline\` - Từ chối thách đấu
+\`wb pvp cancel\` - Hủy thách đấu đã gửi`;
+  }
+  
+  // Accept challenge
+  if (subcommand === 'ac' || subcommand === 'accept') {
+    return await handlePvpAccept(userId);
+  }
+  
+  // Decline challenge
+  if (subcommand === 'decline' || subcommand === 'reject') {
+    return await handlePvpDecline(userId);
+  }
+  
+  // Cancel sent challenge
+  if (subcommand === 'cancel') {
+    return await handlePvpCancel(userId);
+  }
+  
+  // No manual attack needed - PvP is auto combat
+  
+  // Challenge someone
+  const targetId = subcommand;
+  return await handlePvpChallenge(userId, targetId);
+}
+
+async function handlePvpChallenge(challengerId, targetId) {
+  // Validate basic conditions
+  if (!targetId) return '❌ **Thiếu tham số!** Sử dụng: `wb pvp <userId>`';
+  
+  const challenger = wbManager.getUser(challengerId);
+  const target = userManager.getUser(targetId); // Check if user exists in general system
+  
+  if (!target) return '❌ Người chơi không tồn tại!';
+  if (targetId === challengerId) return '❌ Không thể thách đấu chính mình!';
+  
+  // Initialize PvP data if not exists
+  if (!challenger.pvp) {
+    challenger.pvp = {
+      challenges: { sent: null, received: null },
+      inPvP: false,
+      opponent: null,
+      stats: { wins: 0, losses: 0, totalFights: 0 }
+    };
+  }
+  
+  const targetWbUser = wbManager.getUser(targetId);
+  if (!targetWbUser.pvp) {
+    targetWbUser.pvp = {
+      challenges: { sent: null, received: null },
+      inPvP: false,
+      opponent: null,
+      stats: { wins: 0, losses: 0, totalFights: 0 }
+    };
+  }
+  
+  // Check combat states
+  if (challenger.combatState.inCombat) return '❌ Bạn đang trong trận chiến PvE!';
+  if (targetWbUser.combatState.inCombat) return '❌ Đối thủ đang bận chiến đấu PvE!';
+  if (challenger.pvp.inPvP) return '❌ Bạn đang trong trận PvP!';
+  if (targetWbUser.pvp.inPvP) return '❌ Đối thủ đang trong trận PvP khác!';
+  
+  // Check existing challenges
+  if (challenger.pvp.challenges.sent) {
+    const timeLeft = Math.max(0, 60 - Math.floor((Date.now() - challenger.pvp.challenges.sent.timestamp) / 1000));
+    if (timeLeft > 0) {
+      return `❌ Bạn đã gửi thách đấu rồi! Còn ${timeLeft}s. Dùng \`wb pvp cancel\` để hủy.`;
+    } else {
+      // Clean up expired challenge
+      challenger.pvp.challenges.sent = null;
+    }
+  }
+  
+  if (targetWbUser.pvp.challenges.received) {
+    const timeLeft = Math.max(0, 60 - Math.floor((Date.now() - targetWbUser.pvp.challenges.received.timestamp) / 1000));
+    if (timeLeft > 0) {
+      return '❌ Đối thủ đang có thách đấu khác chờ xử lý!';
+    } else {
+      // Clean up expired challenge
+      targetWbUser.pvp.challenges.received = null;
+    }
+  }
+  
+  // Level difference check
+  const levelDiff = Math.abs(challenger.level - targetWbUser.level);
+  if (levelDiff > 10) {
+    return `❌ Chênh lệch level quá lớn! (${levelDiff} levels, tối đa 10)`;
+  }
+  
+  // Send challenge
+  const timestamp = Date.now();
+  challenger.pvp.challenges.sent = { to: targetId, timestamp };
+  targetWbUser.pvp.challenges.received = { from: challengerId, timestamp };
+  
+  wbManager.saveUsers();
+  
+  return `⚔️ **THÁCH ĐẤU ĐÃ GỬI!**
+Đã thách đấu **${targetId}** (Lv.${targetWbUser.level})
+⏰ Thời hạn: 60 giây
+
+Đối thủ sẽ nhận được thông báo khi dùng lệnh wb.`;
+}
+
+async function handlePvpAccept(userId) {
+  const user = wbManager.getUser(userId);
+  
+  if (!user.pvp) {
+    user.pvp = {
+      challenges: { sent: null, received: null },
+      inPvP: false,
+      opponent: null,
+      stats: { wins: 0, losses: 0, totalFights: 0 }
+    };
+  }
+  
+  const challenge = user.pvp.challenges.received;
+  
+  if (!challenge) {
+    return '❌ Bạn không có thách đấu nào!';
+  }
+  
+  // Check timeout (1 minute = 60000ms)
+  const timeLeft = Math.max(0, 60 - Math.floor((Date.now() - challenge.timestamp) / 1000));
+  if (timeLeft <= 0) {
+    user.pvp.challenges.received = null;
+    wbManager.saveUsers();
+    return '⏰ Thách đấu đã hết hạn!';
+  }
+  
+  const challenger = wbManager.getUser(challenge.from);
+  if (!challenger.pvp?.challenges?.sent || challenger.pvp.challenges.sent.to !== userId) {
+    user.pvp.challenges.received = null;
+    wbManager.saveUsers();
+    return '❌ Thách đấu đã được hủy!';
+  }
+  
+  // Start PvP
+  return await startPvPCombat(challenge.from, userId);
+}
+
+async function handlePvpDecline(userId) {
+  const user = wbManager.getUser(userId);
+  
+  if (!user.pvp?.challenges?.received) {
+    return '❌ Bạn không có thách đấu nào để từ chối!';
+  }
+  
+  const challengerId = user.pvp.challenges.received.from;
+  const challenger = wbManager.getUser(challengerId);
+  
+  // Clean up challenges
+  user.pvp.challenges.received = null;
+  if (challenger.pvp?.challenges?.sent) {
+    challenger.pvp.challenges.sent = null;
+  }
+  
+  wbManager.saveUsers();
+  
+  return `❌ **ĐÃ TỪ CHỐI THÁCH ĐẤU**
+Bạn đã từ chối thách đấu từ **${challengerId}**.`;
+}
+
+async function handlePvpCancel(userId) {
+  const user = wbManager.getUser(userId);
+  
+  if (!user.pvp?.challenges?.sent) {
+    return '❌ Bạn không có thách đấu nào để hủy!';
+  }
+  
+  const targetId = user.pvp.challenges.sent.to;
+  const target = wbManager.getUser(targetId);
+  
+  // Clean up challenges
+  user.pvp.challenges.sent = null;
+  if (target.pvp?.challenges?.received) {
+    target.pvp.challenges.received = null;
+  }
+  
+  wbManager.saveUsers();
+  
+  return `🚫 **ĐÃ HỦY THÁCH ĐẤU**
+Đã hủy thách đấu gửi tới **${targetId}**.`;
+}
+
+async function startPvPCombat(player1Id, player2Id) {
+  const player1 = wbManager.getUser(player1Id);
+  const player2 = wbManager.getUser(player2Id);
+  
+  // Clean up challenges
+  player1.pvp.challenges.sent = null;
+  player2.pvp.challenges.received = null;
+  
+  // Reset HP về ban đầu cho fair fight
+  const stats1 = wbManager.getEquippedStats(player1Id);
+  const stats2 = wbManager.getEquippedStats(player2Id);
+  
+  const maxHp1 = player1.maxHp + stats1.hpBonus;
+  const maxHp2 = player2.maxHp + stats2.hpBonus;
+  
+  // Set PvP state và reset HP
+  player1.pvp.inPvP = true;
+  player1.pvp.opponent = player2Id;
+  player1.pvp.currentHp = maxHp1;
+  player1.hp = maxHp1; // Reset HP in main stats too
+  
+  player2.pvp.inPvP = true;
+  player2.pvp.opponent = player1Id;
+  player2.pvp.currentHp = maxHp2;
+  player2.hp = maxHp2; // Reset HP in main stats too
+  
+  wbManager.saveUsers();
+  
+  // Start auto combat immediately
+  return await handlePvpAutoCombat(player1Id, player2Id);
+}
+
+async function handlePvpAutoCombat(player1Id, player2Id) {
+  const player1 = wbManager.getUser(player1Id);
+  const player2 = wbManager.getUser(player2Id);
+  
+  let combatLog = [];
+  let turnCount = 0;
+  let currentPlayer1Hp = player1.pvp.currentHp;
+  let currentPlayer2Hp = player2.pvp.currentHp;
+  const maxTurns = 50; // Prevent infinite loops
+  
+  const stats1 = wbManager.getEquippedStats(player1Id);
+  const stats2 = wbManager.getEquippedStats(player2Id);
+  const maxHp1 = player1.maxHp + stats1.hpBonus;
+  const maxHp2 = player2.maxHp + stats2.hpBonus;
+  
+  combatLog.push(`⚔️ **PVP AUTO-COMBAT** ⚔️`);
+  combatLog.push(`**${player1Id}** (Lv.${player1.level}, ${currentPlayer1Hp} HP) VS **${player2Id}** (Lv.${player2.level}, ${currentPlayer2Hp} HP)`);
+  combatLog.push('');
+
+  while (currentPlayer1Hp > 0 && currentPlayer2Hp > 0 && turnCount < maxTurns) {
+    turnCount++;
+    
+    // Random who attacks first each turn
+    const player1AttacksFirst = Math.random() < 0.5;
+    
+    if (player1AttacksFirst) {
+      // Player 1 attacks Player 2
+      const damage = calculatePvpDamage(stats1, stats2);
+      currentPlayer2Hp = Math.max(0, currentPlayer2Hp - damage.amount);
+      combatLog.push(`Turn ${turnCount}A: 💥 ${player1Id} → ${player2Id}: ${damage.amount} dmg${damage.isCrit ? ' 🎯' : ''} | HP: ${currentPlayer2Hp}/${maxHp2}`);
+      
+      if (currentPlayer2Hp <= 0) break;
+      
+      // Player 2 attacks Player 1
+      const damage2 = calculatePvpDamage(stats2, stats1);
+      currentPlayer1Hp = Math.max(0, currentPlayer1Hp - damage2.amount);
+      combatLog.push(`Turn ${turnCount}B: 💥 ${player2Id} → ${player1Id}: ${damage2.amount} dmg${damage2.isCrit ? ' 🎯' : ''} | HP: ${currentPlayer1Hp}/${maxHp1}`);
+    } else {
+      // Player 2 attacks Player 1
+      const damage = calculatePvpDamage(stats2, stats1);
+      currentPlayer1Hp = Math.max(0, currentPlayer1Hp - damage.amount);
+      combatLog.push(`Turn ${turnCount}A: 💥 ${player2Id} → ${player1Id}: ${damage.amount} dmg${damage.isCrit ? ' 🎯' : ''} | HP: ${currentPlayer1Hp}/${maxHp1}`);
+      
+      if (currentPlayer1Hp <= 0) break;
+      
+      // Player 1 attacks Player 2
+      const damage2 = calculatePvpDamage(stats1, stats2);
+      currentPlayer2Hp = Math.max(0, currentPlayer2Hp - damage2.amount);
+      combatLog.push(`Turn ${turnCount}B: 💥 ${player1Id} → ${player2Id}: ${damage2.amount} dmg${damage2.isCrit ? ' 🎯' : ''} | HP: ${currentPlayer2Hp}/${maxHp2}`);
+    }
+    
+    combatLog.push('');
+  }
+  
+  // Determine winner
+  let winner, loser;
+  if (currentPlayer1Hp <= 0) {
+    winner = player2;
+    loser = player1;
+    combatLog.push(`🎉 **${player2Id} CHIẾN THẮNG!** 🎉`);
+  } else if (currentPlayer2Hp <= 0) {
+    winner = player1;
+    loser = player2;
+    combatLog.push(`🎉 **${player1Id} CHIẾN THẮNG!** 🎉`);
+  } else {
+    // Timeout - determine by remaining HP
+    if (currentPlayer1Hp > currentPlayer2Hp) {
+      winner = player1;
+      loser = player2;
+      combatLog.push(`⏰ **TIMEOUT!** ${player1Id} thắng với nhiều HP hơn (${currentPlayer1Hp} vs ${currentPlayer2Hp})`);
+    } else if (currentPlayer2Hp > currentPlayer1Hp) {
+      winner = player2;
+      loser = player1;
+      combatLog.push(`⏰ **TIMEOUT!** ${player2Id} thắng với nhiều HP hơn (${currentPlayer2Hp} vs ${currentPlayer1Hp})`);
+    } else {
+      // Exact tie - random winner
+      winner = Math.random() < 0.5 ? player1 : player2;
+      loser = winner === player1 ? player2 : player1;
+      combatLog.push(`⏰ **TIMEOUT!** Hòa! ${winner === player1 ? player1Id : player2Id} thắng may mắn!`);
+    }
+  }
+  
+  // Update stats
+  winner.pvp.stats.wins++;
+  winner.pvp.stats.totalFights++;
+  loser.pvp.stats.losses++;
+  loser.pvp.stats.totalFights++;
+  
+  // Rewards
+  const winnerId = winner === player1 ? player1Id : player2Id;
+  const xpReward = Math.floor(loser.level * 5 * XP_MULTIPLIER);
+  const goldReward = loser.level * 10;
+  
+  winner.xp += xpReward;
+  userManager.updateMoney(winnerId, goldReward);
+  
+  // Reset PvP state
+  player1.pvp.inPvP = false;
+  player1.pvp.opponent = null;
+  delete player1.pvp.currentHp;
+  
+  player2.pvp.inPvP = false;
+  player2.pvp.opponent = null;
+  delete player2.pvp.currentHp;
+  
+  wbManager.saveUsers();
+  
+  combatLog.push(`Trận đấu kết thúc sau ${turnCount} turns!`);
+  combatLog.push(`🏆 **${winnerId}** nhận được: ${xpReward} XP và ${goldReward} xu`);
+  combatLog.push(`📊 PvP Record: ${winner.pvp.stats.wins}W/${winner.pvp.stats.losses}L`);
+  
+  return combatLog.join('\n');
+}
+
+function calculatePvpDamage(attackerStats, defenderStats) {
+  const baseDamage = Math.max(1, attackerStats.attack - defenderStats.defense);
+  const critChance = 0.15; // 15% crit chance
+  const isCrit = Math.random() < critChance;
+  const finalDamage = isCrit ? Math.floor(baseDamage * 1.5) : baseDamage;
+  
+  return {
+    amount: finalDamage,
+    isCrit: isCrit
+  };
 }
 
 // --- Main Command Executor ---
@@ -1121,7 +1493,7 @@ export default {
       case 'statistics':
         return await handleStats({ userId });
       case 'pvp':
-        return await handlePvp();
+        return await handlePvp({ userId, args });
       default:
         return `--- 🌟 **HƯỚNG DẪN WORLD BOSS** ---
 
@@ -1147,8 +1519,10 @@ export default {
 \`wb quest claim\` - Nhận thưởng quest
 \`wb stats\` - Xem thống kê cá nhân
 
-**⚔️ Khác:**
-\`wb pvp\` - PvP (sắp ra mắt)
+**⚔️ PvP:**
+\`wb pvp\` - Xem hệ thống PvP
+\`wb pvp <userId>\` - Thách đấu người chơi  
+\`wb pvp ac\` - Chấp nhận (auto combat)
 
 🌟 **Bắt đầu hành trình của bạn với \`wb hunt\`!**`;
     }
