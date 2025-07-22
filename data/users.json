@@ -1,10 +1,10 @@
 {
   "4548471c": {
     "userId": "4548471c",
-    "money": 1224,
+    "money": 29870,
     "joinDate": "2025-07-22T04:35:38.825Z",
-    "lastActive": "2025-07-22T09:54:49.638Z",
-    "commandCount": 67,
+    "lastActive": "2025-07-22T17:09:44.979Z",
+    "commandCount": 118,
     "lastDaily": "2025-07-22T04:35:38.826Z",
     "dailyStreak": 1,
     "role": 1
@@ -40,5 +40,37 @@
     "lastActive": "2025-07-22T09:14:14.452Z",
     "commandCount": 3,
     "role": 0
+  },
+  "testuser123": {
+    "userId": "testuser123",
+    "money": 1000,
+    "joinDate": "2025-07-22T15:44:46.702Z",
+    "lastActive": "2025-07-22T15:44:46.704Z",
+    "commandCount": 1,
+    "role": 0
+  },
+  "testuser456": {
+    "userId": "testuser456",
+    "money": 390,
+    "joinDate": "2025-07-22T15:45:27.278Z",
+    "lastActive": "2025-07-22T15:45:34.837Z",
+    "commandCount": 6,
+    "role": 0
+  },
+  "blackjack_tester": {
+    "userId": "blackjack_tester",
+    "money": 1500,
+    "joinDate": "2025-07-22T15:49:39.498Z",
+    "lastActive": "2025-07-22T15:49:51.631Z",
+    "commandCount": 11,
+    "role": 0
+  },
+  "59b968d8": {
+    "userId": "59b968d8",
+    "money": 595,
+    "joinDate": "2025-07-22T15:59:44.505Z",
+    "lastActive": "2025-07-22T17:09:30.588Z",
+    "commandCount": 156,
+    "role": 1
   }
 }

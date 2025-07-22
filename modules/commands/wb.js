@@ -8,7 +8,7 @@ const wbManager = WB_DataManager.getInstance();
 // --- Helper Functions ---
 
 const MAX_LEVEL = 50; // Level cap
-const XP_MULTIPLIER = 0.6; // Reduce XP gain to 60% of original
+const XP_MULTIPLIER = 0.4; // Reduce XP gain to 40% of original
 
 function calculateLevelFromXP(xp) {
   // New exponential XP system - all levels 5+ are harder than old linear system
@@ -77,6 +77,70 @@ function formatTime(hours) {
   return `${hours} giờ`;
 }
 
+function generateMonsterBuffs(monster) {
+  // Random buffs from 0-40% for each stat
+  const hpBuff = Math.random() * 0.4; // 0-40%
+  const attackBuff = Math.random() * 0.4; // 0-40%  
+  const defenseBuff = Math.random() * 0.4; // 0-40%
+  
+  // Base armor penetration (0-20% of monster's attack as penetration)
+  const baseArmorPen = Math.floor((monster.attack || 5) * 0.2); // Base 20% of attack
+  const armorPenBuff = Math.random() * 0.4; // 0-40% additional buff
+  const armorPenetration = Math.floor(baseArmorPen * (1 + armorPenBuff));
+  
+  const buffedStats = {
+    hp: Math.floor(monster.hp * (1 + hpBuff)),
+    attack: Math.floor(monster.attack * (1 + attackBuff)),
+    defense: Math.floor(monster.defense * (1 + defenseBuff)),
+    armorPenetration: armorPenetration,
+    buffs: {
+      hp: hpBuff,
+      attack: attackBuff,
+      defense: defenseBuff,
+      armorPenetration: armorPenBuff
+    }
+  };
+  
+  return buffedStats;
+}
+
+function getBuffMessage(monster, buffedStats) {
+  const buffs = buffedStats.buffs;
+  let buffMessages = [];
+  
+  if (buffs.hp > 0.05) { // Only show if >5%
+    buffMessages.push(`💪 +${Math.round(buffs.hp * 100)}% HP`);
+  }
+  if (buffs.attack > 0.05) {
+    buffMessages.push(`⚔️ +${Math.round(buffs.attack * 100)}% ATK`);
+  }
+  if (buffs.defense > 0.05) {
+    buffMessages.push(`🛡️ +${Math.round(buffs.defense * 100)}% DEF`);
+  }
+  if (buffedStats.armorPenetration > 0) {
+    buffMessages.push(`🗡️ ${buffedStats.armorPenetration} Xuyên Giáp`);
+  }
+  
+  if (buffMessages.length > 0) {
+    return `\n🔥 **${monster.name} được tăng cường!** (${buffMessages.join(', ')})`;
+  }
+  
+  return '';
+}
+
+function resetCombatState() {
+  return { 
+    inCombat: false, 
+    monsterId: null, 
+    monsterHp: 0, 
+    monsterMaxHp: null,
+    monsterBuffedAttack: null,
+    monsterBuffedDefense: null,
+    monsterArmorPenetration: null,
+    mapId: null 
+  };
+}
+
 // --- Sub-command Handlers ---
 
 async function handleInfo({ userId, args }) {
@@ -110,10 +174,62 @@ async function handleInfo({ userId, args }) {
 ⚔️ **Trạng thái:** ${wbUser.combatState.inCombat ? `Đang chiến đấu với ${wbManager.getMonster(wbUser.combatState.monsterId)?.name || 'Unknown Monster'}` : 'An toàn'}`;
 }
 
+async function handleMap({ userId, args }) {
+  const safeMaps = wbManager.getMapsByType('safe');
+  const normalMaps = wbManager.getMapsByType('normal');
+  const dangerousMaps = wbManager.getMapsByType('dangerous');
+  const extremeMaps = wbManager.getMapsByType('extreme');
+  const bossAreas = wbManager.getMapsByType('boss_area');
+  const worldBossAreas = wbManager.getMapsByType('world_boss_area');
+  const randomMaps = wbManager.getMapsByType('random');
+  const legendaryMaps = wbManager.getMapsByType('legendary');
+  
+  let mapsList = '';
+  
+  if (safeMaps.length > 0) {
+    mapsList += '\n🌱 **Bản đồ an toàn:**\n' + safeMaps.map(m => ` • \`${m.id}\`: ${m.name} (Lv.${m.requiredLevel})`).join('\n');
+  }
+  if (normalMaps.length > 0) {
+    mapsList += '\n🌲 **Bản đồ thường:**\n' + normalMaps.map(m => ` • \`${m.id}\`: ${m.name} (Lv.${m.requiredLevel})`).join('\n');
+  }
+  if (dangerousMaps.length > 0) {
+    mapsList += '\n⚠️ **Bản đồ nguy hiểm:**\n' + dangerousMaps.map(m => ` • \`${m.id}\`: ${m.name} (Lv.${m.requiredLevel})`).join('\n');
+  }
+  if (extremeMaps.length > 0) {
+    mapsList += '\n🔥 **Bản đồ cực hiểm:**\n' + extremeMaps.map(m => ` • \`${m.id}\`: ${m.name} (Lv.${m.requiredLevel})`).join('\n');
+  }
+  if (bossAreas.length > 0) {
+    mapsList += '\n👑 **Khu vực Boss:**\n' + bossAreas.map(m => {
+      const cooldownHours = wbManager.getCooldownRemaining(userId, m.id);
+      const cooldownText = cooldownHours > 0 ? ` (⏰ ${formatTime(cooldownHours)})` : '';
+      return ` • \`${m.id}\`: ${m.name} (Lv.${m.requiredLevel})${cooldownText}`;
+    }).join('\n');
+  }
+  if (worldBossAreas.length > 0) {
+    mapsList += '\n🐉 **Khu vực World Boss:**\n' + worldBossAreas.map(m => {
+      const cooldownHours = wbManager.getCooldownRemaining(userId, m.id);
+      const cooldownText = cooldownHours > 0 ? ` (⏰ ${formatTime(cooldownHours)})` : '';
+      return ` • \`${m.id}\`: ${m.name} (Lv.${m.requiredLevel})${cooldownText}`;
+    }).join('\n');
+  }
+  if (randomMaps.length > 0) {
+    mapsList += '\n🎲 **Bản đồ đặc biệt:**\n' + randomMaps.map(m => ` • \`${m.id}\`: ${m.name} (Lv.${m.requiredLevel})`).join('\n');
+  }
+  if (legendaryMaps.length > 0) {
+    mapsList += '\n✨ **Bản đồ huyền thoại:**\n' + legendaryMaps.map(m => {
+      const cooldownHours = wbManager.getCooldownRemaining(userId, m.id);
+      const cooldownText = cooldownHours > 0 ? ` (⏰ ${formatTime(cooldownHours)})` : '';
+      return ` • \`${m.id}\`: ${m.name} (Lv.${m.requiredLevel})${cooldownText}`;
+    }).join('\n');
+  }
+  
+  return `--- 🗺️ **TẤT CẢ BẢN ĐỒ** ---${mapsList}\n\n**Sử dụng:** \`wb hunt <map_id>\` để vào bản đồ`;
+}
+
 async function handleHunt({ userId, args }) {
   if (args.length < 2) {
     return `❌ **Thiếu tham số!** Sử dụng: \`wb hunt <map_id>\`
-Dùng \`wb hunt\` để xem danh sách bản đồ có sẵn.`;
+Dùng \`wb map\` để xem danh sách bản đồ có sẵn.`;
   }
   
   const mapId = args[1];
@@ -123,33 +239,6 @@ Dùng \`wb hunt\` để xem danh sách bản đồ có sẵn.`;
     return `❌ Bạn đang trong một trận chiến! Dùng \`wb pve\` để tiếp tục.`;
   }
   
-  if (!mapId) {
-    const normalMaps = wbManager.getMapsByType('normal');
-    const dangerousMaps = wbManager.getMapsByType('dangerous');
-    const extremeMaps = wbManager.getMapsByType('extreme');
-    const bossAreas = wbManager.getMapsByType('boss_area');
-    
-    let mapsList = '';
-    if (normalMaps.length > 0) {
-      mapsList += '\n🌲 **Bản đồ thường:**\n' + normalMaps.map(m => ` • \`${m.id}\`: ${m.name} (Lv.${m.requiredLevel})`).join('\n');
-    }
-    if (dangerousMaps.length > 0) {
-      mapsList += '\n⚠️ **Bản đồ nguy hiểm:**\n' + dangerousMaps.map(m => ` • \`${m.id}\`: ${m.name} (Lv.${m.requiredLevel})`).join('\n');
-    }
-    if (extremeMaps.length > 0) {
-      mapsList += '\n🔥 **Bản đồ cực hiểm:**\n' + extremeMaps.map(m => ` • \`${m.id}\`: ${m.name} (Lv.${m.requiredLevel})`).join('\n');
-    }
-    if (bossAreas.length > 0) {
-      mapsList += '\n👑 **Khu vực Boss:**\n' + bossAreas.map(m => {
-        const cooldownHours = wbManager.getCooldownRemaining(userId, m.id);
-        const cooldownText = cooldownHours > 0 ? ` (⏰ ${formatTime(cooldownHours)})` : '';
-        return ` • \`${m.id}\`: ${m.name} (Lv.${m.requiredLevel})${cooldownText}`;
-      }).join('\n');
-    }
-    
-    return `🗺️ **Chọn một bản đồ để đi săn:**${mapsList}\n\n**Sử dụng:** \`wb hunt <map_id>\``;
-  }
-
   const map = wbManager.getMap(mapId);
   if (!map) {
     return `❌ Không tìm thấy bản đồ với ID: \`${mapId}\``;
@@ -180,18 +269,26 @@ Dùng \`wb hunt\` để xem danh sách bản đồ có sẵn.`;
   // Update quest progress
   wbManager.updateQuestProgress(userId, 'explore');
 
+  // Generate random buffs for monster (0-40% each stat)
+  const buffedStats = generateMonsterBuffs(monster);
+  const buffMessage = getBuffMessage(monster, buffedStats);
+
   wbManager.updateUser(userId, {
     combatState: {
       inCombat: true,
       monsterId: monster.id,
-      monsterHp: monster.hp,
+      monsterHp: buffedStats.hp, // Use buffed HP
+      monsterMaxHp: buffedStats.hp, // Store max HP for display
+      monsterBuffedAttack: buffedStats.attack, // Store buffed attack
+      monsterBuffedDefense: buffedStats.defense, // Store buffed defense
+      monsterArmorPenetration: buffedStats.armorPenetration, // Store armor penetration
       mapId: map.id
     }
   });
 
   const dangerEmoji = monster.type === 'boss' ? '👑' : monster.type === 'world_boss' ? '🐉' : '⚔️';
   return `🌲 Bạn đã tiến vào **${map.name}** và gặp một **${monster.name}**! ${dangerEmoji}
-${map.description}
+${map.description}${buffMessage}
 Dùng lệnh \`wb pve\` để tấn công!`;
 }
 
@@ -217,17 +314,19 @@ async function handlePve({ userId, args }) {
     
     if (!monster) {
         wbManager.updateUser(userId, {
-            combatState: { inCombat: false, monsterId: null, monsterHp: 0, mapId: null }
+            combatState: resetCombatState()
         });
         return `❌ Lỗi hệ thống: Quái vật không tồn tại. Trận chiến đã được reset.`;
     }
 
     let combatLog = [];
 
-    // Player attacks monster
-    const playerDamage = Math.max(1, stats.attack - monster.defense);
+    // Player attacks monster (use buffed defense)
+    const monsterDefense = wbUser.combatState.monsterBuffedDefense || monster.defense;
+    const monsterMaxHp = wbUser.combatState.monsterMaxHp || monster.hp;
+    const playerDamage = Math.max(1, stats.attack - monsterDefense);
     const newMonsterHp = wbUser.combatState.monsterHp - playerDamage;
-    combatLog.push(`💥 Bạn tấn công ${monster.name}, gây ${playerDamage} sát thương. HP quái còn: ${Math.max(0, newMonsterHp)}/${monster.hp}`);
+    combatLog.push(`💥 Bạn tấn công ${monster.name}, gây ${playerDamage} sát thương. HP quái còn: ${Math.max(0, newMonsterHp)}/${monsterMaxHp}`);
 
             // Check if monster is defeated
         if (newMonsterHp <= 0) {
@@ -298,12 +397,12 @@ async function handlePve({ userId, args }) {
                 mp: newStats.maxMp,  // Full MP restore
                 baseAttack: newStats.baseAttack,
                 baseDefense: newStats.baseDefense,
-                combatState: { inCombat: false, monsterId: null, monsterHp: 0, mapId: null }
+                combatState: resetCombatState()
             });
         } else {
             wbManager.updateUser(userId, {
                 xp: newXP,
-                combatState: { inCombat: false, monsterId: null, monsterHp: 0, mapId: null }
+                combatState: resetCombatState()
             });
         }
 
@@ -321,27 +420,34 @@ HP của bạn: ${wbManager.getUser(userId).hp}/${wbManager.getUser(userId).maxH
         return victoryMessage;
     }
     
-    // Monster attacks player (with special abilities)
-    let monsterDamage = Math.max(1, monster.attack - stats.defense);
+    // Monster attacks player (with special abilities, use buffed attack and armor penetration)
+    const monsterAttack = wbUser.combatState.monsterBuffedAttack || monster.attack;
+    const armorPenetration = wbUser.combatState.monsterArmorPenetration || 0;
+    const effectiveDefense = Math.max(0, stats.defense - armorPenetration);
+    let monsterDamage = Math.max(1, monsterAttack - effectiveDefense);
     let specialMessage = '';
+    
+    if (armorPenetration > 0) {
+        specialMessage += ` (🗡️ Xuyên ${armorPenetration} giáp)`;
+    }
     
     if (monster.specialAbility) {
         switch (monster.specialAbility) {
             case 'freeze':
                 if (Math.random() < 0.3) {
-                    specialMessage = `\n❄️ ${monster.name} đóng băng bạn! Bạn mất lượt này.`;
+                    specialMessage += `\n❄️ ${monster.name} đóng băng bạn! Bạn mất lượt này.`;
                     monsterDamage = 0;
                 }
                 break;
             case 'fire_breath':
                 if (Math.random() < 0.4) {
                     monsterDamage = Math.floor(monsterDamage * 1.5);
-                    specialMessage = `\n🔥 ${monster.name} phun lửa! Sát thương tăng 50%!`;
+                    specialMessage += `\n🔥 ${monster.name} phun lửa! Sát thương tăng 50%!`;
                 }
                 break;
             case 'life_drain':
                 if (Math.random() < 0.25) {
-                    const healed = Math.min(monsterDamage, monster.hp - wbUser.combatState.monsterHp);
+                    const healed = Math.min(monsterDamage, monsterMaxHp - wbUser.combatState.monsterHp);
                     const newMonsterHp = wbUser.combatState.monsterHp + healed;
                     // Update combat state immediately for consistency
                     wbManager.updateUser(userId, {
@@ -351,7 +457,7 @@ HP của bạn: ${wbManager.getUser(userId).hp}/${wbManager.getUser(userId).maxH
                         }
                     });
                     wbUser.combatState.monsterHp = newMonsterHp; // Update local reference
-                    specialMessage = `\n🩸 ${monster.name} hút máu! Hồi ${healed} HP!`;
+                    specialMessage += `\n🩸 ${monster.name} hút máu! Hồi ${healed} HP!`;
                 }
                 break;
         }
@@ -405,13 +511,13 @@ ${combatLog.join('\n')}`;
                 mp: newStats.maxMp,
                 baseAttack: newStats.baseAttack,
                 baseDefense: newStats.baseDefense,
-                combatState: { inCombat: false, monsterId: null, monsterHp: 0, mapId: null }
+                combatState: resetCombatState()
             });
         } else {
             wbManager.updateUser(userId, {
                 xp: newXP,
                 hp: 1,
-                combatState: { inCombat: false, monsterId: null, monsterHp: 0, mapId: null }
+                combatState: resetCombatState()
             });
         }
 
@@ -444,7 +550,7 @@ async function handleAutoCombat(userId, safeMode = false) {
     
     if (!monster) {
         wbManager.updateUser(userId, {
-            combatState: { inCombat: false, monsterId: null, monsterHp: 0, mapId: null }
+            combatState: resetCombatState()
         });
         return `❌ Lỗi hệ thống: Quái vật không tồn tại. Trận chiến đã được reset.`;
     }
@@ -455,18 +561,24 @@ async function handleAutoCombat(userId, safeMode = false) {
     let currentPlayerHp = wbUser.hp;
     const maxTurns = 50; // Prevent infinite loops
     
+    // Get buffed monster stats
+    const monsterAttack = wbUser.combatState.monsterBuffedAttack || monster.attack;
+    const monsterDefense = wbUser.combatState.monsterBuffedDefense || monster.defense;
+    const monsterMaxHp = wbUser.combatState.monsterMaxHp || monster.hp;
+    const armorPenetration = wbUser.combatState.monsterArmorPenetration || 0;
+    
     combatLog.push(`⚔️ **${safeMode ? 'SAFE AUTO-COMBAT' : 'AUTO-COMBAT'}** vs ${monster.name} bắt đầu!`);
-    combatLog.push(`Monster HP: ${currentMonsterHp}/${monster.hp} | Your HP: ${currentPlayerHp}/${wbUser.maxHp}`);
+    combatLog.push(`Monster HP: ${currentMonsterHp}/${monsterMaxHp} | Your HP: ${currentPlayerHp}/${wbUser.maxHp}`);
     combatLog.push('');
 
     while (currentMonsterHp > 0 && currentPlayerHp > 0 && turnCount < maxTurns) {
         turnCount++;
         const stats = wbManager.getEquippedStats(userId);
         
-        // Player attacks monster
-        const playerDamage = Math.max(1, stats.attack - monster.defense);
+        // Player attacks monster (use buffed defense)
+        const playerDamage = Math.max(1, stats.attack - monsterDefense);
         currentMonsterHp -= playerDamage;
-        combatLog.push(`Turn ${turnCount}: 💥 Bạn tấn công gây ${playerDamage} sát thương. Monster HP: ${Math.max(0, currentMonsterHp)}/${monster.hp}`);
+        combatLog.push(`Turn ${turnCount}: 💥 Bạn tấn công gây ${playerDamage} sát thương. Monster HP: ${Math.max(0, currentMonsterHp)}/${monsterMaxHp}`);
 
                  // Check if monster is defeated
          if (currentMonsterHp <= 0) {
@@ -534,12 +646,13 @@ async function handleAutoCombat(userId, safeMode = false) {
                     mp: newStats.maxMp,
                     baseAttack: newStats.baseAttack,
                     baseDefense: newStats.baseDefense,
-                    combatState: { inCombat: false, monsterId: null, monsterHp: 0, mapId: null }
+                    combatState: resetCombatState()
                 });
             } else {
                 wbManager.updateUser(userId, {
                     xp: newXP,
-                    combatState: { inCombat: false, monsterId: null, monsterHp: 0, mapId: null }
+                    hp: currentPlayerHp, // Save current HP after combat
+                    combatState: resetCombatState()
                 });
             }
 
@@ -550,36 +663,41 @@ async function handleAutoCombat(userId, safeMode = false) {
             combatLog.push('');
             combatLog.push(`🎉 **CHIẾN THẮNG!** 🎉`);
             combatLog.push(`Đã hạ gục ${monster.name} sau ${turnCount} lượt!`);
-                         combatLog.push(`⭐ **Nhận được:** ${xpGained} XP${goldGained > 0 ? ` và ${goldGained} xu` : ''}`);
+            combatLog.push(`⭐ **Nhận được:** ${xpGained} XP${goldGained > 0 ? ` và ${goldGained} xu` : ''}`);
             combatLog.push(`🎁 **Vật phẩm rơi:**\n${lootLog.length > 0 ? lootLog.join('\n') : 'Không có gì cả.'}`);
             if (levelUpMessage) combatLog.push(levelUpMessage);
             
             return combatLog.join('\n');
         }
         
-        // Monster attacks player
-        let monsterDamage = Math.max(1, monster.attack - stats.defense);
+        // Monster attacks player (use buffed attack and armor penetration)
+        const effectiveDefense = Math.max(0, stats.defense - armorPenetration);
+        let monsterDamage = Math.max(1, monsterAttack - effectiveDefense);
         let specialMessage = '';
+        
+        if (armorPenetration > 0) {
+            specialMessage += ` 🗡️ Xuyên ${armorPenetration} giáp`;
+        }
         
         if (monster.specialAbility) {
             switch (monster.specialAbility) {
                 case 'freeze':
                     if (Math.random() < 0.3) {
-                        specialMessage = ` ❄️ Freeze!`;
+                        specialMessage += ` ❄️ Freeze!`;
                         monsterDamage = 0;
                     }
                     break;
                 case 'fire_breath':
                     if (Math.random() < 0.4) {
                         monsterDamage = Math.floor(monsterDamage * 1.5);
-                        specialMessage = ` 🔥 Fire breath!`;
+                        specialMessage += ` 🔥 Fire breath!`;
                     }
                     break;
                 case 'life_drain':
                     if (Math.random() < 0.25) {
-                        const healed = Math.min(monsterDamage, monster.hp - currentMonsterHp);
+                        const healed = Math.min(monsterDamage, monsterMaxHp - currentMonsterHp);
                         currentMonsterHp += healed;
-                        specialMessage = ` 🩸 Life drain +${healed}HP!`;
+                        specialMessage += ` 🩸 Life drain +${healed}HP!`;
                     }
                     break;
             }
@@ -633,13 +751,13 @@ async function handleAutoCombat(userId, safeMode = false) {
                     mp: newStats.maxMp,
                     baseAttack: newStats.baseAttack,
                     baseDefense: newStats.baseDefense,
-                    combatState: { inCombat: false, monsterId: null, monsterHp: 0, mapId: null }
+                    combatState: resetCombatState()
                 });
             } else {
                 wbManager.updateUser(userId, {
                     xp: newXP,
                     hp: 1,
-                    combatState: { inCombat: false, monsterId: null, monsterHp: 0, mapId: null }
+                    combatState: resetCombatState()
                 });
             }
 
@@ -734,7 +852,7 @@ async function handleInventory({ userId }) {
         inventoryText += `\n${typeNames[type] || '📋 **Khác:**'}\n`;
         for (const itemStack of items) {
             const sellPrice = itemStack.item.sellPrice ? ` (${itemStack.item.sellPrice} xu)` : '';
-            inventoryText += ` • **${itemStack.item.name}** x${itemStack.quantity}${sellPrice}\n   *${itemStack.item.description}*\n`;
+            inventoryText += ` • [${itemStack.item.id}] **${itemStack.item.name}** x${itemStack.quantity}${sellPrice}\n   *${itemStack.item.description}*\n`;
         }
     }
 
@@ -1070,6 +1188,47 @@ ${stats.monstersKilled >= 100 ? '⚔️ **Monster Hunter** - Tiêu diệt 100+ q
 ${stats.questsCompleted >= 50 ? '📋 **Quest Master** - Hoàn thành 50+ quest' : ''}`;
 }
 
+async function handleRest({ userId }) {
+    const wbUser = wbManager.getUser(userId);
+    
+    if (wbUser.combatState.inCombat) {
+        return '❌ Không thể nghỉ ngơi khi đang trong trận chiến!';
+    }
+    
+    const stats = wbManager.getEquippedStats(userId);
+    const maxHp = wbUser.maxHp + stats.hpBonus;
+    
+    if (wbUser.hp >= maxHp) {
+        return '❌ HP của bạn đã đầy rồi!';
+    }
+    
+    // Check rest cooldown (5 minutes)
+    const now = Date.now();
+    const restCooldown = 5 * 60 * 1000; // 5 minutes
+    
+    if (wbUser.lastRestTime && now - wbUser.lastRestTime < restCooldown) {
+        const remainingMs = restCooldown - (now - wbUser.lastRestTime);
+        const remainingMin = Math.ceil(remainingMs / 60000);
+        return `⏰ Bạn cần chờ ${remainingMin} phút nữa để nghỉ ngơi lại.`;
+    }
+    
+    // Rest healing: 25% of max HP
+    const healAmount = Math.floor(maxHp * 0.25);
+    const newHp = Math.min(maxHp, wbUser.hp + healAmount);
+    const actualHeal = newHp - wbUser.hp;
+    
+    wbManager.updateUser(userId, {
+        hp: newHp,
+        lastRestTime: now
+    });
+    
+    return `💤 **NGHỈ NGƠI** 💤
+Bạn đã nghỉ ngơi và hồi phục sức lực.
+💚 **Hồi HP:** +${actualHeal} HP (${newHp}/${maxHp})
+
+⏰ Có thể nghỉ ngơi lại sau 5 phút.`;
+}
+
 async function handlePvp({ userId, args }) {
   const subcommand = args[1]?.toLowerCase();
   
@@ -1099,7 +1258,7 @@ async function handlePvp({ userId, args }) {
     }
     
     return `--- ⚔️ **PVP SYSTEM** ---
-💫 **Stats:** ${stats.wins}W/${stats.losses}L (${stats.totalFights} fights)${statusText}
+�� **Stats:** ${stats.wins}W/${stats.losses}L (${stats.totalFights} fights)${statusText}
 
 **Commands:**
 \`wb pvp <userId>\` - Thách đấu người chơi
@@ -1462,6 +1621,9 @@ export default {
       case 'info':
       case 'i':
         return await handleInfo({ userId, args });
+      case 'map':
+      case 'maps':
+        return await handleMap({ userId, args });
       case 'hunt':
       case 'h':
         return await handleHunt({ userId, args });
@@ -1494,15 +1656,20 @@ export default {
         return await handleStats({ userId });
       case 'pvp':
         return await handlePvp({ userId, args });
+      case 'rest':
+      case 'sleep':
+        return await handleRest({ userId });
       default:
         return `--- 🌟 **HƯỚNG DẪN WORLD BOSS** ---
 
 **🎮 Lệnh cơ bản:**
 \`wb info\` - Xem thông tin nhân vật
-\`wb hunt\` - Chọn bản đồ để săn quái
+\`wb map\` - Xem tất cả bản đồ có sẵn
+\`wb hunt <map_id>\` - Vào bản đồ để săn quái
 \`wb pve\` - Tấn công từng lượt (cổ điển)
 \`wb pve auto\` - ⚡ Auto-combat đến kết thúc
 \`wb pve safe\` - 🛡️ Auto-combat với safe stop (HP < 70%)
+\`wb rest\` - 💤 Nghỉ ngơi để hồi HP (5 phút cooldown)
 
 **🎒 Quản lý đồ đạc:**
 \`wb inventory\` - Xem túi đồ
@@ -1524,7 +1691,7 @@ export default {
 \`wb pvp <userId>\` - Thách đấu người chơi  
 \`wb pvp ac\` - Chấp nhận (auto combat)
 
-🌟 **Bắt đầu hành trình của bạn với \`wb hunt\`!**`;
+🌟 **Xem bản đồ với \`wb map\`, sau đó bắt đầu hành trình với \`wb hunt <map_id>\`!**`;
     }
   }
 };

@@ -20,7 +20,7 @@ class WB_DataManager {
     this.users = this.loadJson(userFile, {});
     this.items = this.loadJson(itemFile, {});
     this.monsters = this.loadJson(monsterFile, {});
-    this.maps = this.loadJson(mapFile, []);
+    this.maps = this.loadJson(mapFile, {});
     this.saveTimeout = null;
 
     WB_DataManager.instance = this;
@@ -41,7 +41,7 @@ class WB_DataManager {
         [userFile]: '{}',
         [itemFile]: '{}',
         [monsterFile]: '{}',
-        [mapFile]: '[]'
+        [mapFile]: '{}'
     };
     for (const [file, content] of Object.entries(files)) {
         if (!fs.existsSync(file)) {
@@ -342,10 +342,10 @@ class WB_DataManager {
   
   generateDailyQuests() {
     const quests = [
-      { id: 'kill_monsters', type: 'kill', target: 'any', count: 5, reward: { xp: 150, gold: 100 }, description: 'Tiêu diệt 5 quái vật bất kỳ' },
-      { id: 'kill_goblins', type: 'kill', target: 'goblin', count: 3, reward: { xp: 100, gold: 75 }, description: 'Tiêu diệt 3 Yêu Tinh Xanh' },
-      { id: 'visit_maps', type: 'explore', count: 3, reward: { xp: 120, gold: 80 }, description: 'Khám phá 3 bản đồ khác nhau' },
-      { id: 'collect_items', type: 'loot', count: 10, reward: { xp: 100, gold: 60 }, description: 'Thu thập 10 vật phẩm bất kỳ' }
+      { id: 'kill_monsters', type: 'kill', target: 'any', count: 5, reward: { xp: 5, gold: 100 }, description: 'Tiêu diệt 5 quái vật bất kỳ' },
+      { id: 'kill_goblins', type: 'kill', target: 'goblin', count: 3, reward: { xp: 3, gold: 75 }, description: 'Tiêu diệt 3 Yêu Tinh Xanh' },
+      { id: 'visit_maps', type: 'explore', count: 3, reward: { xp: 4, gold: 80 }, description: 'Khám phá 3 bản đồ khác nhau' },
+      { id: 'collect_items', type: 'loot', count: 10, reward: { xp: 2, gold: 60 }, description: 'Thu thập 10 vật phẩm bất kỳ' }
     ];
     
     // Return 3 random quests
@@ -403,11 +403,14 @@ class WB_DataManager {
   // === HELPER FUNCTIONS ===
   getItem(itemId) { return this.items[itemId] || null; }
   getMonster(monsterId) { return this.monsters[monsterId] || null; }
-  getMap(mapId) { return this.maps.find(m => m.id === mapId) || null; }
-  getAllMaps() { return this.maps; }
+  getMap(mapId) { return this.maps[mapId] || null; }
+  getAllMaps() { return Object.values(this.maps); }
   
   getMapsByType(type) {
-    return this.maps.filter(m => m.type === type);
+    if (!this.maps || typeof this.maps !== 'object') {
+      return [];
+    }
+    return Object.values(this.maps).filter(m => m && m.type === type);
   }
 
   // Inventory management

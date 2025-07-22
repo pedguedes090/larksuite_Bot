@@ -2,22 +2,22 @@
   "4548471c": {
     "userId": "4548471c",
     "level": 1,
-    "xp": 9,
+    "xp": 66,
     "maxHp": 100,
-    "hp": 98,
+    "hp": 100,
     "maxMp": 50,
     "mp": 50,
     "baseAttack": 10,
     "baseDefense": 5,
     "inventory": [
       {
-        "itemId": "slime_gel",
-        "quantity": 1
+        "itemId": "health_potion",
+        "quantity": 2
       }
     ],
     "equipment": {
-      "weapon": null,
-      "armor": null
+      "weapon": "wooden_sword",
+      "armor": "cloth_shirt"
     },
     "buffs": [],
     "combatState": {
@@ -40,8 +40,8 @@
             "gold": 35
           },
           "description": "Thu thập 10 vật phẩm bất kỳ",
-          "progress": 2,
-          "completed": false
+          "progress": 10,
+          "completed": true
         },
         {
           "id": "visit_maps",
@@ -52,8 +52,8 @@
             "gold": 40
           },
           "description": "Khám phá 3 bản đồ khác nhau",
-          "progress": 1,
-          "completed": false
+          "progress": 3,
+          "completed": true
         },
         {
           "id": "kill_goblins",
@@ -71,10 +71,23 @@
       ]
     },
     "statistics": {
-      "monstersKilled": 1,
+      "monstersKilled": 8,
       "bossesKilled": 0,
-      "itemsFound": 2,
+      "itemsFound": 16,
       "questsCompleted": 0
+    },
+    "pvp": {
+      "challenges": {
+        "sent": null,
+        "received": null
+      },
+      "inPvP": false,
+      "opponent": null,
+      "stats": {
+        "wins": 0,
+        "losses": 1,
+        "totalFights": 1
+      }
     }
   },
   "test_user_123": {
@@ -369,6 +382,120 @@
       "bossesKilled": 0,
       "itemsFound": 0,
       "questsCompleted": 0
+    }
+  },
+  "59b968d8": {
+    "userId": "59b968d8",
+    "level": 5,
+    "xp": 651,
+    "maxHp": 180,
+    "hp": 130,
+    "maxMp": 90,
+    "mp": 90,
+    "baseAttack": 22,
+    "baseDefense": 13,
+    "inventory": [
+      {
+        "itemId": "slime_gel",
+        "quantity": 13
+      },
+      {
+        "itemId": "goblin_ear",
+        "quantity": 1
+      },
+      {
+        "itemId": "iron_ore",
+        "quantity": 2
+      },
+      {
+        "itemId": "wolf_pelt",
+        "quantity": 3
+      },
+      {
+        "itemId": "rusty_dagger",
+        "quantity": 1
+      }
+    ],
+    "equipment": {
+      "weapon": "silver_rapier",
+      "armor": "ring_mail"
+    },
+    "buffs": [],
+    "combatState": {
+      "inCombat": false,
+      "monsterId": null,
+      "monsterHp": 0,
+      "monsterMaxHp": null,
+      "monsterBuffedAttack": null,
+      "monsterBuffedDefense": null,
+      "monsterArmorPenetration": null,
+      "mapId": null
+    },
+    "cooldowns": {},
+    "dailyQuests": {
+      "lastReset": "Tue Jul 22 2025",
+      "completed": [
+        "Tue Jul 22 2025"
+      ],
+      "available": [
+        {
+          "id": "visit_maps",
+          "type": "explore",
+          "count": 3,
+          "reward": {
+            "xp": 120,
+            "gold": 80
+          },
+          "description": "Khám phá 3 bản đồ khác nhau",
+          "progress": 3,
+          "completed": true
+        },
+        {
+          "id": "collect_items",
+          "type": "loot",
+          "count": 10,
+          "reward": {
+            "xp": 100,
+            "gold": 60
+          },
+          "description": "Thu thập 10 vật phẩm bất kỳ",
+          "progress": 10,
+          "completed": true
+        },
+        {
+          "id": "kill_monsters",
+          "type": "kill",
+          "target": "any",
+          "count": 5,
+          "reward": {
+            "xp": 150,
+            "gold": 100
+          },
+          "description": "Tiêu diệt 5 quái vật bất kỳ",
+          "progress": 5,
+          "completed": true
+        }
+      ]
+    },
+    "statistics": {
+      "monstersKilled": 31,
+      "bossesKilled": 0,
+      "itemsFound": 56,
+      "questsCompleted": 3
+    },
+    "lastRevivalUse": 0,
+    "pvp": {
+      "challenges": {
+        "sent": null,
+        "received": null
+      },
+      "inPvP": false,
+      "opponent": null,
+      "stats": {
+        "wins": 1,
+        "losses": 0,
+        "totalFights": 1
+      }
     }
   }
 }

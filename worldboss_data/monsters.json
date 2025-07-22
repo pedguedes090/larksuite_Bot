@@ -4,7 +4,7 @@
     "id": "slime",
     "name": "Slime Xanh",
     "hp": 30,
-    "attack": 8,
+    "attack": 10,
     "defense": 2,
     "xpDrop": 15,
     "type": "normal",
@@ -19,7 +19,7 @@
     "name": "Yêu Tinh Xanh",
     "hp": 50,
     "attack": 12,
-    "defense": 5,
+    "defense": 8,
     "xpDrop": 25,
     "type": "normal",
     "drops": [
