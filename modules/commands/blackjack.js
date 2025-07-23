@@ -221,12 +221,7 @@ export default {
         // Player busts
         currentGame.gameOver = true;
         const outcome = determineWinner(currentGame);
-        const payout = Math.floor(currentGame.betAmount * outcome.multiplier);
-        
-        if (outcome.multiplier > 0) {
-          userManager.updateMoney(userId, payout);
-        }
-        
+        // Không cộng lại tiền vì đã trừ khi bắt đầu
         const newBalance = userManager.getUser(userId).money;
         
         response += `💥 **QUÁ 21! BẠN THUA!** 💥\n`;
@@ -252,9 +247,13 @@ export default {
       
       currentGame.gameOver = true;
       const outcome = determineWinner(currentGame);
-      const payout = Math.floor(currentGame.betAmount * outcome.multiplier);
-      
-      userManager.updateMoney(userId, payout - currentGame.betAmount); // Adjust for original bet
+      let payout = 0;
+      if (outcome.result === 'blackjack' || outcome.result === 'win') {
+        payout = Math.floor(currentGame.betAmount * outcome.multiplier);
+        userManager.updateMoney(userId, payout); // Cộng lại toàn bộ tiền thắng (bao gồm cả tiền cược)
+      } else if (outcome.result === 'push') {
+        userManager.updateMoney(userId, currentGame.betAmount); // Hoàn lại tiền cược
+      } // Nếu thua thì không cộng lại gì
       const newBalance = userManager.getUser(userId).money;
       
       let response = `🃏 **STAND - KẾT QUẢ CUỐI** 🃏\n\n`;
@@ -343,7 +342,7 @@ Dùng \`${prefix}blackjack hit\`, \`${prefix}blackjack stand\` hoặc \`${prefix
         } else {
           // Player blackjack wins
           const payout = Math.floor(betAmount * (1 + BLACKJACK_MULTIPLIER));
-          userManager.updateMoney(userId, payout);
+          userManager.updateMoney(userId, payout); // Cộng lại toàn bộ tiền thắng (bao gồm cả tiền cược)
           response += `🌟 **BLACKJACK! BẠN THẮNG!** 🌟\n`;
           response += `🎁 **Tiền thắng:** +${(payout - betAmount).toLocaleString('vi-VN')} xu (x1.5)`;
         }

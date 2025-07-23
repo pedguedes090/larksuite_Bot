@@ -2,9 +2,9 @@
   "4548471c": {
     "userId": "4548471c",
     "level": 1,
-    "xp": 66,
+    "xp": 70,
     "maxHp": 100,
-    "hp": 100,
+    "hp": 99,
     "maxMp": 50,
     "mp": 50,
     "baseAttack": 10,
@@ -24,6 +24,10 @@
       "inCombat": false,
       "monsterId": null,
       "monsterHp": 0,
+      "monsterMaxHp": null,
+      "monsterBuffedAttack": null,
+      "monsterBuffedDefense": null,
+      "monsterArmorPenetration": null,
       "mapId": null
     },
     "cooldowns": {},
@@ -71,9 +75,9 @@
       ]
     },
     "statistics": {
-      "monstersKilled": 8,
+      "monstersKilled": 9,
       "bossesKilled": 0,
-      "itemsFound": 16,
+      "itemsFound": 17,
       "questsCompleted": 0
     },
     "pvp": {
@@ -386,18 +390,18 @@
   },
   "59b968d8": {
     "userId": "59b968d8",
-    "level": 5,
-    "xp": 651,
-    "maxHp": 180,
-    "hp": 130,
-    "maxMp": 90,
-    "mp": 90,
-    "baseAttack": 22,
-    "baseDefense": 13,
+    "level": 8,
+    "xp": 1428,
+    "maxHp": 240,
+    "hp": 84,
+    "maxMp": 120,
+    "mp": 120,
+    "baseAttack": 31,
+    "baseDefense": 19,
     "inventory": [
       {
         "itemId": "slime_gel",
-        "quantity": 13
+        "quantity": 15
       },
       {
         "itemId": "goblin_ear",
@@ -409,16 +413,60 @@
       },
       {
         "itemId": "wolf_pelt",
-        "quantity": 3
+        "quantity": 5
       },
       {
-        "itemId": "rusty_dagger",
+        "itemId": "leather_vest",
         "quantity": 1
+      },
+      {
+        "itemId": "orc_fang",
+        "quantity": 6
+      },
+      {
+        "itemId": "studded_leather",
+        "quantity": 1
+      },
+      {
+        "itemId": "strength_buff",
+        "quantity": 4
+      },
+      {
+        "itemId": "silver_rapier",
+        "quantity": 1
+      },
+      {
+        "itemId": "bat_wing",
+        "quantity": 20
+      },
+      {
+        "itemId": "ring_mail",
+        "quantity": 1
+      },
+      {
+        "itemId": "magic_crystal",
+        "quantity": 2
+      },
+      {
+        "itemId": "iron_sword",
+        "quantity": 2
+      },
+      {
+        "itemId": "health_potion",
+        "quantity": 1
+      },
+      {
+        "itemId": "enchanted_staff",
+        "quantity": 1
+      },
+      {
+        "itemId": "spider_silk",
+        "quantity": 2
       }
     ],
     "equipment": {
-      "weapon": "silver_rapier",
-      "armor": "ring_mail"
+      "weapon": "enchanted_staff",
+      "armor": "scale_mail"
     },
     "buffs": [],
     "combatState": {
@@ -433,21 +481,22 @@
     },
     "cooldowns": {},
     "dailyQuests": {
-      "lastReset": "Tue Jul 22 2025",
+      "lastReset": "Wed Jul 23 2025",
       "completed": [
-        "Tue Jul 22 2025"
+        "Wed Jul 23 2025"
       ],
       "available": [
         {
-          "id": "visit_maps",
-          "type": "explore",
-          "count": 3,
+          "id": "kill_monsters",
+          "type": "kill",
+          "target": "any",
+          "count": 5,
           "reward": {
-            "xp": 120,
-            "gold": 80
+            "xp": 5,
+            "gold": 100
           },
-          "description": "Khám phá 3 bản đồ khác nhau",
-          "progress": 3,
+          "description": "Tiêu diệt 5 quái vật bất kỳ",
+          "progress": 5,
           "completed": true
         },
         {
@@ -455,7 +504,7 @@
           "type": "loot",
           "count": 10,
           "reward": {
-            "xp": 100,
+            "xp": 2,
             "gold": 60
           },
           "description": "Thu thập 10 vật phẩm bất kỳ",
@@ -463,25 +512,25 @@
           "completed": true
         },
         {
-          "id": "kill_monsters",
+          "id": "kill_goblins",
           "type": "kill",
-          "target": "any",
-          "count": 5,
+          "target": "goblin",
+          "count": 3,
           "reward": {
-            "xp": 150,
-            "gold": 100
+            "xp": 3,
+            "gold": 75
           },
-          "description": "Tiêu diệt 5 quái vật bất kỳ",
-          "progress": 5,
-          "completed": true
+          "description": "Tiêu diệt 3 Yêu Tinh Xanh",
+          "progress": 0,
+          "completed": false
         }
       ]
     },
     "statistics": {
-      "monstersKilled": 31,
+      "monstersKilled": 73,
       "bossesKilled": 0,
-      "itemsFound": 56,
-      "questsCompleted": 3
+      "itemsFound": 140,
+      "questsCompleted": 5
     },
     "lastRevivalUse": 0,
     "pvp": {
@@ -496,6 +545,7 @@
         "losses": 0,
         "totalFights": 1
       }
-    }
+    },
+    "lastRestTime": 1753236824858
   }
 }

@@ -1,10 +1,10 @@
 {
   "4548471c": {
     "userId": "4548471c",
-    "money": 29870,
+    "money": 28873,
     "joinDate": "2025-07-22T04:35:38.825Z",
-    "lastActive": "2025-07-22T17:09:44.979Z",
-    "commandCount": 118,
+    "lastActive": "2025-07-23T02:17:13.869Z",
+    "commandCount": 133,
     "lastDaily": "2025-07-22T04:35:38.826Z",
     "dailyStreak": 1,
     "role": 1
@@ -67,10 +67,42 @@
   },
   "59b968d8": {
     "userId": "59b968d8",
-    "money": 595,
+    "money": 185,
     "joinDate": "2025-07-22T15:59:44.505Z",
-    "lastActive": "2025-07-22T17:09:30.588Z",
-    "commandCount": 156,
+    "lastActive": "2025-07-23T02:17:19.727Z",
+    "commandCount": 325,
     "role": 1
+  },
+  "a9981bed": {
+    "userId": "a9981bed",
+    "money": 1619,
+    "joinDate": "2025-07-22T23:58:53.388Z",
+    "lastActive": "2025-07-23T01:19:21.065Z",
+    "commandCount": 6,
+    "role": 0
+  },
+  "e7fcg396": {
+    "userId": "e7fcg396",
+    "money": 1000,
+    "joinDate": "2025-07-23T00:09:04.069Z",
+    "lastActive": "2025-07-23T00:09:04.069Z",
+    "commandCount": 1,
+    "role": 0
+  },
+  "325caf1b": {
+    "userId": "325caf1b",
+    "money": 1000,
+    "joinDate": "2025-07-23T02:03:33.687Z",
+    "lastActive": "2025-07-23T02:03:33.689Z",
+    "commandCount": 1,
+    "role": 0
+  },
+  "f18geb6g": {
+    "userId": "f18geb6g",
+    "money": 0,
+    "joinDate": "2025-07-23T02:13:05.465Z",
+    "lastActive": "2025-07-23T02:15:35.134Z",
+    "commandCount": 4,
+    "role": 0
   }
 }
