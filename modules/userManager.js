@@ -106,6 +106,14 @@ class UserManager {
     }, 100); // 100ms debounce
   }
 
+  // 👤 Kiểm tra user có tồn tại không (không tạo mới)
+  userExists(userId) {
+    if (!userId || typeof userId !== 'string') {
+      return false;
+    }
+    return this.users.hasOwnProperty(userId);
+  }
+
   // 👤 Lấy thông tin user
   getUser(userId) {
     if (!userId || typeof userId !== 'string') {

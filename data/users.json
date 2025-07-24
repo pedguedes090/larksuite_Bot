@@ -104,5 +104,117 @@
     "lastActive": "2025-07-23T02:15:35.134Z",
     "commandCount": 4,
     "role": 0
+  },
+  "skill_test_final": {
+    "userId": "skill_test_final",
+    "money": 1600,
+    "joinDate": "2025-07-24T15:51:37.350Z",
+    "lastActive": "2025-07-24T15:51:37.354Z",
+    "commandCount": 5,
+    "role": 0
+  },
+  "pvp_test_player1": {
+    "userId": "pvp_test_player1",
+    "money": 1000,
+    "joinDate": "2025-07-24T15:53:41.302Z",
+    "lastActive": "2025-07-24T15:53:41.306Z",
+    "commandCount": 4,
+    "role": 0
+  },
+  "pvp_test_player2": {
+    "userId": "pvp_test_player2",
+    "money": 1010,
+    "joinDate": "2025-07-24T15:53:41.303Z",
+    "lastActive": "2025-07-24T15:53:41.306Z",
+    "commandCount": 3,
+    "role": 0
+  },
+  "pvp_advanced_1": {
+    "userId": "pvp_advanced_1",
+    "money": 1000,
+    "joinDate": "2025-07-24T15:54:27.045Z",
+    "lastActive": "2025-07-24T15:54:27.049Z",
+    "commandCount": 9,
+    "role": 0
+  },
+  "pvp_advanced_2": {
+    "userId": "pvp_advanced_2",
+    "money": 1000,
+    "joinDate": "2025-07-24T15:54:27.046Z",
+    "lastActive": "2025-07-24T15:54:27.049Z",
+    "commandCount": 1,
+    "role": 0
+  },
+  "pvp_advanced_3": {
+    "userId": "pvp_advanced_3",
+    "money": 1000,
+    "joinDate": "2025-07-24T15:54:27.046Z",
+    "lastActive": "2025-07-24T15:54:27.049Z",
+    "commandCount": 0,
+    "role": 0
+  },
+  "nonexistent_user_12345": {
+    "userId": "nonexistent_user_12345",
+    "money": 1000,
+    "joinDate": "2025-07-24T15:54:27.048Z",
+    "lastActive": "2025-07-24T15:54:27.048Z",
+    "commandCount": 0,
+    "role": 0
+  },
+  "test_fix_user": {
+    "userId": "test_fix_user",
+    "money": 1000,
+    "joinDate": "2025-07-24T15:56:46.254Z",
+    "lastActive": "2025-07-24T15:56:46.256Z",
+    "commandCount": 1,
+    "role": 0
+  },
+  "pvp_skill_test1": {
+    "userId": "pvp_skill_test1",
+    "money": 2010,
+    "joinDate": "2025-07-24T16:02:43.123Z",
+    "lastActive": "2025-07-24T16:02:43.128Z",
+    "commandCount": 6,
+    "role": 0
+  },
+  "pvp_skill_test2": {
+    "userId": "pvp_skill_test2",
+    "money": 2100,
+    "joinDate": "2025-07-24T16:02:43.123Z",
+    "lastActive": "2025-07-24T16:02:43.127Z",
+    "commandCount": 6,
+    "role": 0
+  },
+  "skill_test_p1": {
+    "userId": "skill_test_p1",
+    "money": 1000,
+    "joinDate": "2025-07-24T16:05:47.931Z",
+    "lastActive": "2025-07-24T16:09:06.426Z",
+    "commandCount": 0,
+    "role": 0
+  },
+  "skill_test_p2": {
+    "userId": "skill_test_p2",
+    "money": 1000,
+    "joinDate": "2025-07-24T16:05:47.932Z",
+    "lastActive": "2025-07-24T16:09:06.427Z",
+    "commandCount": 0,
+    "role": 0
+  },
+  "real_pvp_test1": {
+    "userId": "real_pvp_test1",
+    "money": 1000,
+    "joinDate": "2025-07-24T16:13:06.612Z",
+    "lastActive": "2025-07-24T16:14:56.967Z",
+    "commandCount": 1,
+    "role": 0
+  },
+  "real_pvp_test2": {
+    "userId": "real_pvp_test2",
+    "money": 1000,
+    "joinDate": "2025-07-24T16:13:06.613Z",
+    "lastActive": "2025-07-24T16:14:56.968Z",
+    "commandCount": 0,
+    "role": 0
   }
 }

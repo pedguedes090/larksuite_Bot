@@ -1341,10 +1341,16 @@ async function handlePvpChallenge(challengerId, targetId) {
   if (!targetId) return '❌ **Thiếu tham số!** Sử dụng: `wb pvp <userId>`';
   
   const challenger = wbManager.getUser(challengerId);
-  const target = userManager.getUser(targetId); // Check if user exists in general system
   
-  if (!target) return '❌ Người chơi không tồn tại!';
+  // Check if target user exists without creating them
+  if (!userManager.userExists(targetId)) {
+    return '❌ Người chơi không tồn tại!';
+  }
+  
   if (targetId === challengerId) return '❌ Không thể thách đấu chính mình!';
+  
+  // Now get target user since we know they exist
+  const target = userManager.getUser(targetId);
   
   // Initialize PvP data if not exists
   if (!challenger.pvp) {
@@ -1534,15 +1540,21 @@ async function handlePvpAutoCombat(player1Id, player2Id) {
   let turnCount = 0;
   let currentPlayer1Hp = player1.pvp.currentHp;
   let currentPlayer2Hp = player2.pvp.currentHp;
+  let currentPlayer1Mp = player1.mp;
+  let currentPlayer2Mp = player2.mp;
+  let skillCooldowns1 = { ...(player1.skillCooldowns || {}) };
+  let skillCooldowns2 = { ...(player2.skillCooldowns || {}) };
   const maxTurns = 50; // Prevent infinite loops
   
   const stats1 = wbManager.getEquippedStats(player1Id);
   const stats2 = wbManager.getEquippedStats(player2Id);
   const maxHp1 = player1.maxHp + stats1.hpBonus;
   const maxHp2 = player2.maxHp + stats2.hpBonus;
+  const equippedSkills1 = player1.equippedSkills || [];
+  const equippedSkills2 = player2.equippedSkills || [];
   
-  combatLog.push(`⚔️ **PVP AUTO-COMBAT** ⚔️`);
-  combatLog.push(`**${player1Id}** (Lv.${player1.level}, ${currentPlayer1Hp} HP) VS **${player2Id}** (Lv.${player2.level}, ${currentPlayer2Hp} HP)`);
+  combatLog.push(`⚔️ **PVP AUTO-COMBAT WITH SKILLS** ⚔️`);
+  combatLog.push(`**${player1Id}** (Lv.${player1.level}, ${currentPlayer1Hp} HP, ${currentPlayer1Mp} MP) VS **${player2Id}** (Lv.${player2.level}, ${currentPlayer2Hp} HP, ${currentPlayer2Mp} MP)`);
   combatLog.push('');
 
   while (currentPlayer1Hp > 0 && currentPlayer2Hp > 0 && turnCount < maxTurns) {
@@ -1552,29 +1564,61 @@ async function handlePvpAutoCombat(player1Id, player2Id) {
     const player1AttacksFirst = Math.random() < 0.5;
     
     if (player1AttacksFirst) {
-      // Player 1 attacks Player 2
-      const damage = calculatePvpDamage(stats1, stats2);
-      currentPlayer2Hp = Math.max(0, currentPlayer2Hp - damage.amount);
-      combatLog.push(`Turn ${turnCount}A: 💥 ${player1Id} → ${player2Id}: ${damage.amount} dmg${damage.isCrit ? ' 🎯' : ''} | HP: ${currentPlayer2Hp}/${maxHp2}`);
+      // Player 1 turn with skills
+      const { damage: damage1, mp: newMp1, hp: newHp1, skillMsg: skillMsg1 } = calculatePvpTurnWithSkills(
+        player1Id, stats1, stats2, currentPlayer1Mp, currentPlayer1Hp, maxHp1, equippedSkills1, skillCooldowns1
+      );
+      currentPlayer1Mp = newMp1;
+      currentPlayer1Hp = newHp1;
+      currentPlayer2Hp = Math.max(0, currentPlayer2Hp - damage1);
+      
+      if (skillMsg1) combatLog.push(`Turn ${turnCount}A: ${skillMsg1}`);
+      combatLog.push(`Turn ${turnCount}A: 💥 ${player1Id} → ${player2Id}: ${damage1} dmg | HP: ${currentPlayer2Hp}/${maxHp2}`);
       
       if (currentPlayer2Hp <= 0) break;
       
-      // Player 2 attacks Player 1
-      const damage2 = calculatePvpDamage(stats2, stats1);
-      currentPlayer1Hp = Math.max(0, currentPlayer1Hp - damage2.amount);
-      combatLog.push(`Turn ${turnCount}B: 💥 ${player2Id} → ${player1Id}: ${damage2.amount} dmg${damage2.isCrit ? ' 🎯' : ''} | HP: ${currentPlayer1Hp}/${maxHp1}`);
+      // Player 2 turn with skills
+      const { damage: damage2, mp: newMp2, hp: newHp2, skillMsg: skillMsg2 } = calculatePvpTurnWithSkills(
+        player2Id, stats2, stats1, currentPlayer2Mp, currentPlayer2Hp, maxHp2, equippedSkills2, skillCooldowns2
+      );
+      currentPlayer2Mp = newMp2;
+      currentPlayer2Hp = newHp2;
+      currentPlayer1Hp = Math.max(0, currentPlayer1Hp - damage2);
+      
+      if (skillMsg2) combatLog.push(`Turn ${turnCount}B: ${skillMsg2}`);
+      combatLog.push(`Turn ${turnCount}B: 💥 ${player2Id} → ${player1Id}: ${damage2} dmg | HP: ${currentPlayer1Hp}/${maxHp1}`);
     } else {
-      // Player 2 attacks Player 1
-      const damage = calculatePvpDamage(stats2, stats1);
-      currentPlayer1Hp = Math.max(0, currentPlayer1Hp - damage.amount);
-      combatLog.push(`Turn ${turnCount}A: 💥 ${player2Id} → ${player1Id}: ${damage.amount} dmg${damage.isCrit ? ' 🎯' : ''} | HP: ${currentPlayer1Hp}/${maxHp1}`);
+      // Player 2 turn with skills
+      const { damage: damage2, mp: newMp2, hp: newHp2, skillMsg: skillMsg2 } = calculatePvpTurnWithSkills(
+        player2Id, stats2, stats1, currentPlayer2Mp, currentPlayer2Hp, maxHp2, equippedSkills2, skillCooldowns2
+      );
+      currentPlayer2Mp = newMp2;
+      currentPlayer2Hp = newHp2;
+      currentPlayer1Hp = Math.max(0, currentPlayer1Hp - damage2);
+      
+      if (skillMsg2) combatLog.push(`Turn ${turnCount}A: ${skillMsg2}`);
+      combatLog.push(`Turn ${turnCount}A: 💥 ${player2Id} → ${player1Id}: ${damage2} dmg | HP: ${currentPlayer1Hp}/${maxHp1}`);
       
       if (currentPlayer1Hp <= 0) break;
       
-      // Player 1 attacks Player 2
-      const damage2 = calculatePvpDamage(stats1, stats2);
-      currentPlayer2Hp = Math.max(0, currentPlayer2Hp - damage2.amount);
-      combatLog.push(`Turn ${turnCount}B: 💥 ${player1Id} → ${player2Id}: ${damage2.amount} dmg${damage2.isCrit ? ' 🎯' : ''} | HP: ${currentPlayer2Hp}/${maxHp2}`);
+      // Player 1 turn with skills
+      const { damage: damage1, mp: newMp1, hp: newHp1, skillMsg: skillMsg1 } = calculatePvpTurnWithSkills(
+        player1Id, stats1, stats2, currentPlayer1Mp, currentPlayer1Hp, maxHp1, equippedSkills1, skillCooldowns1
+      );
+      currentPlayer1Mp = newMp1;
+      currentPlayer1Hp = newHp1;
+      currentPlayer2Hp = Math.max(0, currentPlayer2Hp - damage1);
+      
+      if (skillMsg1) combatLog.push(`Turn ${turnCount}B: ${skillMsg1}`);
+      combatLog.push(`Turn ${turnCount}B: 💥 ${player1Id} → ${player2Id}: ${damage1} dmg | HP: ${currentPlayer2Hp}/${maxHp2}`);
+    }
+    
+    // Decrease skill cooldowns
+    for (const skillId of equippedSkills1) {
+      if (skillCooldowns1[skillId] > 0) skillCooldowns1[skillId]--;
+    }
+    for (const skillId of equippedSkills2) {
+      if (skillCooldowns2[skillId] > 0) skillCooldowns2[skillId]--;
     }
     
     combatLog.push('');
@@ -1638,6 +1682,99 @@ async function handlePvpAutoCombat(player1Id, player2Id) {
   combatLog.push(`📊 PvP Record: ${winner.pvp.stats.wins}W/${winner.pvp.stats.losses}L`);
   
   return combatLog.join('\n');
+}
+
+function calculatePvpTurnWithSkills(playerId, attackerStats, defenderStats, currentMp, currentHp, maxHp, equippedSkills, skillCooldowns) {
+  let usedSkill = null;
+  let skillMsg = '';
+  let damage = 0;
+  let mp = currentMp;
+  let hp = currentHp;
+  
+  // Smart skill selection (similar to PVE auto-combat)
+  // Prioritize heal if HP < 40%
+  for (const skillId of equippedSkills) {
+    const skill = wbManager.getSkill(skillId);
+    if (!skill) continue;
+    if (skill.category === 'heal' && skillCooldowns[skillId] <= 0 && mp >= skill.mp_cost && hp < maxHp * 0.4) {
+      usedSkill = skill;
+      break;
+    }
+  }
+  
+  // If no heal needed, prioritize attack skills
+  if (!usedSkill) {
+    for (const skillId of equippedSkills) {
+      const skill = wbManager.getSkill(skillId);
+      if (!skill) continue;
+      if (skill.category === 'attack' && skillCooldowns[skillId] <= 0 && mp >= skill.mp_cost) {
+        usedSkill = skill;
+        break;
+      }
+    }
+  }
+  
+  // If no attack, use buff skills
+  if (!usedSkill) {
+    for (const skillId of equippedSkills) {
+      const skill = wbManager.getSkill(skillId);
+      if (!skill) continue;
+      if (skill.category === 'buff' && skillCooldowns[skillId] <= 0 && mp >= skill.mp_cost) {
+        usedSkill = skill;
+        break;
+      }
+    }
+  }
+  
+  // Calculate damage based on skill or normal attack
+  if (usedSkill) {
+    mp -= usedSkill.mp_cost;
+    skillCooldowns[usedSkill.id] = usedSkill.cooldown;
+    
+    switch (usedSkill.effect) {
+      case 'double_attack':
+        damage = Math.max(1, Math.floor(attackerStats.attack * 0.8) - defenderStats.defense);
+        skillMsg = `🌀 ${playerId} dùng ${usedSkill.name}! 2 đòn, mỗi đòn ${damage} sát thương.`;
+        damage = damage * 2;
+        break;
+      case 'heal_30':
+        const heal = Math.floor(maxHp * 0.3);
+        hp = Math.min(maxHp, hp + heal);
+        skillMsg = `💚 ${playerId} dùng ${usedSkill.name}! Hồi ${heal} HP (${hp}/${maxHp})`;
+        damage = 0;
+        break;
+      case 'buff_def_40_2':
+        // Note: PVP buffs don't persist across turns in this simple system
+        skillMsg = `🛡️ ${playerId} dùng ${usedSkill.name}! Tăng phòng thủ.`;
+        damage = Math.max(1, attackerStats.attack - defenderStats.defense);
+        break;
+      case 'fireball':
+        damage = Math.max(1, Math.floor(attackerStats.attack * 1.5) - Math.floor(defenderStats.defense * 0.8));
+        skillMsg = `🔥 ${playerId} dùng ${usedSkill.name}! Gây ${damage} sát thương phép.`;
+        break;
+      case 'buff_atk_30_def_-20_3':
+        skillMsg = `💢 ${playerId} dùng ${usedSkill.name}! Tăng tấn công, giảm phòng thủ.`;
+        damage = Math.max(1, attackerStats.attack - defenderStats.defense);
+        break;
+      default:
+        skillMsg = `${playerId} dùng ${usedSkill.name}!`;
+        damage = Math.max(1, attackerStats.attack - defenderStats.defense);
+    }
+  } else {
+    // Normal attack with crit chance
+    const baseDamage = Math.max(1, attackerStats.attack - defenderStats.defense);
+    const critChance = 0.15;
+    const isCrit = Math.random() < critChance;
+    damage = isCrit ? Math.floor(baseDamage * 1.5) : baseDamage;
+    if (isCrit) skillMsg = `🎯 Critical Hit!`;
+  }
+  
+  return {
+    damage: damage,
+    mp: mp,
+    hp: hp,
+    skillMsg: skillMsg
+  };
 }
 
 function calculatePvpDamage(attackerStats, defenderStats) {
@@ -1758,6 +1895,7 @@ export default {
 \`wb pve\` - Tấn công từng lượt (cổ điển)
 \`wb pve auto\` - ⚡ Auto-combat đến kết thúc
 \`wb pve safe\` - 🛡️ Auto-combat với safe stop (HP < 70%)
+\`wb pve <skill_id>\` - 🧙‍♂️ Sử dụng skill cụ thể
 \`wb rest\` - 💤 Nghỉ ngơi để hồi HP (5 phút cooldown)
 
 **🎒 Quản lý đồ đạc:**
@@ -1767,8 +1905,13 @@ export default {
 
 **🏪 Mua bán:**
 \`wb shop\` - Xem cửa hàng
-\`wb shop buy <item>\` - Mua vật phẩm
+\`wb shop buy <item>\` - Mua vật phẩm/skill
 \`wb shop sell <item>\` - Bán vật phẩm
+
+**🧙‍♂️ Hệ thống Skill:**
+\`wb skill\` - Xem skills đã sở hữu
+\`wb skill equip <skill_id>\` - Trang bị skill (tối đa 3)
+\`wb skill unequip <skill_id>\` - Gỡ skill
 
 **📋 Nhiệm vụ & Thống kê:**
 \`wb quest\` - Xem nhiệm vụ hàng ngày
