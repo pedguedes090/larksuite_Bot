@@ -396,7 +396,8 @@
       { "itemId": "chainmail", "quantity": 1, "chance": 0.5 },
       { "itemId": "experience_gem", "quantity": 2, "chance": 0.8 },
       { "itemId": "lucky_charm", "quantity": 1, "chance": 0.4 }
-    ]
+    ],
+    "skills": ["double_strike", "shield"]
   },
   "orc_chieftain": {
     "id": "orc_chieftain",
@@ -413,7 +414,8 @@
       { "itemId": "mithril_chainmail", "quantity": 1, "chance": 0.3 },
       { "itemId": "revival_stone", "quantity": 1, "chance": 0.3 },
       { "itemId": "greater_experience_gem", "quantity": 2, "chance": 0.9 }
-    ]
+    ],
+    "skills": ["berserk", "double_strike"]
   },
   "lich": {
     "id": "lich",
@@ -430,7 +432,8 @@
       { "itemId": "enchanted_robe", "quantity": 1, "chance": 0.4 },
       { "itemId": "master_experience_gem", "quantity": 1, "chance": 0.7 },
       { "itemId": "phoenix_down", "quantity": 1, "chance": 0.2 }
-    ]
+    ],
+    "skills": ["fireball", "heal"]
   },
   "hydra": {
     "id": "hydra",
@@ -447,7 +450,8 @@
       { "itemId": "dragon_scale_armor", "quantity": 1, "chance": 0.25 },
       { "itemId": "dragon_scale", "quantity": 5, "chance": 1.0 },
       { "itemId": "treasure_map", "quantity": 1, "chance": 0.4 }
-    ]
+    ],
+    "skills": ["double_strike", "shield"]
   },
 
   "_comment": "=== WORLD BOSSES (Lv20+) ===",
@@ -468,7 +472,8 @@
       { "itemId": "dragon_scale", "quantity": 10, "chance": 1.0 },
       { "itemId": "master_experience_gem", "quantity": 3, "chance": 1.0 },
       { "itemId": "phoenix_down", "quantity": 2, "chance": 0.6 }
-    ]
+    ],
+    "skills": ["fireball", "berserk"]
   },
   "demon_lord": {
     "id": "demon_lord",
@@ -487,7 +492,8 @@
       { "itemId": "demon_horn", "quantity": 5, "chance": 1.0 },
       { "itemId": "phoenix_down", "quantity": 3, "chance": 0.8 },
       { "itemId": "key_of_mysteries", "quantity": 1, "chance": 0.7 }
-    ]
+    ],
+    "skills": ["berserk", "fireball"]
   },
   "celestial_guardian": {
     "id": "celestial_guardian",
@@ -506,7 +512,8 @@
       { "itemId": "phoenix_feather", "quantity": 3, "chance": 1.0 },
       { "itemId": "gods_blessing", "quantity": 2, "chance": 1.0 },
       { "itemId": "elixir_of_life", "quantity": 3, "chance": 0.9 }
-    ]
+    ],
+    "skills": ["shield", "heal"]
   },
 
   "_comment": "=== RARE ENCOUNTERS ===",

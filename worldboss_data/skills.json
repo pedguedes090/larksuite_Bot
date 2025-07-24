@@ -1,0 +1,75 @@
+{
+  "double_strike": {
+    "id": "double_strike",
+    "name": "Đánh Đôi",
+    "description": "Tấn công 2 lần trong lượt này (mỗi đòn 80% sát thương).",
+    "mp_cost": 18,
+    "cooldown": 3,
+    "type": "active",
+    "effect": "double_attack",
+    "buyPrice": 400,
+    "category": "attack"
+  },
+  "heal": {
+    "id": "heal",
+    "name": "Hồi Máu",
+    "description": "Hồi 30% HP tối đa.",
+    "mp_cost": 22,
+    "cooldown": 4,
+    "type": "active",
+    "effect": "heal_30",
+    "buyPrice": 500,
+    "category": "heal"
+  },
+  "shield": {
+    "id": "shield",
+    "name": "Khiên Bảo Hộ",
+    "description": "Tăng 40% phòng thủ trong 2 lượt.",
+    "mp_cost": 16,
+    "cooldown": 4,
+    "type": "active",
+    "effect": "buff_def_40_2",
+    "buyPrice": 350,
+    "category": "buff"
+  },
+  "fireball": {
+    "id": "fireball",
+    "name": "Cầu Lửa",
+    "description": "Gây sát thương phép mạnh (150% tấn công, bỏ qua 20% phòng thủ đối phương).",
+    "mp_cost": 24,
+    "cooldown": 3,
+    "type": "active",
+    "effect": "fireball",
+    "buyPrice": 600,
+    "category": "attack"
+  },
+  "berserk": {
+    "id": "berserk",
+    "name": "Cuồng Nộ",
+    "description": "Tăng 30% tấn công, giảm 20% phòng thủ trong 3 lượt.",
+    "mp_cost": 20,
+    "cooldown": 5,
+    "type": "active",
+    "effect": "buff_atk_30_def_-20_3",
+    "buyPrice": 550,
+    "category": "buff"
+  },
+  "fury": {
+    "id": "fury",
+    "name": "Cuồng Bạo",
+    "description": "[Bị động] Tăng 10% tấn công vĩnh viễn khi trang bị.",
+    "type": "passive",
+    "effect": "passive_atk_10",
+    "category": "passive",
+    "buyPrice": 700
+  },
+  "iron_skin": {
+    "id": "iron_skin",
+    "name": "Da Sắt",
+    "description": "[Bị động] Tăng 10% phòng thủ vĩnh viễn khi trang bị.",
+    "type": "passive",
+    "effect": "passive_def_10",
+    "category": "passive",
+    "buyPrice": 700
+  }
+} 

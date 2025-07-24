@@ -7,6 +7,7 @@ const userFile = path.join(dataDir, 'wbUsers.json');
 const itemFile = path.join(dataDir, 'items.json');
 const monsterFile = path.join(dataDir, 'monsters.json');
 const mapFile = path.join(dataDir, 'maps.json');
+const skillFile = path.join(dataDir, 'skills.json');
 
 class WB_DataManager {
   static instance = null;
@@ -21,6 +22,7 @@ class WB_DataManager {
     this.items = this.loadJson(itemFile, {});
     this.monsters = this.loadJson(monsterFile, {});
     this.maps = this.loadJson(mapFile, {});
+    this.skills = this.loadJson(skillFile, {});
     this.saveTimeout = null;
 
     WB_DataManager.instance = this;
@@ -41,7 +43,8 @@ class WB_DataManager {
         [userFile]: '{}',
         [itemFile]: '{}',
         [monsterFile]: '{}',
-        [mapFile]: '{}'
+        [mapFile]: '{}',
+        [skillFile]: '{}'
     };
     for (const [file, content] of Object.entries(files)) {
         if (!fs.existsSync(file)) {
@@ -167,6 +170,12 @@ class WB_DataManager {
       }
     }
     
+    // Add passive skill effects
+    if (user.passiveEffects) {
+      if (user.passiveEffects.atk) totalAttack = Math.floor(totalAttack * (1 + user.passiveEffects.atk));
+      if (user.passiveEffects.def) totalDefense = Math.floor(totalDefense * (1 + user.passiveEffects.def));
+    }
+
     return {
       attack: totalAttack,
       defense: totalDefense,
@@ -300,7 +309,14 @@ class WB_DataManager {
       buff.turnsRemaining = Math.max(0, buff.turnsRemaining - 1);
     }
     
+    // Passive regen mỗi lượt
+    if (user.passiveEffects && user.passiveEffects.regen) {
+      const maxHp = user.maxHp + (this.getEquippedStats(userId).hpBonus || 0);
+      const regen = Math.floor(maxHp * user.passiveEffects.regen);
+      user.hp = Math.min(maxHp, user.hp + regen);
+    }
     this.cleanExpiredBuffs(userId);
+    this.saveUsers();
   }
 
   // === COOLDOWN SYSTEM ===
@@ -456,6 +472,112 @@ class WB_DataManager {
       user.statistics[stat] += amount;
       this.saveUsers();
     }
+  }
+
+  // === SKILL SYSTEM ===
+  getSkill(skillId) {
+    return this.skills[skillId] || null;
+  }
+  getAllSkills() {
+    return Object.values(this.skills);
+  }
+  // Thêm skill vào danh sách đã sở hữu của user
+  addSkillToUser(userId, skillId) {
+    const user = this.getUser(userId);
+    if (!user.skills) user.skills = [];
+    if (!user.skills.includes(skillId)) {
+      user.skills.push(skillId);
+      this.saveUsers();
+      return true;
+    }
+    return false;
+  }
+  // Trang bị skill (tối đa 3)
+  equipSkill(userId, skillId) {
+    const user = this.getUser(userId);
+    if (!user.skills || !user.skills.includes(skillId)) return { success: false, message: 'Bạn chưa sở hữu kỹ năng này.' };
+    if (!user.equippedSkills) user.equippedSkills = [];
+    if (user.equippedSkills.includes(skillId)) return { success: false, message: 'Kỹ năng đã được trang bị.' };
+    if (user.equippedSkills.length >= 3) return { success: false, message: 'Chỉ được trang bị tối đa 3 kỹ năng.' };
+    const skill = this.getSkill(skillId);
+    user.equippedSkills.push(skillId);
+    // Passive skill: cộng chỉ số ngay khi trang bị
+    if (skill && skill.type === 'passive') {
+      if (!user.passiveEffects) user.passiveEffects = {};
+      switch (skill.effect) {
+        case 'passive_atk_10':
+          user.passiveEffects.atk = (user.passiveEffects.atk || 0) + 0.1;
+          break;
+        case 'passive_def_10':
+          user.passiveEffects.def = (user.passiveEffects.def || 0) + 0.1;
+          break;
+        // Có thể mở rộng thêm các passive khác
+      }
+    }
+    this.saveUsers();
+    return { success: true, message: 'Đã trang bị kỹ năng.' };
+  }
+  // Gỡ skill khỏi trang bị
+  unequipSkill(userId, skillId) {
+    const user = this.getUser(userId);
+    if (!user.equippedSkills) user.equippedSkills = [];
+    const idx = user.equippedSkills.indexOf(skillId);
+    if (idx === -1) return { success: false, message: 'Kỹ năng chưa được trang bị.' };
+    const skill = this.getSkill(skillId);
+    user.equippedSkills.splice(idx, 1);
+    // Passive skill: trừ chỉ số khi gỡ
+    if (skill && skill.type === 'passive') {
+      if (!user.passiveEffects) user.passiveEffects = {};
+      switch (skill.effect) {
+        case 'passive_atk_10':
+          user.passiveEffects.atk = (user.passiveEffects.atk || 0) - 0.1;
+          break;
+        case 'passive_def_10':
+          user.passiveEffects.def = (user.passiveEffects.def || 0) - 0.1;
+          break;
+      }
+    }
+    this.saveUsers();
+    return { success: true, message: 'Đã gỡ kỹ năng.' };
+  }
+  // Kiểm tra cooldown skill
+  getSkillCooldown(userId, skillId) {
+    const user = this.getUser(userId);
+    if (!user.skillCooldowns) user.skillCooldowns = {};
+    return user.skillCooldowns[skillId] || 0;
+  }
+  setSkillCooldown(userId, skillId, turns) {
+    const user = this.getUser(userId);
+    if (!user.skillCooldowns) user.skillCooldowns = {};
+    user.skillCooldowns[skillId] = turns;
+    this.saveUsers();
+  }
+  decreaseSkillCooldowns(userId) {
+    const user = this.getUser(userId);
+    if (!user.skillCooldowns) user.skillCooldowns = {};
+    for (const skillId in user.skillCooldowns) {
+      if (user.skillCooldowns[skillId] > 0) user.skillCooldowns[skillId]--;
+    }
+    this.saveUsers();
+  }
+  // Dùng skill (trừ mp, set cooldown)
+  useSkill(userId, skillId) {
+    const user = this.getUser(userId);
+    const skill = this.getSkill(skillId);
+    if (!skill) return { success: false, message: 'Kỹ năng không tồn tại.' };
+    if (!user.equippedSkills || !user.equippedSkills.includes(skillId)) return { success: false, message: 'Kỹ năng chưa được trang bị.' };
+    if (!user.skillCooldowns) user.skillCooldowns = {};
+    if (user.skillCooldowns[skillId] > 0) return { success: false, message: `Kỹ năng đang hồi (${user.skillCooldowns[skillId]} lượt).` };
+    if (user.mp < skill.mp_cost) return { success: false, message: 'Không đủ MP.' };
+    user.mp -= skill.mp_cost;
+    user.skillCooldowns[skillId] = skill.cooldown;
+    this.saveUsers();
+    return { success: true, message: `Đã dùng kỹ năng ${skill.name}.` };
+  }
+  // Hỗ trợ skill cho quái/boss
+  getMonsterSkills(monsterId) {
+    const monster = this.getMonster(monsterId);
+    return monster && monster.skills ? monster.skills : [];
   }
 }
 
