@@ -430,7 +430,6 @@ async function handlePve({ userId, args }) {
         } else {
             wbManager.updateUser(userId, {
                 xp: newXP,
-                hp: currentPlayerHp,
                 combatState: resetCombatState()
             });
         }
@@ -439,10 +438,11 @@ async function handlePve({ userId, args }) {
         }
         combatLog.push('');
         combatLog.push(`🎉 **CHIẾN THẮNG!** 🎉`);
-        combatLog.push(`Đã hạ gục ${monster.name} sau ${turnCount} lượt!`);
+        combatLog.push(`Đã hạ gục ${monster.name}!`);
         combatLog.push(`⭐ **Nhận được:** ${xpGained} XP${goldGained > 0 ? ` và ${goldGained} xu` : ''}`);
         combatLog.push(`🎁 **Vật phẩm rơi:**\n${lootLog.length > 0 ? lootLog.join('\n') : 'Không có gì cả.'}`);
         if (levelUpMessage) combatLog.push(levelUpMessage);
+        // RETURN NGAY LẬP TỨC, KHÔNG ĐỂ VÒNG LẶP CHẠY TIẾP
         return combatLog.join('\n');
     }
     // Monster turn: nếu monster có skills, có xác suất dùng skill
@@ -672,12 +672,139 @@ async function handleAutoCombat(userId, safeMode = false) {
         // Player attacks monster
         currentMonsterHp -= playerDamage;
         combatLog.push(`   💥 Gây ${playerDamage} sát thương. Monster HP: ${Math.max(0, currentMonsterHp)}/${wbUser.combatState.monsterMaxHp || monster.hp}`);
+        
         if (currentMonsterHp <= 0) {
-            // ... giữ nguyên logic thắng ...
-            // ... existing code ...
+            // Victory logic
+            const xpGained = Math.floor(monster.xpDrop * XP_MULTIPLIER);
+            const newXP = wbUser.xp + xpGained;
+            const oldLevel = wbUser.level;
+            const newLevel = calculateLevelFromXP(newXP);
+            let lootLog = [];
+            let goldGained = 0;
+            
+            // Handle loot
+            for (const drop of monster.drops) {
+                if (Math.random() < drop.chance) {
+                    const item = wbManager.getItem(drop.itemId);
+                    if (!item) continue;
+                    if (drop.itemId === 'gold_coin') {
+                        goldGained += drop.quantity;
+                    } else {
+                        wbManager.addItemToInventory(userId, drop.itemId, drop.quantity);
+                    }
+                    lootLog.push(`  + ${drop.quantity} ${item.name}`);
+                }
+            }
+            
+            // Update statistics
+            wbManager.updateStatistic(userId, 'monstersKilled');
+            if (monster.type === 'boss' || monster.type === 'world_boss') {
+                wbManager.updateStatistic(userId, 'bossesKilled');
+            }
+            
+            let levelUpMessage = '';
+            if (newLevel > oldLevel) {
+                const newStats = calculateStatsForLevel(newLevel);
+                const hpIncrease = newStats.maxHp - wbUser.maxHp;
+                const mpIncrease = newStats.maxMp - wbUser.maxMp;
+                levelUpMessage = `\n🎊 **LEVEL UP!** Level ${oldLevel} → Level ${newLevel}\n📈 **Tăng thể lực:** +${hpIncrease} HP, +${mpIncrease} MP, +${newStats.baseAttack - wbUser.baseAttack} ATK, +${newStats.baseDefense - wbUser.baseDefense} DEF`;
+                
+                wbManager.updateUser(userId, {
+                    level: newLevel,
+                    xp: newXP,
+                    maxHp: newStats.maxHp,
+                    maxMp: newStats.maxMp,
+                    hp: newStats.maxHp,
+                    mp: newStats.maxMp,
+                    baseAttack: newStats.baseAttack,
+                    baseDefense: newStats.baseDefense,
+                    combatState: resetCombatState()
+                });
+            } else {
+                wbManager.updateUser(userId, {
+                    xp: newXP,
+                    hp: currentPlayerHp,
+                    combatState: resetCombatState()
+                });
+            }
+            
+            if (goldGained > 0) {
+                userManager.updateMoney(userId, goldGained);
+            }
+            
+            combatLog.push('');
+            combatLog.push(`🎉 **CHIẾN THẮNG!** 🎉`);
+            combatLog.push(`Đã hạ gục ${monster.name} sau ${turnCount} lượt!`);
+            combatLog.push(`⭐ **Nhận được:** ${xpGained} XP${goldGained > 0 ? ` và ${goldGained} xu` : ''}`);
+            combatLog.push(`🎁 **Vật phẩm rơi:**\n${lootLog.length > 0 ? lootLog.join('\n') : 'Không có gì cả.'}`);
+            if (levelUpMessage) combatLog.push(levelUpMessage);
+            
+            return combatLog.join('\n');
         }
-        // Monster turn (giữ nguyên logic)
-        // ... existing code ...
+        
+        // Monster turn
+        let monsterDamage = Math.max(1, (wbUser.combatState.monsterBuffedAttack || monster.attack) - stats.defense);
+        currentPlayerHp -= monsterDamage;
+        combatLog.push(`   🩸 Monster tấn công: ${monsterDamage} sát thương. Your HP: ${Math.max(0, currentPlayerHp)}/${wbUser.maxHp + stats.hpBonus}`);
+        
+        // Check if player is defeated
+        if (currentPlayerHp <= 0) {
+            // Check for revival stone
+            const now = Date.now();
+            const revivalCooldown = 60000;
+            
+            if (wbManager.hasItem(userId, 'revival_stone') && 
+                (!wbUser.lastRevivalUse || now - wbUser.lastRevivalUse >= revivalCooldown)) {
+                
+                wbManager.removeItemFromInventory(userId, 'revival_stone', 1);
+                const reviveHp = Math.floor(wbUser.maxHp * 0.5);
+                currentPlayerHp = reviveHp;
+                
+                wbManager.updateUser(userId, {
+                    hp: reviveHp,
+                    lastRevivalUse: now
+                });
+                
+                combatLog.push(`💎 **ĐÁ HỒI SINH KÍCH HOẠT!** Hồi sinh với ${reviveHp} HP!`);
+            } else {
+                // Player died
+                const xpLost = Math.min(Math.floor(wbUser.xp * 0.1), 50);
+                const newXP = Math.max(0, wbUser.xp - xpLost);
+                const newLevel = calculateLevelFromXP(newXP);
+                
+                let levelDownMessage = '';
+                if (newLevel < wbUser.level) {
+                    const newStats = calculateStatsForLevel(newLevel);
+                    levelDownMessage = `\n📉 **Xuống cấp:** Level ${wbUser.level} → Level ${newLevel}`;
+                    
+                    wbManager.updateUser(userId, {
+                        level: newLevel,
+                        xp: newXP,
+                        maxHp: newStats.maxHp,
+                        maxMp: newStats.maxMp,
+                        hp: 1,
+                        mp: newStats.maxMp,
+                        baseAttack: newStats.baseAttack,
+                        baseDefense: newStats.baseDefense,
+                        combatState: resetCombatState()
+                    });
+                } else {
+                    wbManager.updateUser(userId, {
+                        xp: newXP,
+                        hp: 1,
+                        combatState: resetCombatState()
+                    });
+                }
+                
+                combatLog.push('');
+                combatLog.push(`☠️ **THẤT BẠI!** ☠️`);
+                combatLog.push(`Bạn đã bị ${monster.name} hạ gục sau ${turnCount} lượt.`);
+                combatLog.push(`- Bạn bị mất ${xpLost} XP.`);
+                combatLog.push(`- Bạn đã được hồi sinh tại thành với 1 HP.${levelDownMessage}`);
+                
+                return combatLog.join('\n');
+            }
+        }
         // Safe mode HP check
         if (safeMode) {
             const hpPercentage = currentPlayerHp / wbUser.maxHp;
@@ -983,11 +1110,11 @@ async function handleUse({ userId, args }) {
     
     // XP gem
     if (item.xpBonus) {
+        const adjustedXpBonus = Math.floor(item.xpBonus * XP_MULTIPLIER);
         const newXP = wbUser.xp + adjustedXpBonus;
         const oldLevel = wbUser.level;
         const newLevel = calculateLevelFromXP(newXP);
         
-        const adjustedXpBonus = Math.floor(item.xpBonus * XP_MULTIPLIER);
         message = `✅ Đã nhận ${adjustedXpBonus} XP!`;
         
         if (newLevel > oldLevel) {
