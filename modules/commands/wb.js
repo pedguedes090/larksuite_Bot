@@ -372,27 +372,21 @@ async function handlePve({ userId, args }) {
     else combatLog.push(`💥 Tổng sát thương lên quái: ${playerDamage}. HP quái còn: ${Math.max(0, newMonsterHp)}/${wbUser.combatState.monsterMaxHp || monster.hp}`);
     // Check if monster is defeated
     if (newMonsterHp <= 0) {
+        // === LOGIC CHIẾN THẮNG ===
         const xpGained = Math.floor(monster.xpDrop * XP_MULTIPLIER);
         const newXP = wbUser.xp + xpGained;
         const oldLevel = wbUser.level;
         const newLevel = calculateLevelFromXP(newXP);
-        
         let lootLog = [];
         let goldGained = 0;
-        
         // Handle loot with luck buff
         const luckBuff = wbUser.buffs.find(b => b.type === 'luck');
         const luckMultiplier = luckBuff ? (1 + luckBuff.amount) : 1;
-        
         for (const drop of monster.drops) {
             const adjustedChance = Math.min(1, drop.chance * luckMultiplier);
             if (Math.random() < adjustedChance) {
                 const item = wbManager.getItem(drop.itemId);
-                if (!item) {
-                    console.error(`❌ Item ${drop.itemId} not found in database`);
-                    continue;
-                }
-                
+                if (!item) continue;
                 if (drop.itemId === 'gold_coin') {
                     goldGained += drop.quantity;
                 } else {
@@ -401,7 +395,6 @@ async function handlePve({ userId, args }) {
                 lootLog.push(`  + ${drop.quantity} ${item.name}`);
             }
         }
-
         // Update statistics
         wbManager.updateStatistic(userId, 'monstersKilled');
         if (monster.type === 'boss' || monster.type === 'world_boss') {
@@ -410,33 +403,26 @@ async function handlePve({ userId, args }) {
         if (lootLog.length > 0) {
             wbManager.updateStatistic(userId, 'itemsFound', lootLog.length);
         }
-        
         // Update quest progress
         wbManager.updateQuestProgress(userId, 'kill', monster.id);
         wbManager.updateQuestProgress(userId, 'loot', null, lootLog.length);
-
         let levelUpMessage = '';
         if (newLevel > oldLevel) {
             const newStats = calculateStatsForLevel(newLevel);
             const hpIncrease = newStats.maxHp - wbUser.maxHp;
             const mpIncrease = newStats.maxMp - wbUser.maxMp;
-            
-            levelUpMessage = `\n🎊 **LEVEL UP!** Level ${oldLevel} → Level ${newLevel}
-📈 **Tăng thể lực:** +${hpIncrease} HP, +${mpIncrease} MP, +${newStats.baseAttack - wbUser.baseAttack} ATK, +${newStats.baseDefense - wbUser.baseDefense} DEF`;
-            
-            // Check for max level
+            levelUpMessage = `\n🎊 **LEVEL UP!** Level ${oldLevel} → Level ${newLevel}\n📈 **Tăng thể lực:** +${hpIncrease} HP, +${mpIncrease} MP, +${newStats.baseAttack - wbUser.baseAttack} ATK, +${newStats.baseDefense - wbUser.baseDefense} DEF`;
             if (newLevel >= MAX_LEVEL) {
                 const overflow = getXPOverflow(newXP, newLevel);
                 levelUpMessage += `\n🌟 **ĐÃ ĐẠT LEVEL TỐI ĐA!** (${overflow} XP thừa sẽ được lưu)`;
             }
-            
             wbManager.updateUser(userId, {
                 level: newLevel,
                 xp: newXP,
                 maxHp: newStats.maxHp,
                 maxMp: newStats.maxMp,
-                hp: newStats.maxHp, // Full heal on level up
-                mp: newStats.maxMp,  // Full MP restore
+                hp: newStats.maxHp,
+                mp: newStats.maxMp,
                 baseAttack: newStats.baseAttack,
                 baseDefense: newStats.baseDefense,
                 combatState: resetCombatState()
@@ -444,22 +430,20 @@ async function handlePve({ userId, args }) {
         } else {
             wbManager.updateUser(userId, {
                 xp: newXP,
+                hp: currentPlayerHp,
                 combatState: resetCombatState()
             });
         }
-
         if (goldGained > 0) {
             userManager.updateMoney(userId, goldGained);
         }
-
-        const victoryMessage = `🎉 **CHIẾN THẮNG!** 🎉
-Bạn đã hạ gục ${monster.name}!
-⭐ **Nhận được:** ${xpGained} XP${goldGained > 0 ? ` và ${goldGained} xu` : ''}
-🎁 **Vật phẩm rơi:**\n${lootLog.length > 0 ? lootLog.join('\n') : 'Không có gì cả.'}${levelUpMessage}
-
-HP của bạn: ${wbManager.getUser(userId).hp}/${wbManager.getUser(userId).maxHp}`;
-        
-        return victoryMessage;
+        combatLog.push('');
+        combatLog.push(`🎉 **CHIẾN THẮNG!** 🎉`);
+        combatLog.push(`Đã hạ gục ${monster.name} sau ${turnCount} lượt!`);
+        combatLog.push(`⭐ **Nhận được:** ${xpGained} XP${goldGained > 0 ? ` và ${goldGained} xu` : ''}`);
+        combatLog.push(`🎁 **Vật phẩm rơi:**\n${lootLog.length > 0 ? lootLog.join('\n') : 'Không có gì cả.'}`);
+        if (levelUpMessage) combatLog.push(levelUpMessage);
+        return combatLog.join('\n');
     }
     // Monster turn: nếu monster có skills, có xác suất dùng skill
     let monsterSkillMsg = '';
@@ -679,10 +663,15 @@ async function handleAutoCombat(userId, safeMode = false) {
                     skillMsg = `Dùng ${usedSkill.name}!`;
             }
         }
-        if (skillMsg) combatLog.push(skillMsg);
+        // Luôn log rõ ràng skill hoặc đánh thường
+        if (skillMsg) {
+            combatLog.push(`Turn ${turnCount}: ${skillMsg}`);
+        } else {
+            combatLog.push(`Turn ${turnCount}: 💥 Đánh thường!`);
+        }
         // Player attacks monster
         currentMonsterHp -= playerDamage;
-        combatLog.push(`Turn ${turnCount}: 💥 Gây ${playerDamage} sát thương. Monster HP: ${Math.max(0, currentMonsterHp)}/${wbUser.combatState.monsterMaxHp || monster.hp}`);
+        combatLog.push(`   💥 Gây ${playerDamage} sát thương. Monster HP: ${Math.max(0, currentMonsterHp)}/${wbUser.combatState.monsterMaxHp || monster.hp}`);
         if (currentMonsterHp <= 0) {
             // ... giữ nguyên logic thắng ...
             // ... existing code ...
@@ -707,8 +696,8 @@ async function handleAutoCombat(userId, safeMode = false) {
                 combatLog.push(`HP xuống dưới 70% (${currentPlayerHp}/${wbUser.maxHp}). Tạm dừng để bạn dùng thuốc!`);
                 combatLog.push(`Monster còn ${currentMonsterHp}/${monster.hp} HP.`);
                 combatLog.push('');
-                combatLog.push(`**Tiếp tục:** \`wb pve\` | \`wb pve auto\` | \`wb pve safe\``);
-                combatLog.push(`**Dùng thuốc:** \`wb use health_potion\``);
+                combatLog.push('**Tiếp tục:** `wb pve` | `wb pve auto` | `wb pve safe`');
+                combatLog.push('**Dùng thuốc:** `wb use health_potion`');
                 return combatLog.join('\n');
             }
         }
