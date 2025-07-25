@@ -67,7 +67,7 @@ function parseBets(args, userMoney) {
 export default {
   name: 'baucua',
   description: 'Chơi game Bầu Cua Tôm Cá, cược nhiều mặt cùng lúc!',
-  usage: '!baucua <mặt> <số tiền> [<mặt2> <số tiền2> ...] hoặc !baucua bầu cua cá 1000',
+  usage: '!baucua <bầu/cua/tôm/cá/gà/nai> <số tiền> [<bầu/cua/tôm/cá/gà/nai> <số tiền2> ...] hoặc !baucua bầu cua cá 1000',
   aliases: ['bctc', 'bau', 'cua', 'tom', 'ca', 'ga', 'nai'],
   adminOnly: false,
 
@@ -77,7 +77,7 @@ export default {
     const user = userManager.getUser(userId);
 
     if (!args || args.length === 0) {
-      return `🎲 **Cách chơi Bầu Cua:**\n\`${prefix}baucua <mặt> <số tiền> [<mặt2> <số tiền2> ...]\`\nVD: \`${prefix}baucua bầu 1000 cua 500 cá 2000\`\nHoặc: \`${prefix}baucua tôm 1000\`\n\nCác mặt: ${FACES.map(f => `${f.emoji} ${f.name}`).join(', ')}\nMức cược tối thiểu: ${MIN_BET.toLocaleString('vi-VN')} xu.`;
+      return `🎲 **Cách chơi Bầu Cua:**\n\`${prefix}baucua <bầu/cua/tôm/cá/gà/nai> <số tiền> [<bầu/cua/tôm/cá/gà/nai> <số tiền2> ...]\`\nVD: \`${prefix}baucua bầu 1000 cua 500 cá 2000\`\nHoặc: \`${prefix}baucua tôm 1000\`\n\nCác mặt: ${FACES.map(f => `${f.emoji} ${f.name}`).join(', ')}\nMức cược tối thiểu: ${MIN_BET.toLocaleString('vi-VN')} xu.`;
     }
 
     const { bets, totalBet, error } = parseBets(args, user.money);
@@ -113,7 +113,13 @@ export default {
     let response = `🎲 **KẾT QUẢ BẦU CUA** 🎲\n\n`;
     response += `Kết quả: ${result.map(f => getFaceEmoji(f)).join('  ')}\n\n`;
     response += detail;
-    response += `\n${totalWin > 0 ? `🎉 **Bạn thắng tổng cộng: +${(totalWin - totalBet).toLocaleString('vi-VN')} xu!**` : `😥 **Bạn đã thua toàn bộ số cược!**`}`;
+    if (totalWin === totalBet) {
+      response += `\n😐 **Bạn hòa tiền, nhận lại số đã cược!**`;
+    } else if (totalWin > totalBet) {
+      response += `\n🎉 **Bạn thắng tổng cộng: +${(totalWin - totalBet).toLocaleString('vi-VN')} xu!**`;
+    } else {
+      response += `\n😥 **Bạn thua -${(totalBet - totalWin).toLocaleString('vi-VN')} xu!**`;
+    }
     response += `\n\n💰 **Số dư hiện tại:** ${newUser.money.toLocaleString('vi-VN')} xu`;
     return response;
   }
