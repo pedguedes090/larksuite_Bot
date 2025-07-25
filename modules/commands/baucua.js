@@ -96,12 +96,13 @@ export default {
     // Tính tiền thắng
     let totalWin = 0;
     let detail = '';
+    const PAYOUT = 1.9;
     for (const [face, bet] of Object.entries(bets)) {
       const winCount = counts[face] || 0;
       if (winCount > 0) {
-        const win = bet * winCount;
+        const win = Math.floor(bet * PAYOUT * winCount);
         totalWin += win;
-        detail += `• ${getFaceEmoji(face)} **${face}**: Đặt ${bet.toLocaleString('vi-VN')} × ${winCount} = +${win.toLocaleString('vi-VN')} xu\n`;
+        detail += `• ${getFaceEmoji(face)} **${face}**: Đặt ${bet.toLocaleString('vi-VN')} × ${winCount} × 1.9 = +${win.toLocaleString('vi-VN')} xu\n`;
       } else {
         detail += `• ${getFaceEmoji(face)} **${face}**: Đặt ${bet.toLocaleString('vi-VN')} × 0 = -${bet.toLocaleString('vi-VN')} xu\n`;
       }
