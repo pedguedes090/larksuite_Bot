@@ -50,11 +50,11 @@ export default {
     }
     
     if (betAmount < MIN_BET) {
-        return `❌ **Mức cược tối thiểu là ${MIN_BET.toLocaleString('vi-VN')}!**`;
+        return `❌ **Mức cược tối thiểu là ${MIN_BET.toLocaleString('vi-VN')} xu!**`;
     }
 
     if (betAmount > user.money) {
-      return `😥 **Không đủ tiền!**\n💰 Bạn chỉ có **${user.money.toLocaleString('vi-VN')}** để cược.`;
+      return `😥 **Không đủ tiền!**\n💰 Bạn chỉ có **${user.money.toLocaleString('vi-VN')} xu** để cược.`;
     }
 
     // --- 2. Game Logic ---
@@ -89,10 +89,22 @@ export default {
           const timeLeft = eventManager.getTimeRemaining('happy_hour_taxiu');
           const timeStr = eventManager.formatTimeRemaining(timeLeft);
           eventMessage = `\n🎉 **${event.title}** - ${timeStr} còn lại!`;
+        } else if (eventManager.isEventActive('happy_hour_taxiu_morning')) {
+          eventMultiplier = eventManager.getMultiplier('taxiu');
+          const event = eventManager.getEvent('happy_hour_taxiu_morning');
+          const timeLeft = eventManager.getTimeRemaining('happy_hour_taxiu_morning');
+          const timeStr = eventManager.formatTimeRemaining(timeLeft);
+          eventMessage = `\n🎉 **${event.title}** - ${timeStr} còn lại!`;
         } else if (eventManager.isEventActive('gold_rush')) {
           eventMultiplier = eventManager.getMultiplier('global_gold');
           const event = eventManager.getEvent('gold_rush');
           const timeLeft = eventManager.getTimeRemaining('gold_rush');
+          const timeStr = eventManager.formatTimeRemaining(timeLeft);
+          eventMessage = `\n💰 **${event.title}** - ${timeStr} còn lại!`;
+        } else if (eventManager.isEventActive('gold_rush_morning')) {
+          eventMultiplier = eventManager.getMultiplier('global_gold');
+          const event = eventManager.getEvent('gold_rush_morning');
+          const timeLeft = eventManager.getTimeRemaining('gold_rush_morning');
           const timeStr = eventManager.formatTimeRemaining(timeLeft);
           eventMessage = `\n💰 **${event.title}** - ${timeStr} còn lại!`;
         }
@@ -117,15 +129,15 @@ export default {
           response += `🌪️ **BÃO!** Rất tiếc, nhà cái đã thắng. Bạn mất số tiền đã cược.\n`;
       } else if (win) {
         response += `🎉 **CHÚC MỪNG! BẠN THẮNG**\n`;
-        response += `• Bạn đã cược **${betAmount.toLocaleString('vi-VN')}** vào **${normalizedChoice.toUpperCase()}**.\n`;
+        response += `• Bạn đã cược **${betAmount.toLocaleString('vi-VN')} xu** vào **${normalizedChoice.toUpperCase()}**.\n`;
         const multiplierText = eventMultiplier > 1.0 ? ` (x${eventMultiplier.toFixed(1)} sự kiện)` : '';
-        response += `• Tiền thắng (đã bao gồm 5% phí${multiplierText}): **+${(winnings - betAmount).toLocaleString('vi-VN')}** 💰\n`;
+        response += `• Tiền thắng (đã bao gồm 5% phí${multiplierText}): **+${(winnings - betAmount).toLocaleString('vi-VN')} xu** 💰\n`;
       } else {
         response += `😥 **RẤT TIẾC! BẠN THUA**\n`;
-        response += `• Bạn đã cược **${betAmount.toLocaleString('vi-VN')}** vào **${normalizedChoice.toUpperCase()}** nhưng kết quả là **${result.toUpperCase()}**.\n`;
+        response += `• Bạn đã cược **${betAmount.toLocaleString('vi-VN')} xu** vào **${normalizedChoice.toUpperCase()}** nhưng kết quả là **${result.toUpperCase()}**.\n`;
       }
 
-      response += `\n📊 Số dư mới của bạn: **${newUser.money.toLocaleString('vi-VN')}**`;
+      response += `\n📊 Số dư mới của bạn: **${newUser.money.toLocaleString('vi-VN')} xu**`;
 
       return response;
 

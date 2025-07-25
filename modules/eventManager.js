@@ -211,6 +211,28 @@ class EventManager {
         type: 'global_gold',
         multiplier: 1.5,
         autoStart: true
+      },
+      {
+        name: 'lucky_blackjack',
+        title: '🃏 Lucky Blackjack',
+        description: 'Blackjack có tỷ lệ thắng cao hơn trong 20 phút!',
+        startHour: 16, // 16:00
+        startMinute: 0,
+        duration: 20 * 60 * 1000, // 20 phút
+        type: 'blackjack',
+        multiplier: 1.3,
+        autoStart: true
+      },
+      {
+        name: 'lucky_blackjack_evening',
+        title: '🃏 Lucky Blackjack (Tối)',
+        description: 'Blackjack có tỷ lệ thắng cao hơn buổi tối trong 20 phút!',
+        startHour: 21,
+        startMinute: 30,
+        duration: 20 * 60 * 1000,
+        type: 'blackjack',
+        multiplier: 1.3,
+        autoStart: true
       }
     ];
 

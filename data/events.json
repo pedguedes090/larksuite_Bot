@@ -1,0 +1,160 @@
+{
+  "activeEvents": {},
+  "eventHistory": [],
+  "scheduledEvents": [
+    {
+      "name": "world_boss",
+      "title": "🐉 Boss Thế Giới Xuất Hiện",
+      "description": "Boss thế giới xuất hiện! Tham gia ngay trong 5 phút!",
+      "startHour": 20,
+      "startMinute": 0,
+      "duration": 300000,
+      "type": "world_boss",
+      "multiplier": 2,
+      "autoStart": true
+    },
+    {
+      "name": "world_boss_morning",
+      "title": "🐉 Boss Thế Giới Xuất Hiện (Sáng)",
+      "description": "Boss thế giới xuất hiện buổi sáng! Tham gia ngay trong 5 phút!",
+      "startHour": 8,
+      "startMinute": 0,
+      "duration": 300000,
+      "type": "world_boss",
+      "multiplier": 2,
+      "autoStart": true
+    },
+    {
+      "name": "happy_hour_taxiu",
+      "title": "🎉 Happy Hour Tài Xỉu",
+      "description": "Tài xỉu gấp đôi thưởng trong 15 phút!",
+      "startHour": 19,
+      "startMinute": 0,
+      "duration": 900000,
+      "type": "taxiu",
+      "multiplier": 2,
+      "autoStart": true
+    },
+    {
+      "name": "happy_hour_taxiu_morning",
+      "title": "🎉 Happy Hour Tài Xỉu (Sáng)",
+      "description": "Tài xỉu gấp đôi thưởng buổi sáng trong 15 phút!",
+      "startHour": 10,
+      "startMinute": 0,
+      "duration": 900000,
+      "type": "taxiu",
+      "multiplier": 2,
+      "autoStart": true
+    },
+    {
+      "name": "happy_hour_baucua",
+      "title": "🎲 Happy Hour Bầu Cua",
+      "description": "Bầu cua gấp đôi thưởng trong 15 phút!",
+      "startHour": 21,
+      "startMinute": 0,
+      "duration": 900000,
+      "type": "baucua",
+      "multiplier": 2,
+      "autoStart": true
+    },
+    {
+      "name": "happy_hour_baucua_morning",
+      "title": "🎲 Happy Hour Bầu Cua (Sáng)",
+      "description": "Bầu cua gấp đôi thưởng buổi sáng trong 15 phút!",
+      "startHour": 11,
+      "startMinute": 30,
+      "duration": 900000,
+      "type": "baucua",
+      "multiplier": 2,
+      "autoStart": true
+    },
+    {
+      "name": "double_xp_worldboss",
+      "title": "⭐ Double XP World Boss",
+      "description": "Nhận gấp đôi XP khi đánh quái trong 30 phút!",
+      "startHour": 18,
+      "startMinute": 0,
+      "duration": 1800000,
+      "type": "world_boss_xp",
+      "multiplier": 2,
+      "autoStart": true
+    },
+    {
+      "name": "double_xp_worldboss_morning",
+      "title": "⭐ Double XP World Boss (Sáng)",
+      "description": "Nhận gấp đôi XP khi đánh quái buổi sáng trong 30 phút!",
+      "startHour": 6,
+      "startMinute": 0,
+      "duration": 1800000,
+      "type": "world_boss_xp",
+      "multiplier": 2,
+      "autoStart": true
+    },
+    {
+      "name": "lucky_slot",
+      "title": "🎰 Lucky Slot Machine",
+      "description": "Slot machine có tỷ lệ trúng cao hơn trong 20 phút!",
+      "startHour": 22,
+      "startMinute": 0,
+      "duration": 1200000,
+      "type": "slot",
+      "multiplier": 1.5,
+      "autoStart": true
+    },
+    {
+      "name": "lucky_slot_morning",
+      "title": "🎰 Lucky Slot Machine (Sáng)",
+      "description": "Slot machine có tỷ lệ trúng cao hơn buổi sáng trong 20 phút!",
+      "startHour": 9,
+      "startMinute": 0,
+      "duration": 1200000,
+      "type": "slot",
+      "multiplier": 1.5,
+      "autoStart": true
+    },
+    {
+      "name": "gold_rush",
+      "title": "💰 Gold Rush",
+      "description": "Tất cả game đều có thưởng tiền gấp 1.5 lần trong 25 phút!",
+      "startHour": 23,
+      "startMinute": 0,
+      "duration": 1500000,
+      "type": "global_gold",
+      "multiplier": 1.5,
+      "autoStart": true
+    },
+    {
+      "name": "gold_rush_morning",
+      "title": "💰 Gold Rush (Sáng)",
+      "description": "Tất cả game đều có thưởng tiền gấp 1.5 lần buổi sáng trong 25 phút!",
+      "startHour": 7,
+      "startMinute": 30,
+      "duration": 1500000,
+      "type": "global_gold",
+      "multiplier": 1.5,
+      "autoStart": true
+    },
+    {
+      "name": "lucky_blackjack",
+      "title": "🃏 Lucky Blackjack",
+      "description": "Blackjack có tỷ lệ thắng cao hơn trong 20 phút!",
+      "startHour": 16,
+      "startMinute": 0,
+      "duration": 1200000,
+      "type": "blackjack",
+      "multiplier": 1.3,
+      "autoStart": true
+    },
+    {
+      "name": "lucky_blackjack_evening",
+      "title": "🃏 Lucky Blackjack (Tối)",
+      "description": "Blackjack có tỷ lệ thắng cao hơn buổi tối trong 20 phút!",
+      "startHour": 21,
+      "startMinute": 30,
+      "duration": 1200000,
+      "type": "blackjack",
+      "multiplier": 1.3,
+      "autoStart": true
+    }
+  ]
+}

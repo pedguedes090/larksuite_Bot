@@ -1,10 +1,12 @@
 // modules/commands/blackjack.js
 import UserManager from '../userManager.js';
+import EventManager from '../eventManager.js';
 
 // --- Cấu hình Game ---
 const MIN_BET = 100;
 const BLACKJACK_MULTIPLIER = 1.5; // Blackjack pays 3:2
 const GAME_TIMEOUT = 300000; // 5 minutes
+const eventManager = EventManager.getInstance();
 
 // --- Bộ bài ---
 const SUITS = ['♠️', '♥️', '♦️', '♣️'];
@@ -247,25 +249,59 @@ export default {
       
       currentGame.gameOver = true;
       const outcome = determineWinner(currentGame);
+      
+      // Kiểm tra sự kiện
+      let eventMultiplier = 1.0;
+      let eventMessage = '';
+      
+      if (eventManager.isEventActive('lucky_blackjack')) {
+        eventMultiplier = eventManager.getMultiplier('blackjack');
+        const event = eventManager.getEvent('lucky_blackjack');
+        const timeLeft = eventManager.getTimeRemaining('lucky_blackjack');
+        const timeStr = eventManager.formatTimeRemaining(timeLeft);
+        eventMessage = `\n🃏 **${event.title}** - ${timeStr} còn lại!`;
+      } else if (eventManager.isEventActive('lucky_blackjack_evening')) {
+        eventMultiplier = eventManager.getMultiplier('blackjack');
+        const event = eventManager.getEvent('lucky_blackjack_evening');
+        const timeLeft = eventManager.getTimeRemaining('lucky_blackjack_evening');
+        const timeStr = eventManager.formatTimeRemaining(timeLeft);
+        eventMessage = `\n🃏 **${event.title}** - ${timeStr} còn lại!`;
+      } else if (eventManager.isEventActive('gold_rush')) {
+        eventMultiplier = eventManager.getMultiplier('global_gold');
+        const event = eventManager.getEvent('gold_rush');
+        const timeLeft = eventManager.getTimeRemaining('gold_rush');
+        const timeStr = eventManager.formatTimeRemaining(timeLeft);
+        eventMessage = `\n💰 **${event.title}** - ${timeStr} còn lại!`;
+      } else if (eventManager.isEventActive('gold_rush_morning')) {
+        eventMultiplier = eventManager.getMultiplier('global_gold');
+        const event = eventManager.getEvent('gold_rush_morning');
+        const timeLeft = eventManager.getTimeRemaining('gold_rush_morning');
+        const timeStr = eventManager.formatTimeRemaining(timeLeft);
+        eventMessage = `\n💰 **${event.title}** - ${timeStr} còn lại!`;
+      }
+      
       let payout = 0;
       if (outcome.result === 'blackjack' || outcome.result === 'win') {
-        payout = Math.floor(currentGame.betAmount * outcome.multiplier);
+        const basePayout = Math.floor(currentGame.betAmount * outcome.multiplier);
+        payout = Math.floor(basePayout * eventMultiplier);
         userManager.updateMoney(userId, payout); // Cộng lại toàn bộ tiền thắng (bao gồm cả tiền cược)
       } else if (outcome.result === 'push') {
         userManager.updateMoney(userId, currentGame.betAmount); // Hoàn lại tiền cược
       } // Nếu thua thì không cộng lại gì
       const newBalance = userManager.getUser(userId).money;
       
-      let response = `🃏 **STAND - KẾT QUẢ CUỐI** 🃏\n\n`;
+      let response = `🃏 **STAND - KẾT QUẢ CUỐI** 🃏${eventMessage}\n\n`;
       response += `👤 **Bài của bạn:** ${formatHand(currentGame.playerHand)} = **${playerValue}**\n`;
       response += `🤖 **Bài Dealer:** ${formatHand(currentGame.dealerHand)} = **${dealerFinalValue}**\n\n`;
       
       if (outcome.result === 'blackjack') {
         response += `🌟 **${outcome.reason}** 🌟\n`;
-        response += `🎁 **Tiền thắng:** +${(payout - currentGame.betAmount).toLocaleString('vi-VN')} xu (x1.5)\n`;
+        const multiplierText = eventMultiplier > 1.0 ? ` (x${eventMultiplier.toFixed(1)} sự kiện)` : '';
+        response += `🎁 **Tiền thắng:** +${(payout - currentGame.betAmount).toLocaleString('vi-VN')} xu (x1.5${multiplierText})\n`;
       } else if (outcome.result === 'win') {
         response += `🎉 **${outcome.reason}** 🎉\n`;
-        response += `💰 **Tiền thắng:** +${(payout - currentGame.betAmount).toLocaleString('vi-VN')} xu\n`;
+        const multiplierText = eventMultiplier > 1.0 ? ` (x${eventMultiplier.toFixed(1)} sự kiện)` : '';
+        response += `💰 **Tiền thắng:** +${(payout - currentGame.betAmount).toLocaleString('vi-VN')} xu${multiplierText}\n`;
       } else if (outcome.result === 'push') {
         response += `🤝 **${outcome.reason}** 🤝\n`;
         response += `↩️ **Hoàn tiền:** ${currentGame.betAmount.toLocaleString('vi-VN')} xu\n`;
@@ -321,10 +357,40 @@ Dùng \`${prefix}blackjack hit\`, \`${prefix}blackjack stand\` hoặc \`${prefix
       const newGame = createGameState(userId, betAmount);
       gameStates.set(userId, newGame);
       
+      // Kiểm tra sự kiện
+      let eventMultiplier = 1.0;
+      let eventMessage = '';
+      
+      if (eventManager.isEventActive('lucky_blackjack')) {
+        eventMultiplier = eventManager.getMultiplier('blackjack');
+        const event = eventManager.getEvent('lucky_blackjack');
+        const timeLeft = eventManager.getTimeRemaining('lucky_blackjack');
+        const timeStr = eventManager.formatTimeRemaining(timeLeft);
+        eventMessage = `\n🃏 **${event.title}** - ${timeStr} còn lại!`;
+      } else if (eventManager.isEventActive('lucky_blackjack_evening')) {
+        eventMultiplier = eventManager.getMultiplier('blackjack');
+        const event = eventManager.getEvent('lucky_blackjack_evening');
+        const timeLeft = eventManager.getTimeRemaining('lucky_blackjack_evening');
+        const timeStr = eventManager.formatTimeRemaining(timeLeft);
+        eventMessage = `\n🃏 **${event.title}** - ${timeStr} còn lại!`;
+      } else if (eventManager.isEventActive('gold_rush')) {
+        eventMultiplier = eventManager.getMultiplier('global_gold');
+        const event = eventManager.getEvent('gold_rush');
+        const timeLeft = eventManager.getTimeRemaining('gold_rush');
+        const timeStr = eventManager.formatTimeRemaining(timeLeft);
+        eventMessage = `\n💰 **${event.title}** - ${timeStr} còn lại!`;
+      } else if (eventManager.isEventActive('gold_rush_morning')) {
+        eventMultiplier = eventManager.getMultiplier('global_gold');
+        const event = eventManager.getEvent('gold_rush_morning');
+        const timeLeft = eventManager.getTimeRemaining('gold_rush_morning');
+        const timeStr = eventManager.formatTimeRemaining(timeLeft);
+        eventMessage = `\n💰 **${event.title}** - ${timeStr} còn lại!`;
+      }
+      
       const playerValue = calculateHandValue(newGame.playerHand);
       const dealerUpCard = calculateHandValue([newGame.dealerHand[1]]);
       
-      let response = `🃏 **BLACKJACK GAME STARTED** 🃏\n\n`;
+      let response = `🃏 **BLACKJACK GAME STARTED** 🃏${eventMessage}\n\n`;
       response += `💰 **Tiền cược:** ${betAmount.toLocaleString('vi-VN')} xu\n\n`;
       response += `👤 **Bài của bạn:** ${formatHand(newGame.playerHand)} = **${playerValue}**\n`;
       response += `🤖 **Bài Dealer:** ${formatHand(newGame.dealerHand, true)} = **${dealerUpCard}+?**\n\n`;
@@ -341,10 +407,12 @@ Dùng \`${prefix}blackjack hit\`, \`${prefix}blackjack stand\` hoặc \`${prefix
           response += `↩️ **Hoàn tiền:** ${betAmount.toLocaleString('vi-VN')} xu`;
         } else {
           // Player blackjack wins
-          const payout = Math.floor(betAmount * (1 + BLACKJACK_MULTIPLIER));
+          const basePayout = Math.floor(betAmount * (1 + BLACKJACK_MULTIPLIER));
+          const payout = Math.floor(basePayout * eventMultiplier);
           userManager.updateMoney(userId, payout); // Cộng lại toàn bộ tiền thắng (bao gồm cả tiền cược)
           response += `🌟 **BLACKJACK! BẠN THẮNG!** 🌟\n`;
-          response += `🎁 **Tiền thắng:** +${(payout - betAmount).toLocaleString('vi-VN')} xu (x1.5)`;
+          const multiplierText = eventMultiplier > 1.0 ? ` (x${eventMultiplier.toFixed(1)} sự kiện)` : '';
+          response += `🎁 **Tiền thắng:** +${(payout - betAmount).toLocaleString('vi-VN')} xu (x1.5${multiplierText})`;
         }
         
         const newBalance = userManager.getUser(userId).money;

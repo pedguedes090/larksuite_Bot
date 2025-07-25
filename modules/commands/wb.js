@@ -385,6 +385,12 @@ async function handlePve({ userId, args }) {
           const timeStr = eventManager.formatTimeRemaining(timeLeft);
           eventMessage = `\n⭐ **${event.title}** - ${timeStr} còn lại!`;
           xpGained = Math.floor(xpGained * eventManager.getMultiplier('world_boss_xp'));
+        } else if (eventManager.isEventActive('double_xp_worldboss_morning')) {
+          const event = eventManager.getEvent('double_xp_worldboss_morning');
+          const timeLeft = eventManager.getTimeRemaining('double_xp_worldboss_morning');
+          const timeStr = eventManager.formatTimeRemaining(timeLeft);
+          eventMessage = `\n⭐ **${event.title}** - ${timeStr} còn lại!`;
+          xpGained = Math.floor(xpGained * eventManager.getMultiplier('world_boss_xp'));
         }
         
         const newXP = wbUser.xp + xpGained;

@@ -108,10 +108,22 @@ export default {
       const timeLeft = eventManager.getTimeRemaining('happy_hour_baucua');
       const timeStr = eventManager.formatTimeRemaining(timeLeft);
       eventMessage = `\n🎉 **${event.title}** - ${timeStr} còn lại!`;
+    } else if (eventManager.isEventActive('happy_hour_baucua_morning')) {
+      eventMultiplier = eventManager.getMultiplier('baucua');
+      const event = eventManager.getEvent('happy_hour_baucua_morning');
+      const timeLeft = eventManager.getTimeRemaining('happy_hour_baucua_morning');
+      const timeStr = eventManager.formatTimeRemaining(timeLeft);
+      eventMessage = `\n🎉 **${event.title}** - ${timeStr} còn lại!`;
     } else if (eventManager.isEventActive('gold_rush')) {
       eventMultiplier = eventManager.getMultiplier('global_gold');
       const event = eventManager.getEvent('gold_rush');
       const timeLeft = eventManager.getTimeRemaining('gold_rush');
+      const timeStr = eventManager.formatTimeRemaining(timeLeft);
+      eventMessage = `\n💰 **${event.title}** - ${timeStr} còn lại!`;
+    } else if (eventManager.isEventActive('gold_rush_morning')) {
+      eventMultiplier = eventManager.getMultiplier('global_gold');
+      const event = eventManager.getEvent('gold_rush_morning');
+      const timeLeft = eventManager.getTimeRemaining('gold_rush_morning');
       const timeStr = eventManager.formatTimeRemaining(timeLeft);
       eventMessage = `\n💰 **${event.title}** - ${timeStr} còn lại!`;
     }

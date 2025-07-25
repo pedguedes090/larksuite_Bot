@@ -170,28 +170,39 @@ export default {
       
       let winnings = 0;
       let totalReturn = 0;
+      
+      // Kiểm tra sự kiện
+      let eventMultiplier = 1.0;
+      let eventMessage = '';
+      
+      if (eventManager.isEventActive('lucky_slot')) {
+        eventMultiplier = eventManager.getMultiplier('slot');
+        const event = eventManager.getEvent('lucky_slot');
+        const timeLeft = eventManager.getTimeRemaining('lucky_slot');
+        const timeStr = eventManager.formatTimeRemaining(timeLeft);
+        eventMessage = `\n🎰 **${event.title}** - ${timeStr} còn lại!`;
+      } else if (eventManager.isEventActive('lucky_slot_morning')) {
+        eventMultiplier = eventManager.getMultiplier('slot');
+        const event = eventManager.getEvent('lucky_slot_morning');
+        const timeLeft = eventManager.getTimeRemaining('lucky_slot_morning');
+        const timeStr = eventManager.formatTimeRemaining(timeLeft);
+        eventMessage = `\n🎰 **${event.title}** - ${timeStr} còn lại!`;
+      } else if (eventManager.isEventActive('gold_rush')) {
+        eventMultiplier = eventManager.getMultiplier('global_gold');
+        const event = eventManager.getEvent('gold_rush');
+        const timeLeft = eventManager.getTimeRemaining('gold_rush');
+        const timeStr = eventManager.formatTimeRemaining(timeLeft);
+        eventMessage = `\n💰 **${event.title}** - ${timeStr} còn lại!`;
+      } else if (eventManager.isEventActive('gold_rush_morning')) {
+        eventMultiplier = eventManager.getMultiplier('global_gold');
+        const event = eventManager.getEvent('gold_rush_morning');
+        const timeLeft = eventManager.getTimeRemaining('gold_rush_morning');
+        const timeStr = eventManager.formatTimeRemaining(timeLeft);
+        eventMessage = `\n💰 **${event.title}** - ${timeStr} còn lại!`;
+      }
 
       if (win) {
         let baseWinnings = Math.floor(betAmount * win.multiplier);
-        
-        // Kiểm tra sự kiện
-        let eventMultiplier = 1.0;
-        let eventMessage = '';
-        
-        if (eventManager.isEventActive('lucky_slot')) {
-          eventMultiplier = eventManager.getMultiplier('slot');
-          const event = eventManager.getEvent('lucky_slot');
-          const timeLeft = eventManager.getTimeRemaining('lucky_slot');
-          const timeStr = eventManager.formatTimeRemaining(timeLeft);
-          eventMessage = `\n🎰 **${event.title}** - ${timeStr} còn lại!`;
-        } else if (eventManager.isEventActive('gold_rush')) {
-          eventMultiplier = eventManager.getMultiplier('global_gold');
-          const event = eventManager.getEvent('gold_rush');
-          const timeLeft = eventManager.getTimeRemaining('gold_rush');
-          const timeStr = eventManager.formatTimeRemaining(timeLeft);
-          eventMessage = `\n💰 **${event.title}** - ${timeStr} còn lại!`;
-        }
-        
         winnings = Math.floor(baseWinnings * eventMultiplier);
         totalReturn = winnings;
         userManager.updateMoney(userId, totalReturn);
