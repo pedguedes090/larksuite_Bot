@@ -1,10 +1,12 @@
 // modules/commands/taxiu.js
 import UserManager from '../userManager.js';
+import EventManager from '../eventManager.js';
 
 // --- Cấu hình Game ---
 const TAI_THRESHOLD = 10; // Tổng điểm từ 11 trở lên là Tài
 const WIN_MULTIPLIER = 0.95; // Người chơi nhận 95% tiền thắng (nhà cái thu 5% phí)
 const MIN_BET = 100; // Mức cược tối thiểu
+const eventManager = EventManager.getInstance();
 
 // --- Hàm hỗ trợ ---
 const rollDice = () => Math.floor(Math.random() * 6) + 1;
@@ -76,7 +78,27 @@ export default {
       } else if (normalizedChoice === result) {
         // Người chơi thắng
         win = true;
-        winnings = betAmount + Math.floor(betAmount * WIN_MULTIPLIER);
+        
+        // Kiểm tra sự kiện
+        let eventMultiplier = 1.0;
+        let eventMessage = '';
+        
+        if (eventManager.isEventActive('happy_hour_taxiu')) {
+          eventMultiplier = eventManager.getMultiplier('taxiu');
+          const event = eventManager.getEvent('happy_hour_taxiu');
+          const timeLeft = eventManager.getTimeRemaining('happy_hour_taxiu');
+          const timeStr = eventManager.formatTimeRemaining(timeLeft);
+          eventMessage = `\n🎉 **${event.title}** - ${timeStr} còn lại!`;
+        } else if (eventManager.isEventActive('gold_rush')) {
+          eventMultiplier = eventManager.getMultiplier('global_gold');
+          const event = eventManager.getEvent('gold_rush');
+          const timeLeft = eventManager.getTimeRemaining('gold_rush');
+          const timeStr = eventManager.formatTimeRemaining(timeLeft);
+          eventMessage = `\n💰 **${event.title}** - ${timeStr} còn lại!`;
+        }
+        
+        const adjustedMultiplier = WIN_MULTIPLIER * eventMultiplier;
+        winnings = betAmount + Math.floor(betAmount * adjustedMultiplier);
       }
       // Nếu thua, winnings vẫn là 0
 
@@ -87,7 +109,7 @@ export default {
       const newUser = userManager.getUser(userId);
 
       // --- 3. Format Response ---
-      let response = `🎲 **KẾT QUẢ TÀI XỈU** 🎲\n\n`;
+      let response = `🎲 **KẾT QUẢ TÀI XỈU** 🎲${eventMessage}\n\n`;
       response += `• Xúc xắc: **[ ${dice.join(' ] - [ ')} ]**\n`;
       response += `• Tổng: **${sum}** nút ➠ **${result.toUpperCase()}**\n\n`;
 
@@ -96,7 +118,8 @@ export default {
       } else if (win) {
         response += `🎉 **CHÚC MỪNG! BẠN THẮNG**\n`;
         response += `• Bạn đã cược **${betAmount.toLocaleString('vi-VN')}** vào **${normalizedChoice.toUpperCase()}**.\n`;
-        response += `• Tiền thắng (đã bao gồm 5% phí): **+${(winnings - betAmount).toLocaleString('vi-VN')}** 💰\n`;
+        const multiplierText = eventMultiplier > 1.0 ? ` (x${eventMultiplier.toFixed(1)} sự kiện)` : '';
+        response += `• Tiền thắng (đã bao gồm 5% phí${multiplierText}): **+${(winnings - betAmount).toLocaleString('vi-VN')}** 💰\n`;
       } else {
         response += `😥 **RẤT TIẾC! BẠN THUA**\n`;
         response += `• Bạn đã cược **${betAmount.toLocaleString('vi-VN')}** vào **${normalizedChoice.toUpperCase()}** nhưng kết quả là **${result.toUpperCase()}**.\n`;
