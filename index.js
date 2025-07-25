@@ -4,6 +4,7 @@ import bodyParser from 'body-parser';
 import * as lark from '@larksuiteoapi/node-sdk';
 import CommandHandler from './modules/commandHandler.js';
 import UserManager from './modules/userManager.js';
+import EventManager from './modules/eventManager.js';
 import dotenv from 'dotenv';
 
 // Load environment variables
@@ -37,6 +38,7 @@ const client = new lark.Client({
 
 const commandHandler = new CommandHandler('!'); // Prefix: !
 const userManager = UserManager.getInstance(); // Sử dụng singleton
+const eventManager = EventManager.getInstance(); // Khởi tạo hệ thống sự kiện
 
 // 🧠 Bộ nhớ tạm để chống lặp message với automatic cleanup
 const handledMessages = new Map(); // Sử dụng Map thay vì Set để lưu timestamp

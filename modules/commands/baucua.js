@@ -1,6 +1,8 @@
 import UserManager from '../userManager.js';
+import EventManager from '../eventManager.js';
 
 const MIN_BET = 100;
+const eventManager = EventManager.getInstance();
 const FACES = [
   { name: 'bầu', emoji: '🍐' },
   { name: 'cua', emoji: '🦀' },
@@ -93,16 +95,36 @@ export default {
     const counts = {};
     result.forEach(face => { counts[face] = (counts[face] || 0) + 1; });
 
-    // Tính tiền thắng
+    // Tính tiền thắng với sự kiện
     let totalWin = 0;
     let detail = '';
-    const PAYOUT = 1.9;
+    let eventMultiplier = 1.0;
+    let eventMessage = '';
+    
+    // Kiểm tra sự kiện
+    if (eventManager.isEventActive('happy_hour_baucua')) {
+      eventMultiplier = eventManager.getMultiplier('baucua');
+      const event = eventManager.getEvent('happy_hour_baucua');
+      const timeLeft = eventManager.getTimeRemaining('happy_hour_baucua');
+      const timeStr = eventManager.formatTimeRemaining(timeLeft);
+      eventMessage = `\n🎉 **${event.title}** - ${timeStr} còn lại!`;
+    } else if (eventManager.isEventActive('gold_rush')) {
+      eventMultiplier = eventManager.getMultiplier('global_gold');
+      const event = eventManager.getEvent('gold_rush');
+      const timeLeft = eventManager.getTimeRemaining('gold_rush');
+      const timeStr = eventManager.formatTimeRemaining(timeLeft);
+      eventMessage = `\n💰 **${event.title}** - ${timeStr} còn lại!`;
+    }
+    
+    const PAYOUT = 1.9 * eventMultiplier;
+    
     for (const [face, bet] of Object.entries(bets)) {
       const winCount = counts[face] || 0;
       if (winCount > 0) {
         const win = Math.floor(bet * PAYOUT * winCount);
         totalWin += win;
-        detail += `• ${getFaceEmoji(face)} **${face}**: Đặt ${bet.toLocaleString('vi-VN')} × ${winCount} × 1.9 = +${win.toLocaleString('vi-VN')} xu\n`;
+        const multiplierText = eventMultiplier > 1.0 ? ` × ${eventMultiplier.toFixed(1)}` : '';
+        detail += `• ${getFaceEmoji(face)} **${face}**: Đặt ${bet.toLocaleString('vi-VN')} × ${winCount} × 1.9${multiplierText} = +${win.toLocaleString('vi-VN')} xu\n`;
       } else {
         detail += `• ${getFaceEmoji(face)} **${face}**: Đặt ${bet.toLocaleString('vi-VN')} × 0 = -${bet.toLocaleString('vi-VN')} xu\n`;
       }
@@ -111,7 +133,7 @@ export default {
     const newUser = userManager.getUser(userId);
 
     // Hiển thị kết quả
-    let response = `🎲 **KẾT QUẢ BẦU CUA** 🎲\n\n`;
+    let response = `🎲 **KẾT QUẢ BẦU CUA** 🎲${eventMessage}\n\n`;
     response += `Kết quả: ${result.map(f => getFaceEmoji(f)).join('  ')}\n\n`;
     response += detail;
     if (totalWin === totalBet) {

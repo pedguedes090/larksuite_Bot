@@ -1,9 +1,11 @@
 // modules/commands/wb.js
 import UserManager from '../userManager.js';
 import WB_DataManager from '../wbDataManager.js';
+import EventManager from '../eventManager.js';
 
 const userManager = UserManager.getInstance();
 const wbManager = WB_DataManager.getInstance();
+const eventManager = EventManager.getInstance();
 
 // --- Helper Functions ---
 
@@ -373,7 +375,18 @@ async function handlePve({ userId, args }) {
     // Check if monster is defeated
     if (newMonsterHp <= 0) {
         // === LOGIC CHIẾN THẮNG ===
-        const xpGained = Math.floor(monster.xpDrop * XP_MULTIPLIER);
+        let xpGained = Math.floor(monster.xpDrop * XP_MULTIPLIER);
+        
+        // Kiểm tra sự kiện Double XP
+        let eventMessage = '';
+        if (eventManager.isEventActive('double_xp_worldboss')) {
+          const event = eventManager.getEvent('double_xp_worldboss');
+          const timeLeft = eventManager.getTimeRemaining('double_xp_worldboss');
+          const timeStr = eventManager.formatTimeRemaining(timeLeft);
+          eventMessage = `\n⭐ **${event.title}** - ${timeStr} còn lại!`;
+          xpGained = Math.floor(xpGained * eventManager.getMultiplier('world_boss_xp'));
+        }
+        
         const newXP = wbUser.xp + xpGained;
         const oldLevel = wbUser.level;
         const newLevel = calculateLevelFromXP(newXP);
@@ -437,7 +450,7 @@ async function handlePve({ userId, args }) {
             userManager.updateMoney(userId, goldGained);
         }
         combatLog.push('');
-        combatLog.push(`🎉 **CHIẾN THẮNG!** 🎉`);
+        combatLog.push(`🎉 **CHIẾN THẮNG!** 🎉${eventMessage}`);
         combatLog.push(`Đã hạ gục ${monster.name}!`);
         combatLog.push(`⭐ **Nhận được:** ${xpGained} XP${goldGained > 0 ? ` và ${goldGained} xu` : ''}`);
         combatLog.push(`🎁 **Vật phẩm rơi:**\n${lootLog.length > 0 ? lootLog.join('\n') : 'Không có gì cả.'}`);

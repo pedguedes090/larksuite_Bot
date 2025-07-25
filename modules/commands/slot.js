@@ -1,8 +1,10 @@
 // modules/commands/slot.js
 import UserManager from '../userManager.js';
+import EventManager from '../eventManager.js';
 
 // --- Cấu hình Game Slot ---
 const MIN_BET = 100; // Mức cược tối thiểu
+const eventManager = EventManager.getInstance();
 const SYMBOLS = ['🍒', '🍋', '🍊', '🍇', '🔔', '⭐', '💎', '7️⃣'];
 const SYMBOL_WEIGHTS = {
   '🍒': 30, // Cherry - phổ biến nhất
@@ -170,7 +172,27 @@ export default {
       let totalReturn = 0;
 
       if (win) {
-        winnings = Math.floor(betAmount * win.multiplier);
+        let baseWinnings = Math.floor(betAmount * win.multiplier);
+        
+        // Kiểm tra sự kiện
+        let eventMultiplier = 1.0;
+        let eventMessage = '';
+        
+        if (eventManager.isEventActive('lucky_slot')) {
+          eventMultiplier = eventManager.getMultiplier('slot');
+          const event = eventManager.getEvent('lucky_slot');
+          const timeLeft = eventManager.getTimeRemaining('lucky_slot');
+          const timeStr = eventManager.formatTimeRemaining(timeLeft);
+          eventMessage = `\n🎰 **${event.title}** - ${timeStr} còn lại!`;
+        } else if (eventManager.isEventActive('gold_rush')) {
+          eventMultiplier = eventManager.getMultiplier('global_gold');
+          const event = eventManager.getEvent('gold_rush');
+          const timeLeft = eventManager.getTimeRemaining('gold_rush');
+          const timeStr = eventManager.formatTimeRemaining(timeLeft);
+          eventMessage = `\n💰 **${event.title}** - ${timeStr} còn lại!`;
+        }
+        
+        winnings = Math.floor(baseWinnings * eventMultiplier);
         totalReturn = winnings;
         userManager.updateMoney(userId, totalReturn);
       }
@@ -178,7 +200,7 @@ export default {
       const newUser = userManager.getUser(userId);
 
       // --- 3. Format Response ---
-      let response = `🎰 **SLOT MACHINE** 🎰\n\n`;
+      let response = `🎰 **SLOT MACHINE** 🎰${eventMessage}\n\n`;
       response += `${animation}\n`;
       response += `**Đang quay...**\n\n`;
       response += `┌─────────────────┐\n`;
@@ -189,7 +211,8 @@ export default {
         response += `🎉 **CHÚC MỪNG! BẠN THẮNG!** 🎉\n`;
         response += `🏆 **${win.description}** (x${win.multiplier})\n`;
         response += `💰 **Tiền cược:** ${betAmount.toLocaleString('vi-VN')} xu\n`;
-        response += `🎁 **Tiền thắng:** +${winnings.toLocaleString('vi-VN')} xu\n`;
+        const multiplierText = eventMultiplier > 1.0 ? ` (x${eventMultiplier.toFixed(1)} sự kiện)` : '';
+        response += `🎁 **Tiền thắng:** +${winnings.toLocaleString('vi-VN')} xu${multiplierText}\n`;
         response += `💵 **Lãi:** +${(winnings - betAmount).toLocaleString('vi-VN')} xu\n`;
         
         // Thêm hiệu ứng đặc biệt cho jackpot
