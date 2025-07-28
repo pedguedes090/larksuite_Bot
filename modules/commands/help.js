@@ -74,7 +74,7 @@ export default {
             response += `• ${prefix}${cmd.name}${aliases} - ${cmd.description}\n`;
           });
       }
-      
+      //abc
       // Hiển thị lệnh admin (chỉ cho admin)
       if (isAdmin && adminCommands.length > 0) {
         response += `\n🔐 **LỆNH ADMIN:** (${adminCommands.length} lệnh)\n`;
