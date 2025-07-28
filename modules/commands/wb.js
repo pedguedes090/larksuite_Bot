@@ -368,8 +368,22 @@ async function handlePve({ userId, args }) {
     }
     // Player attacks monster
     const newMonsterHp = wbUser.combatState.monsterHp - playerDamage;
-    if (!skillId) combatLog.push(`💥 Bạn tấn công ${monster.name}, gây ${playerDamage} sát thương. HP quái còn: ${Math.max(0, newMonsterHp)}/${wbUser.combatState.monsterMaxHp || monster.hp}`);
-    else combatLog.push(`💥 Tổng sát thương lên quái: ${playerDamage}. HP quái còn: ${Math.max(0, newMonsterHp)}/${wbUser.combatState.monsterMaxHp || monster.hp}`);
+    if (!skillId) {
+        combatLog.push(`💥 Bạn tấn công ${monster.name}, gây ${playerDamage} sát thương.`);
+    } else {
+        combatLog.push(`💥 Tổng sát thương lên quái: ${playerDamage}`);
+    }
+    combatLog.push(`🩸 HP quái còn: ${Math.max(0, newMonsterHp)}/${wbUser.combatState.monsterMaxHp || monster.hp}`);
+    
+    // Show current MP and skill cooldowns after using skill
+    if (skillId) {
+        combatLog.push(`� MP còn lại: ${wbUser.mp}/${wbUser.maxMp}`);
+        const activeCooldowns = Object.entries(wbUser.skillCooldowns || {}).filter(([_, cd]) => cd > 0);
+        if (activeCooldowns.length > 0) {
+            const cooldownText = activeCooldowns.map(([skill, cd]) => `${skill}(${cd})`).join(', ');
+            combatLog.push(`⏳ Cooldown: ${cooldownText}`);
+        }
+    }
     // Check if monster is defeated
     if (newMonsterHp <= 0) {
         // === LOGIC CHIẾN THẮNG ===
@@ -449,6 +463,8 @@ async function handlePve({ userId, args }) {
     let monsterSkillMsg = '';
     const monsterSkills = monster.skills || [];
     let monsterUsedSkill = null;
+    let monsterDamage = Math.max(1, (wbUser.combatState.monsterBuffedAttack || monster.attack) - stats.defense);
+    
     if (monsterSkills.length > 0 && Math.random() < 0.5) { // 50% dùng skill nếu có
         const skillId = monsterSkills[Math.floor(Math.random() * monsterSkills.length)];
         const skill = wbManager.getSkill(skillId);
@@ -469,6 +485,7 @@ async function handlePve({ userId, args }) {
                     const heal = Math.floor(maxHp * 0.3);
                     wbManager.updateUser(userId, { combatState: { ...wbUser.combatState, monsterHp: Math.min(maxHp, newMonsterHp + heal) } });
                     monsterSkillMsg = `💚 ${monster.name} dùng ${skill.name}! Hồi ${heal} HP.`;
+                    monsterDamage = 0; // No damage when healing
                     break;
                 case 'buff_def_40_2':
                     // Không lưu trạng thái buff cho quái, chỉ thông báo
@@ -482,14 +499,14 @@ async function handlePve({ userId, args }) {
             }
         }
     }
-    // Monster attacks player
-    let monsterDamage = Math.max(1, (wbUser.combatState.monsterBuffedAttack || monster.attack) - stats.defense);
-    if (monsterUsedSkill && (monsterUsedSkill.effect === 'double_attack' || monsterUsedSkill.effect === 'fireball')) {
-        // monsterDamage đã tính ở trên
-    }
+    
+    // Monster attacks player (if not healing)
     const newPlayerHp = wbUser.hp - monsterDamage;
     if (monsterSkillMsg) combatLog.push(monsterSkillMsg);
-    combatLog.push(`🩸 ${monster.name} tấn công bạn, gây ${monsterDamage} sát thương. HP của bạn còn: ${Math.max(0, newPlayerHp)}/${wbUser.maxHp + stats.hpBonus}`);
+    if (monsterDamage > 0) {
+        combatLog.push(`🩸 ${monster.name} tấn công bạn, gây ${monsterDamage} sát thương.`);
+    }
+    combatLog.push(`❤️ HP của bạn còn: ${Math.max(0, newPlayerHp)}/${wbUser.maxHp + stats.hpBonus}`);
     // Check if player is defeated
     if (newPlayerHp <= 0) {
         // Check for revival stone with cooldown
@@ -568,8 +585,15 @@ Bạn đã bị ${monster.name} hạ gục.
     // Hiển thị buff hiện tại
     const buffs = wbManager.getActiveBuffs(userId);
     if (buffs.length > 0) {
-      combatLog.push('🔮 Buff hiện tại: ' + buffs.map(b => `${b.type === 'attack' ? '⚔️' : b.type === 'defense' ? '🛡️' : '🍀'} +${Math.round(b.amount * 100)}% (${b.turnsRemaining} lượt)`).join(', '));
+      const buffText = buffs.map(b => `${b.type === 'attack' ? '⚔️' : b.type === 'defense' ? '🛡️' : '🍀'} +${Math.round(b.amount * 100)}% (${b.turnsRemaining} lượt)`).join(', ');
+      combatLog.push(`🔮 **Buff hiện tại:** ${buffText}`);
     }
+    
+    // Show current MP if not at max
+    if (wbUser.mp < wbUser.maxMp) {
+        combatLog.push(`💙 **MP:** ${wbUser.mp}/${wbUser.maxMp}`);
+    }
+    
     return combatLog.join('\n');
 }
 
@@ -636,7 +660,7 @@ async function handleAutoCombat(userId, safeMode = false) {
             switch (usedSkill.effect) {
                 case 'double_attack':
                     playerDamage = Math.max(1, Math.floor(stats.attack * 0.8) - (wbUser.combatState.monsterBuffedDefense || monster.defense));
-                    skillMsg = `🌀 Dùng ${usedSkill.name}! 2 đòn, mỗi đòn ${playerDamage} sát thương.`;
+                    skillMsg = `🌀 Dùng ${usedSkill.name}! 2 đòn, mỗi đòn ${playerDamage} sát thương (Tổng: ${playerDamage * 2})`;
                     playerDamage = playerDamage * 2;
                     break;
                 case 'heal_30':
@@ -648,30 +672,35 @@ async function handleAutoCombat(userId, safeMode = false) {
                     break;
                 case 'buff_def_40_2':
                     wbManager.addBuff(userId, 'defense', 0.4, 2);
-                    skillMsg = `🛡️ Dùng ${usedSkill.name}! Tăng 40% phòng thủ 2 lượt.`;
+                    skillMsg = `🛡️ Dùng ${usedSkill.name}! Tăng 40% phòng thủ 2 lượt`;
                     break;
                 case 'fireball':
                     playerDamage = Math.max(1, Math.floor(stats.attack * 1.5) - Math.floor((wbUser.combatState.monsterBuffedDefense || monster.defense) * 0.8));
-                    skillMsg = `🔥 Dùng ${usedSkill.name}! Gây ${playerDamage} sát thương phép.`;
+                    skillMsg = `🔥 Dùng ${usedSkill.name}! Gây ${playerDamage} sát thương phép`;
                     break;
                 case 'buff_atk_30_def_-20_3':
                     wbManager.addBuff(userId, 'attack', 0.3, 3);
                     wbManager.addBuff(userId, 'defense', -0.2, 3);
-                    skillMsg = `💢 Dùng ${usedSkill.name}! Tăng 30% tấn công, giảm 20% phòng thủ 3 lượt.`;
+                    skillMsg = `💢 Dùng ${usedSkill.name}! Tăng 30% tấn công, giảm 20% phòng thủ 3 lượt`;
                     break;
                 default:
-                    skillMsg = `Dùng ${usedSkill.name}!`;
+                    skillMsg = `🔮 Dùng ${usedSkill.name}!`;
             }
+            skillMsg += ` [-${usedSkill.mp_cost} MP]`;
         }
-        // Luôn log rõ ràng skill hoặc đánh thường
+        
+        // Combat log for turn
         if (skillMsg) {
             combatLog.push(`Turn ${turnCount}: ${skillMsg}`);
         } else {
-            combatLog.push(`Turn ${turnCount}: 💥 Đánh thường!`);
+            combatLog.push(`Turn ${turnCount}: 💥 Đánh thường! Gây ${playerDamage} sát thương`);
         }
         // Player attacks monster
         currentMonsterHp -= playerDamage;
-        combatLog.push(`   💥 Gây ${playerDamage} sát thương. Monster HP: ${Math.max(0, currentMonsterHp)}/${wbUser.combatState.monsterMaxHp || monster.hp}`);
+        if (playerDamage > 0) {
+            combatLog.push(`   💥 Gây ${playerDamage} sát thương`);
+        }
+        combatLog.push(`   🩸 Monster HP: ${Math.max(0, currentMonsterHp)}/${wbUser.combatState.monsterMaxHp || monster.hp}`);
         
         if (currentMonsterHp <= 0) {
             // Victory logic
@@ -744,8 +773,53 @@ async function handleAutoCombat(userId, safeMode = false) {
         
         // Monster turn
         let monsterDamage = Math.max(1, (wbUser.combatState.monsterBuffedAttack || monster.attack) - stats.defense);
+        let monsterSkillMsg = '';
+        
+        // Monster skill usage (simplified for auto combat)
+        const monsterSkills = monster.skills || [];
+        if (monsterSkills.length > 0 && Math.random() < 0.3) { // 30% chance in auto combat
+            const skillId = monsterSkills[Math.floor(Math.random() * monsterSkills.length)];
+            const skill = wbManager.getSkill(skillId);
+            if (skill) {
+                switch (skill.effect) {
+                    case 'double_attack':
+                        monsterDamage = Math.max(1, Math.floor((wbUser.combatState.monsterBuffedAttack || monster.attack) * 0.8) - stats.defense) * 2;
+                        monsterSkillMsg = `🌀 ${skill.name}!`;
+                        break;
+                    case 'fireball':
+                        monsterDamage = Math.max(1, Math.floor((wbUser.combatState.monsterBuffedAttack || monster.attack) * 1.5) - Math.floor(stats.defense * 0.8));
+                        monsterSkillMsg = `🔥 ${skill.name}!`;
+                        break;
+                    case 'heal_30':
+                        const maxHp = wbUser.combatState.monsterMaxHp || monster.hp;
+                        const heal = Math.floor(maxHp * 0.3);
+                        currentMonsterHp = Math.min(maxHp, currentMonsterHp + heal);
+                        monsterSkillMsg = `💚 ${skill.name}! (+${heal} HP)`;
+                        monsterDamage = 0;
+                        break;
+                    default:
+                        monsterSkillMsg = `🔮 ${skill.name}!`;
+                }
+            }
+        }
+        
         currentPlayerHp -= monsterDamage;
-        combatLog.push(`   🩸 Monster tấn công: ${monsterDamage} sát thương. Your HP: ${Math.max(0, currentPlayerHp)}/${wbUser.maxHp + stats.hpBonus}`);
+        if (monsterSkillMsg) {
+            combatLog.push(`   ${monsterSkillMsg} Gây ${monsterDamage} sát thương`);
+        } else {
+            combatLog.push(`   🩸 Monster tấn công: ${monsterDamage} sát thương`);
+        }
+        combatLog.push(`   ❤️ Your HP: ${Math.max(0, currentPlayerHp)}/${wbUser.maxHp + stats.hpBonus}`);
+        
+        // Show MP and important cooldowns every few turns
+        if (turnCount % 5 === 0 || currentPlayerHp <= wbUser.maxHp * 0.3) {
+            combatLog.push(`   💙 MP: ${currentMp}/${wbUser.maxMp}`);
+            const activeCooldowns = Object.entries(skillCooldowns).filter(([_, cd]) => cd > 0);
+            if (activeCooldowns.length > 0) {
+                const cooldownText = activeCooldowns.map(([skill, cd]) => `${skill}(${cd})`).join(', ');
+                combatLog.push(`   ⏳ Cooldowns: ${cooldownText}`);
+            }
+        }
         
         // Check if player is defeated
         if (currentPlayerHp <= 0) {
@@ -834,6 +908,15 @@ async function handleAutoCombat(userId, safeMode = false) {
         }
         // Decrease buff turns
         wbManager.decreaseBuffTurns(userId);
+        
+        // Show active buffs occasionally
+        if (turnCount % 3 === 0) {
+            const buffs = wbManager.getActiveBuffs(userId);
+            if (buffs.length > 0) {
+                const buffText = buffs.map(b => `${b.type === 'attack' ? '⚔️' : b.type === 'defense' ? '🛡️' : '🍀'} +${Math.round(b.amount * 100)}% (${b.turnsRemaining})`).join(', ');
+                combatLog.push(`   🔮 Buffs: ${buffText}`);
+            }
+        }
         combatLog.push('');
     }
     // Timeout
