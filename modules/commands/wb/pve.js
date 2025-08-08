@@ -1,4 +1,17 @@
 import { wbManager, userManager, MAX_LEVEL, XP_MULTIPLIER, resetCombatState, calculateStatsForLevel, calculateLevelFromXP, getXPRequiredForSingleLevel, getXPOverflow } from './utils.js';
+import doubleAttack from './skills/double_attack.js';
+import heal30 from './skills/heal_30.js';
+import buffDef402 from './skills/buff_def_40_2.js';
+import fireball from './skills/fireball.js';
+import buffAtk30Def20_3 from './skills/buff_atk_30_def_-20_3.js';
+
+const skillEffects = {
+    double_attack: doubleAttack,
+    heal_30: heal30,
+    buff_def_40_2: buffDef402,
+    fireball: fireball,
+    'buff_atk_30_def_-20_3': buffAtk30Def20_3
+};
 
 export default async function handlePve({ userId, args }) {
     const wbUser = wbManager.getUser(userId);
@@ -34,48 +47,18 @@ export default async function handlePve({ userId, args }) {
         wbUser.skillCooldowns[skillId] = skill.cooldown;
         await wbManager.saveUsers();
         // Thực hiện hiệu ứng skill
-        switch (skill.effect) {
-            case 'double_attack':
-                playerDamage = Math.max(1, Math.floor(stats.attack * 0.8) - (wbUser.combatState.monsterBuffedDefense || monster.defense));
-                combatLog.push(`🌀 Bạn dùng ${skill.name}! Tấn công 2 lần, mỗi đòn ${playerDamage} sát thương.`);
-                combatLog.push(`💥 Đòn 1: ${playerDamage} sát thương.`);
-                combatLog.push(`💥 Đòn 2: ${playerDamage} sát thương.`);
-                playerDamage = playerDamage * 2;
-                skillMessage = ` (Kỹ năng: ${skill.name})`;
-                break;
-            case 'heal_30':
-                const maxHp = wbUser.maxHp + stats.hpBonus;
-                const heal = Math.floor(maxHp * 0.3);
-                wbUser.hp = Math.min(maxHp, wbUser.hp + heal);
-                await wbManager.saveUsers();
-                combatLog.push(`💚 Bạn dùng ${skill.name}! Hồi ${heal} HP (${wbUser.hp}/${maxHp})`);
-                playerDamage = 0;
-                skillMessage = ` (Kỹ năng: ${skill.name})`;
-                break;
-            case 'buff_def_40_2':
-                wbManager.addBuff(userId, 'defense', 0.4, 2);
-                combatLog.push(`🛡️ Bạn dùng ${skill.name}! Tăng 40% phòng thủ trong 2 lượt.`);
-                playerDamage = Math.max(1, stats.attack - (wbUser.combatState.monsterBuffedDefense || monster.defense));
-                skillMessage = ` (Kỹ năng: ${skill.name})`;
-                break;
-            case 'fireball':
-                playerDamage = Math.max(1, Math.floor(stats.attack * 1.5) - Math.floor((wbUser.combatState.monsterBuffedDefense || monster.defense) * 0.8));
-                combatLog.push(`🔥 Bạn dùng ${skill.name}! Gây ${playerDamage} sát thương phép (bỏ qua 20% phòng thủ).`);
-                skillMessage = ` (Kỹ năng: ${skill.name})`;
-                break;
-            case 'buff_atk_30_def_-20_3':
-                wbManager.addBuff(userId, 'attack', 0.3, 3);
-                wbManager.addBuff(userId, 'defense', -0.2, 3);
-                combatLog.push(`💢 Bạn dùng ${skill.name}! Tăng 30% tấn công, giảm 20% phòng thủ trong 3 lượt.`);
-                playerDamage = Math.max(1, stats.attack - (wbUser.combatState.monsterBuffedDefense || monster.defense));
-                skillMessage = ` (Kỹ năng: ${skill.name})`;
-                break;
-            default:
-                combatLog.push(`Bạn dùng ${skill.name} nhưng chưa có hiệu ứng!`);
+        const effectFn = skillEffects[skill.effect];
+        const effectState = { wbUser, stats, wbManager, combatLog, damage: playerDamage, skill };
+        if (effectFn) {
+            await effectFn({ userId, monster, state: effectState });
+            playerDamage = effectState.damage;
+            skillMessage = effectState.skillMessage || '';
+        } else {
+            combatLog.push(`Bạn dùng ${skill.name} nhưng chưa có hiệu ứng!`);
         }
     }
     // Player attacks monster
-    const newMonsterHp = wbUser.combatState.monsterHp - playerDamage;
+    let newMonsterHp = wbUser.combatState.monsterHp - playerDamage;
     if (!skillId) {
         combatLog.push(`💥 Bạn tấn công ${monster.name}, gây ${playerDamage} sát thương.`);
     } else {
@@ -178,32 +161,15 @@ export default async function handlePve({ userId, args }) {
         const skill = wbManager.getSkill(skillId);
         if (skill) {
             monsterUsedSkill = skill;
-            switch (skill.effect) {
-                case 'double_attack':
-                    monsterDamage = Math.max(1, Math.floor((wbUser.combatState.monsterBuffedAttack || monster.attack) * 0.8) - stats.defense);
-                    monsterSkillMsg = `🌀 ${monster.name} dùng ${skill.name}! Tấn công 2 lần, mỗi đòn ${monsterDamage} sát thương.`;
-                    monsterDamage = monsterDamage * 2;
-                    break;
-                case 'fireball':
-                    monsterDamage = Math.max(1, Math.floor((wbUser.combatState.monsterBuffedAttack || monster.attack) * 1.5) - Math.floor(stats.defense * 0.8));
-                    monsterSkillMsg = `🔥 ${monster.name} dùng ${skill.name}! Gây ${monsterDamage} sát thương phép (bỏ qua 20% phòng thủ).`;
-                    break;
-                case 'heal_30':
-                    const maxHp = wbUser.combatState.monsterMaxHp || monster.hp;
-                    const heal = Math.floor(maxHp * 0.3);
-                    wbManager.updateUser(userId, { combatState: { ...wbUser.combatState, monsterHp: Math.min(maxHp, newMonsterHp + heal) } });
-                    monsterSkillMsg = `💚 ${monster.name} dùng ${skill.name}! Hồi ${heal} HP.`;
-                    monsterDamage = 0; // No damage when healing
-                    break;
-                case 'buff_def_40_2':
-                    // Không lưu trạng thái buff cho quái, chỉ thông báo
-                    monsterSkillMsg = `🛡️ ${monster.name} dùng ${skill.name}! Tăng phòng thủ.`;
-                    break;
-                case 'buff_atk_30_def_-20_3':
-                    monsterSkillMsg = `💢 ${monster.name} dùng ${skill.name}! Tăng tấn công, giảm phòng thủ.`;
-                    break;
-                default:
-                    monsterSkillMsg = `${monster.name} dùng ${skill.name}!`;
+            const effectFn = skillEffects[skill.effect];
+            const effectState = { wbUser, stats, wbManager, monsterHp: newMonsterHp, damage: monsterDamage, skill, isMonster: true };
+            if (effectFn) {
+                await effectFn({ userId, monster, state: effectState });
+                monsterDamage = effectState.damage;
+                newMonsterHp = effectState.monsterHp;
+                monsterSkillMsg = effectState.monsterSkillMsg || '';
+            } else {
+                monsterSkillMsg = `${monster.name} dùng ${skill.name}!`;
             }
         }
     }
@@ -365,34 +331,17 @@ async function handleAutoCombat(userId, safeMode = false) {
         if (usedSkill) {
             currentMp -= usedSkill.mp_cost;
             skillCooldowns[usedSkill.id] = usedSkill.cooldown;
-            switch (usedSkill.effect) {
-                case 'double_attack':
-                    playerDamage = Math.max(1, Math.floor(stats.attack * 0.8) - (wbUser.combatState.monsterBuffedDefense || monster.defense));
-                    skillMsg = `🌀 Dùng ${usedSkill.name}! 2 đòn, mỗi đòn ${playerDamage} sát thương (Tổng: ${playerDamage * 2})`;
-                    playerDamage = playerDamage * 2;
-                    break;
-                case 'heal_30':
-                    const maxHp = wbUser.maxHp + stats.hpBonus;
-                    const heal = Math.floor(maxHp * 0.3);
-                    currentPlayerHp = Math.min(maxHp, currentPlayerHp + heal);
-                    skillMsg = `💚 Dùng ${usedSkill.name}! Hồi ${heal} HP (${currentPlayerHp}/${maxHp})`;
-                    playerDamage = 0;
-                    break;
-                case 'buff_def_40_2':
-                    wbManager.addBuff(userId, 'defense', 0.4, 2);
-                    skillMsg = `🛡️ Dùng ${usedSkill.name}! Tăng 40% phòng thủ 2 lượt`;
-                    break;
-                case 'fireball':
-                    playerDamage = Math.max(1, Math.floor(stats.attack * 1.5) - Math.floor((wbUser.combatState.monsterBuffedDefense || monster.defense) * 0.8));
-                    skillMsg = `🔥 Dùng ${usedSkill.name}! Gây ${playerDamage} sát thương phép`;
-                    break;
-                case 'buff_atk_30_def_-20_3':
-                    wbManager.addBuff(userId, 'attack', 0.3, 3);
-                    wbManager.addBuff(userId, 'defense', -0.2, 3);
-                    skillMsg = `💢 Dùng ${usedSkill.name}! Tăng 30% tấn công, giảm 20% phòng thủ 3 lượt`;
-                    break;
-                default:
-                    skillMsg = `🔮 Dùng ${usedSkill.name}!`;
+            const effectFn = skillEffects[usedSkill.effect];
+            const effectState = { wbUser, stats, wbManager, damage: playerDamage, skill: usedSkill, auto: true };
+            if (effectFn) {
+                await effectFn({ userId, monster, state: effectState });
+                playerDamage = effectState.damage;
+                skillMsg = effectState.autoMsg || `🔮 Dùng ${usedSkill.name}!`;
+            } else {
+                skillMsg = `🔮 Dùng ${usedSkill.name}!`;
+            }
+            if (usedSkill.effect === 'heal_30') {
+                currentPlayerHp = wbUser.hp;
             }
             skillMsg += ` [-${usedSkill.mp_cost} MP]`;
         }
@@ -489,24 +438,15 @@ async function handleAutoCombat(userId, safeMode = false) {
             const skillId = monsterSkills[Math.floor(Math.random() * monsterSkills.length)];
             const skill = wbManager.getSkill(skillId);
             if (skill) {
-                switch (skill.effect) {
-                    case 'double_attack':
-                        monsterDamage = Math.max(1, Math.floor((wbUser.combatState.monsterBuffedAttack || monster.attack) * 0.8) - stats.defense) * 2;
-                        monsterSkillMsg = `🌀 ${skill.name}!`;
-                        break;
-                    case 'fireball':
-                        monsterDamage = Math.max(1, Math.floor((wbUser.combatState.monsterBuffedAttack || monster.attack) * 1.5) - Math.floor(stats.defense * 0.8));
-                        monsterSkillMsg = `🔥 ${skill.name}!`;
-                        break;
-                    case 'heal_30':
-                        const maxHp = wbUser.combatState.monsterMaxHp || monster.hp;
-                        const heal = Math.floor(maxHp * 0.3);
-                        currentMonsterHp = Math.min(maxHp, currentMonsterHp + heal);
-                        monsterSkillMsg = `💚 ${skill.name}! (+${heal} HP)`;
-                        monsterDamage = 0;
-                        break;
-                    default:
-                        monsterSkillMsg = `🔮 ${skill.name}!`;
+                const effectFn = skillEffects[skill.effect];
+                const effectState = { wbUser, stats, wbManager, monsterHp: currentMonsterHp, damage: monsterDamage, skill, isMonster: true, auto: true };
+                if (effectFn) {
+                    await effectFn({ userId, monster, state: effectState });
+                    monsterDamage = effectState.damage;
+                    currentMonsterHp = effectState.monsterHp;
+                    monsterSkillMsg = effectState.autoMsg || `🔮 ${skill.name}!`;
+                } else {
+                    monsterSkillMsg = `🔮 ${skill.name}!`;
                 }
             }
         }
