@@ -55,7 +55,7 @@ export async function handleQuestClaim({ userId }) {
     // Mark as claimed
     wbUser.dailyQuests.completed.push(today);
     wbManager.updateStatistic(userId, 'questsCompleted', completedQuests.length);
-    wbManager.saveUsers();
+    await wbManager.saveUsers();
     
     return `🎉 **NHẬN THƯỞNG THÀNH CÔNG!**
 Đã hoàn thành ${completedQuests.length} quest và nhận được:

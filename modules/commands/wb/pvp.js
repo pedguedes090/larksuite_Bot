@@ -134,7 +134,7 @@ async function handlePvpChallenge(challengerId, targetId) {
   challenger.pvp.challenges.sent = { to: targetId, timestamp };
   targetWbUser.pvp.challenges.received = { from: challengerId, timestamp };
   
-  wbManager.saveUsers();
+  await wbManager.saveUsers();
   
   return `⚔️ **THÁCH ĐẤU ĐÃ GỬI!**
 Đã thách đấu **${targetId}** (Lv.${targetWbUser.level})
@@ -165,14 +165,14 @@ async function handlePvpAccept(userId) {
   const timeLeft = Math.max(0, 60 - Math.floor((Date.now() - challenge.timestamp) / 1000));
   if (timeLeft <= 0) {
     user.pvp.challenges.received = null;
-    wbManager.saveUsers();
+    await wbManager.saveUsers();
     return '⏰ Thách đấu đã hết hạn!';
   }
   
   const challenger = wbManager.getUser(challenge.from);
   if (!challenger.pvp?.challenges?.sent || challenger.pvp.challenges.sent.to !== userId) {
     user.pvp.challenges.received = null;
-    wbManager.saveUsers();
+    await wbManager.saveUsers();
     return '❌ Thách đấu đã được hủy!';
   }
   
@@ -196,7 +196,7 @@ async function handlePvpDecline(userId) {
     challenger.pvp.challenges.sent = null;
   }
   
-  wbManager.saveUsers();
+  await wbManager.saveUsers();
   
   return `❌ **ĐÃ TỪ CHỐI THÁCH ĐẤU**
 Bạn đã từ chối thách đấu từ **${challengerId}**.`;
@@ -218,7 +218,7 @@ async function handlePvpCancel(userId) {
     target.pvp.challenges.received = null;
   }
   
-  wbManager.saveUsers();
+  await wbManager.saveUsers();
   
   return `🚫 **ĐÃ HỦY THÁCH ĐẤU**
 Đã hủy thách đấu gửi tới **${targetId}**.`;
@@ -250,7 +250,7 @@ async function startPvPCombat(player1Id, player2Id) {
   player2.pvp.currentHp = maxHp2;
   player2.hp = maxHp2; // Reset HP in main stats too
   
-  wbManager.saveUsers();
+  await wbManager.saveUsers();
   
   // Start auto combat immediately
   return await handlePvpAutoCombat(player1Id, player2Id);
@@ -399,7 +399,7 @@ async function handlePvpAutoCombat(player1Id, player2Id) {
   player2.pvp.opponent = null;
   delete player2.pvp.currentHp;
   
-  wbManager.saveUsers();
+  await wbManager.saveUsers();
   
   combatLog.push(`Trận đấu kết thúc sau ${turnCount} turns!`);
   combatLog.push(`🏆 **${winnerId}** nhận được: ${xpReward} XP và ${goldReward} xu`);
