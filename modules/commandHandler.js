@@ -9,7 +9,11 @@ class CommandHandler {
     this.commands = new Map();
     this.commandStats = new Map(); // Track command usage
     this.userManager = UserManager.getInstance();
-    this.loadCommands();
+  }
+
+  async init() {
+    await this.loadCommands();
+    return this;
   }
 
   // 📂 Load tất cả commands từ thư mục commands/

@@ -1,6 +1,7 @@
 // modules/userManager.js
 import fs from 'fs';
 import path from 'path';
+import { DEFAULT_ADMINS } from '../config.js';
 
 class UserManager {
   static instance = null;
@@ -17,7 +18,7 @@ class UserManager {
     this.saveTimeout = null; // Debounce saves
     
     // Default admin list from environment variable
-    this.defaultAdmins = (process.env.DEFAULT_ADMINS || '').split(',').filter(id => id.trim());
+    this.defaultAdmins = DEFAULT_ADMINS.split(',').filter(id => id.trim());
     
     UserManager.instance = this;
   }

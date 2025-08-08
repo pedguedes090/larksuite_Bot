@@ -4,27 +4,15 @@ import bodyParser from 'body-parser';
 import * as lark from '@larksuiteoapi/node-sdk';
 import CommandHandler from './modules/commandHandler.js';
 import UserManager from './modules/userManager.js';
-import dotenv from 'dotenv';
-
-// Load environment variables
-dotenv.config();
-
-// ⚙️ Cấu hình từ environment variables
-const APP_ID = process.env.APP_ID;
-const APP_SECRET = process.env.APP_SECRET;
-const ENCRYPT_KEY = process.env.ENCRYPT_KEY;
-const VERIFY_TOKEN = process.env.VERIFY_TOKEN;
-const PORT = process.env.PORT || 3000;
-
-// Kiểm tra required environment variables
-const requiredEnvVars = ['APP_ID', 'APP_SECRET', 'ENCRYPT_KEY', 'VERIFY_TOKEN'];
-for (const envVar of requiredEnvVars) {
-  if (!process.env[envVar]) {
-    console.error(`❌ Missing required environment variable: ${envVar}`);
-    console.error('💡 Please check your .env file or environment configuration');
-    process.exit(1);
-  }
-}
+import {
+  APP_ID,
+  APP_SECRET,
+  ENCRYPT_KEY,
+  VERIFY_TOKEN,
+  PORT,
+  NODE_ENV,
+  DEFAULT_ADMINS
+} from './config.js';
 
 // 🚀 Khởi tạo các components
 const client = new lark.Client({
@@ -35,7 +23,7 @@ const client = new lark.Client({
   disableTokenCache: process.env.DISABLE_TOKEN_CACHE === 'true'
 });
 
-const commandHandler = new CommandHandler('!'); // Prefix: !
+const commandHandler = await new CommandHandler('!').init(); // Prefix: !
 const userManager = UserManager.getInstance(); // Sử dụng singleton
 
 // 🧠 Bộ nhớ tạm để chống lặp message với automatic cleanup
@@ -126,7 +114,7 @@ const app = express();
 app.use(bodyParser.json());
 
 // 📥 Log webhook requests (simplified)
-if (process.env.NODE_ENV === 'development') {
+if (NODE_ENV === 'development') {
   app.use((req, res, next) => {
     console.log('📥 Webhook received');
     next();
@@ -150,6 +138,6 @@ app.listen(PORT, () => {
   console.log(`✅ Server running at http://localhost:${PORT}`);
   console.log(`🎮 Command prefix: ${commandHandler.prefix}`);
   console.log(`📁 Commands loaded: ${userCommands} user + ${totalAdminOnly} admin = ${adminCommands} total`);
-  console.log(`🔒 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🔐 Default admins: ${process.env.DEFAULT_ADMINS || 'none'}`);
+  console.log(`🔒 Environment: ${NODE_ENV}`);
+  console.log(`🔐 Default admins: ${DEFAULT_ADMINS || 'none'}`);
 });
