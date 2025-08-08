@@ -27,9 +27,9 @@ export default async function handlePvp({ userId, args }) {
     if (wbUser.pvp?.inPvP) {
       statusText = `\n⚔️ **Đang trong trận PvP với ${wbUser.pvp.opponent}**\n   Trận đấu đang diễn ra tự động!`;
     }
-    
+
     return `--- ⚔️ **PVP SYSTEM** ---
-�� **Stats:** ${stats.wins}W/${stats.losses}L (${stats.totalFights} fights)${statusText}
+📊 **Stats:** ${stats.wins}W/${stats.losses}L (${stats.totalFights} fights)${statusText}
 
 **Commands:**
 \`wb pvp <userId>\` - Thách đấu người chơi

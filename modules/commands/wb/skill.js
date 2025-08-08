@@ -18,6 +18,34 @@ export default async function handleSkill({ userId, args }) {
     }
     return text;
   }
+  if (sub === 'list') {
+    const allSkills = wbManager.getAllSkills();
+    const owned = new Set(wbUser.skills || []);
+    const equipped = new Set(wbUser.equippedSkills || []);
+    let text = '--- 📚 **DANH SÁCH KỸ NĂNG** ---\n';
+    for (const skill of allSkills) {
+      const status = owned.has(skill.id)
+        ? equipped.has(skill.id)
+          ? ' [Đã trang bị]'
+          : ' [Đã sở hữu]'
+        : '';
+      text += `• ${skill.id} - ${skill.name}${status} (MP: ${skill.mp_cost}, CD: ${skill.cooldown})\n   *${skill.description}*\n`;
+    }
+    return text;
+  }
+  if (sub === 'info') {
+    const skillId = args[2];
+    if (!skillId) return '❌ Thiếu ID kỹ năng.';
+    const skill = wbManager.getSkill(skillId);
+    if (!skill) return '❌ Kỹ năng không tồn tại.';
+    const owned = wbUser.skills?.includes(skillId);
+    const equipped = wbUser.equippedSkills?.includes(skillId);
+    let text = `--- 🧙‍♂️ **${skill.name}** ---\n`;
+    text += `${skill.description}\nMP: ${skill.mp_cost} | CD: ${skill.cooldown}\n`;
+    if (skill.type === 'passive') text += 'Loại: Bị động\n';
+    if (owned) text += equipped ? 'Trạng thái: Đã trang bị\n' : 'Trạng thái: Đã sở hữu\n';
+    return text;
+  }
   if (sub === 'equip') {
     const skillId = args[2];
     if (!skillId) return '❌ Thiếu ID kỹ năng.';

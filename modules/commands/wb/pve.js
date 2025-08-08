@@ -85,7 +85,7 @@ export default async function handlePve({ userId, args }) {
     
     // Show current MP and skill cooldowns after using skill
     if (skillId) {
-        combatLog.push(`� MP còn lại: ${wbUser.mp}/${wbUser.maxMp}`);
+        combatLog.push(`💙 MP còn lại: ${wbUser.mp}/${wbUser.maxMp}`);
         const activeCooldowns = Object.entries(wbUser.skillCooldowns || {}).filter(([_, cd]) => cd > 0);
         if (activeCooldowns.length > 0) {
             const cooldownText = activeCooldowns.map(([skill, cd]) => `${skill}(${cd})`).join(', ');
