@@ -94,7 +94,9 @@ class CommandHandler {
     if (!isAdmin) {
       return {
         allowed: false,
-        message: `🔒 **Quyền hạn không đủ!**\n❌ Lệnh **${command.name}** chỉ dành cho Admin.\n💡 Liên hệ Admin để được cấp quyền.`
+        message: `🔒 **Quyền hạn không đủ!**
+❌ Lệnh **${command.name}** chỉ dành cho Admin.
+💡 Liên hệ Admin để được cấp quyền.`
       };
     }
 
@@ -135,10 +137,12 @@ class CommandHandler {
         let response = `❌ Không tìm thấy lệnh: **${commandName}**`;
         
         if (suggestions.length > 0) {
-          response += `\n💡 **Có phải bạn muốn:** ${suggestions.map(cmd => `${this.prefix}${cmd}`).join(', ')}?`;
+          response += `
+💡 **Có phải bạn muốn:** ${suggestions.map(cmd => `${this.prefix}${cmd}`).join(', ')}?`;
         }
         
-        response += `\n📋 Dùng ${this.prefix}help để xem danh sách lệnh`;
+        response += `
+📋 Dùng ${this.prefix}help để xem danh sách lệnh`;
         return response;
       }
 
@@ -176,7 +180,8 @@ class CommandHandler {
 
     } catch (err) {
       console.error(`❌ Command handler error:`, err.message);
-      return `❌ **Lỗi hệ thống:** ${err.message}\n💡 Nếu lỗi tiếp tục, vui lòng liên hệ admin`;
+      return `❌ **Lỗi hệ thống:** ${err.message}
+💡 Nếu lỗi tiếp tục, vui lòng liên hệ admin`;
     }
   }
 
