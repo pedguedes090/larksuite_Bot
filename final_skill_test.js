@@ -1,6 +1,13 @@
 // Final skill system test
 console.log('🔥 FINAL SKILL SYSTEM TEST');
 
+// Provide default environment variables so config can load in test environment
+process.env.NODE_ENV = 'test';
+process.env.APP_ID = process.env.APP_ID || 'test';
+process.env.APP_SECRET = process.env.APP_SECRET || 'test';
+process.env.ENCRYPT_KEY = process.env.ENCRYPT_KEY || 'test';
+process.env.VERIFY_TOKEN = process.env.VERIFY_TOKEN || 'test';
+
 // Simulate wb command execution
 const mockWbCommand = {
   async execute({ userId, args }) {
