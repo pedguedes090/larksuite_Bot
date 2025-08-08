@@ -4,6 +4,7 @@ import path from 'path';
 
 const dataDir = path.join(process.cwd(), 'worldboss_data');
 const userFile = path.join(dataDir, 'wbUsers.json');
+const lockFile = path.join(dataDir, 'wbUsers.json.lock');
 const itemFile = path.join(dataDir, 'items.json');
 const monsterFile = path.join(dataDir, 'monsters.json');
 const mapFile = path.join(dataDir, 'maps.json');
@@ -23,6 +24,7 @@ class WB_DataManager {
     this.monsters = this.loadJson(monsterFile, {});
     this.maps = this.loadJson(mapFile, {});
     this.skills = this.loadJson(skillFile, {});
+    this.lockFile = lockFile;
     this.saveTimeout = null;
 
     WB_DataManager.instance = this;
@@ -64,17 +66,54 @@ class WB_DataManager {
     }
     return defaultValue;
   }
+
+  async acquireLock(timeout = 5000) {
+    const start = Date.now();
+    while (fs.existsSync(this.lockFile)) {
+      if (Date.now() - start > timeout) {
+        throw new Error('Timeout acquiring file lock');
+      }
+      await new Promise(resolve => setTimeout(resolve, 10));
+    }
+
+    try {
+      await fs.promises.writeFile(this.lockFile, process.pid.toString());
+    } catch (err) {
+      throw new Error('Failed to acquire lock: ' + err.message);
+    }
+  }
+
+  async releaseLock() {
+    try {
+      if (fs.existsSync(this.lockFile)) {
+        await fs.promises.unlink(this.lockFile);
+      }
+    } catch (err) {
+      console.error('⚠️ Error releasing lock:', err.message);
+    }
+  }
   
-  saveUsers() {
+  async saveUsers() {
     if (this.saveTimeout) clearTimeout(this.saveTimeout);
-    
-    this.saveTimeout = setTimeout(() => {
+
+    return new Promise(resolve => {
+      this.saveTimeout = setTimeout(async () => {
         try {
-            fs.writeFileSync(userFile, JSON.stringify(this.users, null, 2), 'utf8');
+          await this.acquireLock();
+
+          const tempFile = userFile + '.tmp';
+          await fs.promises.writeFile(tempFile, JSON.stringify(this.users, null, 2), 'utf8');
+          await fs.promises.rename(tempFile, userFile);
+
+          await this.releaseLock();
         } catch (err) {
-            console.error('❌ Lỗi ghi file wbUsers.json:', err.message);
+          console.error('❌ Lỗi ghi file wbUsers.json:', err.message);
+          await this.releaseLock();
+        } finally {
+          resolve();
         }
-    }, 100);
+      }, 100);
+    });
   }
   
   getUser(userId) {

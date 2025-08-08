@@ -32,7 +32,7 @@ export default async function handlePve({ userId, args }) {
         wbUser.mp -= skill.mp_cost;
         wbUser.skillCooldowns = wbUser.skillCooldowns || {};
         wbUser.skillCooldowns[skillId] = skill.cooldown;
-        wbManager.saveUsers();
+        await wbManager.saveUsers();
         // Thực hiện hiệu ứng skill
         switch (skill.effect) {
             case 'double_attack':
@@ -47,7 +47,7 @@ export default async function handlePve({ userId, args }) {
                 const maxHp = wbUser.maxHp + stats.hpBonus;
                 const heal = Math.floor(maxHp * 0.3);
                 wbUser.hp = Math.min(maxHp, wbUser.hp + heal);
-                wbManager.saveUsers();
+                await wbManager.saveUsers();
                 combatLog.push(`💚 Bạn dùng ${skill.name}! Hồi ${heal} HP (${wbUser.hp}/${maxHp})`);
                 playerDamage = 0;
                 skillMessage = ` (Kỹ năng: ${skill.name})`;
