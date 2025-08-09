@@ -5,14 +5,14 @@ export default function apply({ userId, monster, state }) {
   if (isMonster) {
     addStatus(wbUser, 'stun', 1);
     if (auto) {
-      state.autoMsg = `💫 ${skill.name}!`;
+      state.autoMsg = `💫 ${skill.name}! Choáng 1 lượt`;
     } else {
       state.monsterSkillMsg = `💫 ${monster.name} dùng ${skill.name}!`;
     }
   } else {
     addStatus(wbUser.combatState, 'stun', 1, undefined, 'monsterStatusEffects');
     if (auto) {
-      state.autoMsg = `💫 Dùng ${skill.name}!`;
+      state.autoMsg = `💫 Dùng ${skill.name}! Choáng 1 lượt`;
     } else {
       combatLog.push(`💫 Bạn dùng ${skill.name}! Làm choáng kẻ địch.`);
       state.skillMessage = ` (Kỹ năng: ${skill.name})`;

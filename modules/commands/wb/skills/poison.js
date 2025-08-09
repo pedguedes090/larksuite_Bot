@@ -5,14 +5,14 @@ export default function apply({ userId, monster, state }) {
   if (isMonster) {
     addStatus(wbUser, 'poison', 3);
     if (auto) {
-      state.autoMsg = `☠️ ${skill.name}!`;
+      state.autoMsg = `☠️ ${skill.name}! Độc 3 lượt`;
     } else {
       state.monsterSkillMsg = `☠️ ${monster.name} dùng ${skill.name}!`;
     }
   } else {
     addStatus(wbUser.combatState, 'poison', 3, undefined, 'monsterStatusEffects');
     if (auto) {
-      state.autoMsg = `☠️ Dùng ${skill.name}!`;
+      state.autoMsg = `☠️ Dùng ${skill.name}! Độc 3 lượt`;
     } else {
       combatLog.push(`☠️ Bạn dùng ${skill.name}! Độc sẽ gây sát thương theo thời gian.`);
       state.skillMessage = ` (Kỹ năng: ${skill.name})`;
