@@ -5,14 +5,14 @@ export default function apply({ userId, monster, state }) {
   if (isMonster) {
     addStatus(wbUser, 'freeze', 2);
     if (auto) {
-      state.autoMsg = `❄️ ${skill.name}!`;
+      state.autoMsg = `❄️ ${skill.name}! Đóng băng 2 lượt`;
     } else {
       state.monsterSkillMsg = `❄️ ${monster.name} dùng ${skill.name}!`;
     }
   } else {
     addStatus(wbUser.combatState, 'freeze', 2, undefined, 'monsterStatusEffects');
     if (auto) {
-      state.autoMsg = `❄️ Dùng ${skill.name}!`;
+      state.autoMsg = `❄️ Dùng ${skill.name}! Đóng băng 2 lượt`;
     } else {
       combatLog.push(`❄️ Bạn dùng ${skill.name}! Đóng băng kẻ địch.`);
       state.skillMessage = ` (Kỹ năng: ${skill.name})`;

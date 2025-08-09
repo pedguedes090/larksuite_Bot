@@ -87,7 +87,7 @@ export default async function handlePve({ userId, args }) {
         if (!skillId) {
             combatLog.push(`💥 Bạn tấn công ${monster.name}, gây ${playerDamage} sát thương.`);
         } else {
-            combatLog.push(`💥 Tổng sát thương lên quái: ${playerDamage}`);
+            combatLog.push(`💥 Tổng sát thương lên quái: ${playerDamage}${skillMessage}`);
         }
         // Lifesteal
         if (playerDamage > 0 && stats.lifesteal > 0) {
@@ -391,7 +391,7 @@ async function handleAutoCombat(userId, safeMode = false) {
         if (skillMsg) {
             combatLog.push(`Turn ${turnCount}: ${skillMsg}`);
         } else {
-            combatLog.push(`Turn ${turnCount}: 💥 Đánh thường! Gây ${playerDamage} sát thương`);
+            combatLog.push(`Turn ${turnCount}: 💥 Đánh thường!`);
         }
         // Player attacks monster
         currentMonsterHp -= playerDamage;
