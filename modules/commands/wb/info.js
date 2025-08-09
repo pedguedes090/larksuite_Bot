@@ -27,6 +27,12 @@ export default async function handleInfo({ userId, args }) {
 ⭐ **Level:** ${wbUser.level}/${MAX_LEVEL} (${wbUser.xp}/${getXPRequiredForLevel(wbUser.level + 1)} XP)${wbUser.level >= MAX_LEVEL ? ' 🌟 MAX!' : ''}
 ⚔️ **Tấn công:** ${stats.attack} (Base: ${wbUser.baseAttack})
 🛡️ **Phòng thủ:** ${stats.defense} (Base: ${wbUser.baseDefense})
+🗡️ **Xuyên giáp:** ${stats.armorPen}
+🩸 **Hút máu:** ${(stats.lifesteal * 100).toFixed(0)}%
+🔮 **Phép thuật:** ${stats.magic}
+✨ **Kháng phép:** ${stats.magicResist}
+👟 **Tốc độ:** ${stats.speed}
+💨 **Né tránh:** ${(stats.dodge * 100).toFixed(0)}%
 💰 **Tiền:** ${generalUser.money}${equipmentText}${buffText}
 ⚔️ **Trạng thái:** ${wbUser.combatState.inCombat ? `Đang chiến đấu với ${wbManager.getMonster(wbUser.combatState.monsterId)?.name || 'Unknown Monster'}` : 'An toàn'}`;
 }

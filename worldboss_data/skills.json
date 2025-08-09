@@ -71,5 +71,71 @@
     "effect": "passive_def_10",
     "category": "passive",
     "buyPrice": 700
+  },
+  "poison": {
+    "id": "poison",
+    "name": "Độc Tố",
+    "description": "Gây độc cho đối thủ trong 3 lượt.",
+    "mp_cost": 20,
+    "cooldown": 3,
+    "type": "active",
+    "effect": "poison",
+    "category": "attack",
+    "buyPrice": 500
+  },
+  "paralyze": {
+    "id": "paralyze",
+    "name": "Tê Liệt",
+    "description": "Làm tê liệt đối thủ, có thể khiến bỏ lượt trong 2 lượt.",
+    "mp_cost": 18,
+    "cooldown": 3,
+    "type": "active",
+    "effect": "paralyze",
+    "category": "attack",
+    "buyPrice": 500
+  },
+  "burn": {
+    "id": "burn",
+    "name": "Thiêu Đốt",
+    "description": "Gây cháy, mất HP mỗi lượt trong 3 lượt.",
+    "mp_cost": 20,
+    "cooldown": 3,
+    "type": "active",
+    "effect": "burn",
+    "category": "attack",
+    "buyPrice": 500
+  },
+  "freeze": {
+    "id": "freeze",
+    "name": "Đóng Băng",
+    "description": "Đóng băng kẻ địch, mất lượt trong 2 lượt.",
+    "mp_cost": 22,
+    "cooldown": 4,
+    "type": "active",
+    "effect": "freeze",
+    "category": "attack",
+    "buyPrice": 600
+  },
+  "stun": {
+    "id": "stun",
+    "name": "Choáng",
+    "description": "Làm choáng đối thủ 1 lượt.",
+    "mp_cost": 16,
+    "cooldown": 3,
+    "type": "active",
+    "effect": "stun",
+    "category": "attack",
+    "buyPrice": 450
+  },
+  "quicksand": {
+    "id": "quicksand",
+    "name": "Sa Lầy",
+    "description": "Giảm tốc độ của đối thủ trong 3 lượt.",
+    "mp_cost": 18,
+    "cooldown": 3,
+    "type": "active",
+    "effect": "quicksand",
+    "category": "attack",
+    "buyPrice": 500
   }
-} 
+}

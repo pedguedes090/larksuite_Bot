@@ -9,6 +9,8 @@ export default async function handleStats({ userId }) {
 👑 **Boss đã hạ gục:** ${stats.bossesKilled}
 🎁 **Vật phẩm đã tìm thấy:** ${stats.itemsFound}
 📋 **Quest đã hoàn thành:** ${stats.questsCompleted}
+⚔️ **PvP Thắng:** ${stats.pvpWins}
+💀 **PvP Thua:** ${stats.pvpLosses}
 
 🏆 **Thành tích:**
 ${stats.bossesKilled >= 10 ? '👑 **Boss Slayer** - Hạ gục 10+ boss' : ''}

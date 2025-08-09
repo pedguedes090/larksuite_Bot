@@ -4,13 +4,26 @@ import heal30 from './skills/heal_30.js';
 import buffDef402 from './skills/buff_def_40_2.js';
 import fireball from './skills/fireball.js';
 import buffAtk30Def20_3 from './skills/buff_atk_30_def_-20_3.js';
+import poison from './skills/poison.js';
+import paralyze from './skills/paralyze.js';
+import burn from './skills/burn.js';
+import freeze from './skills/freeze.js';
+import stun from './skills/stun.js';
+import quicksand from './skills/quicksand.js';
+import { applyStatusEffects } from './statusEffects.js';
 
 const skillEffects = {
     double_attack: doubleAttack,
     heal_30: heal30,
     buff_def_40_2: buffDef402,
     fireball: fireball,
-    'buff_atk_30_def_-20_3': buffAtk30Def20_3
+    'buff_atk_30_def_-20_3': buffAtk30Def20_3,
+    poison: poison,
+    paralyze: paralyze,
+    burn: burn,
+    freeze: freeze,
+    stun: stun,
+    quicksand: quicksand
 };
 
 export default async function handlePve({ userId, args }) {
@@ -32,49 +45,71 @@ export default async function handlePve({ userId, args }) {
         return `❌ Lỗi hệ thống: Quái vật không tồn tại. Trận chiến đã được reset.`;
     }
     let combatLog = [];
-    let playerDamage = Math.max(1, stats.attack - (wbUser.combatState.monsterBuffedDefense || monster.defense));
+
+    // Apply status effects
+    const playerStatus = applyStatusEffects(wbUser, wbUser.maxHp + stats.hpBonus, combatLog, 'Bạn');
+    const monsterState = { hp: wbUser.combatState.monsterHp, statusEffects: wbUser.combatState.monsterStatusEffects };
+    const monsterStatus = applyStatusEffects(monsterState, wbUser.combatState.monsterMaxHp || monster.hp, combatLog, monster.name);
+    wbUser.combatState.monsterHp = monsterState.hp;
+    wbUser.combatState.monsterStatusEffects = monsterState.statusEffects;
+    await wbManager.saveUsers();
+
+    let playerDamage = 0;
     let skillMessage = '';
-    // Nếu có skillId, kiểm tra và thực hiện skill
-    if (skillId) {
-        const skill = wbManager.getSkill(skillId);
-        if (!skill) return '❌ Kỹ năng không tồn tại.';
-        if (!wbUser.equippedSkills || !wbUser.equippedSkills.includes(skillId)) return '❌ Kỹ năng chưa được trang bị.';
-        if (wbUser.skillCooldowns?.[skillId] > 0) return `❌ Kỹ năng đang hồi (${wbUser.skillCooldowns[skillId]} lượt).`;
-        if (wbUser.mp < skill.mp_cost) return '❌ Không đủ MP.';
-        // Trừ mp, set cooldown
-        wbUser.mp -= skill.mp_cost;
-        wbUser.skillCooldowns = wbUser.skillCooldowns || {};
-        wbUser.skillCooldowns[skillId] = skill.cooldown;
-        await wbManager.saveUsers();
-        // Thực hiện hiệu ứng skill
-        const effectFn = skillEffects[skill.effect];
-        const effectState = { wbUser, stats, wbManager, combatLog, damage: playerDamage, skill };
-        if (effectFn) {
-            await effectFn({ userId, monster, state: effectState });
-            playerDamage = effectState.damage;
-            skillMessage = effectState.skillMessage || '';
+    let newMonsterHp = wbUser.combatState.monsterHp;
+
+    if (!playerStatus.skipTurn) {
+        playerDamage = Math.max(1, stats.attack - Math.max(0, (wbUser.combatState.monsterBuffedDefense || monster.defense) - stats.armorPen));
+        // Nếu có skillId, kiểm tra và thực hiện skill
+        if (skillId) {
+            const skill = wbManager.getSkill(skillId);
+            if (!skill) return '❌ Kỹ năng không tồn tại.';
+            if (!wbUser.equippedSkills || !wbUser.equippedSkills.includes(skillId)) return '❌ Kỹ năng chưa được trang bị.';
+            if (wbUser.skillCooldowns?.[skillId] > 0) return `❌ Kỹ năng đang hồi (${wbUser.skillCooldowns[skillId]} lượt).`;
+            if (wbUser.mp < skill.mp_cost) return '❌ Không đủ MP.';
+            // Trừ mp, set cooldown
+            wbUser.mp -= skill.mp_cost;
+            wbUser.skillCooldowns = wbUser.skillCooldowns || {};
+            wbUser.skillCooldowns[skillId] = skill.cooldown;
+            await wbManager.saveUsers();
+            // Thực hiện hiệu ứng skill
+            const effectFn = skillEffects[skill.effect];
+            const effectState = { wbUser, stats, wbManager, combatLog, damage: playerDamage, skill };
+            if (effectFn) {
+                await effectFn({ userId, monster, state: effectState });
+                playerDamage = effectState.damage;
+                skillMessage = effectState.skillMessage || '';
+            } else {
+                combatLog.push(`Bạn dùng ${skill.name} nhưng chưa có hiệu ứng!`);
+            }
+        }
+        newMonsterHp = wbUser.combatState.monsterHp - playerDamage;
+        if (!skillId) {
+            combatLog.push(`💥 Bạn tấn công ${monster.name}, gây ${playerDamage} sát thương.`);
         } else {
-            combatLog.push(`Bạn dùng ${skill.name} nhưng chưa có hiệu ứng!`);
+            combatLog.push(`💥 Tổng sát thương lên quái: ${playerDamage}`);
         }
-    }
-    // Player attacks monster
-    let newMonsterHp = wbUser.combatState.monsterHp - playerDamage;
-    if (!skillId) {
-        combatLog.push(`💥 Bạn tấn công ${monster.name}, gây ${playerDamage} sát thương.`);
+        // Lifesteal
+        if (playerDamage > 0 && stats.lifesteal > 0) {
+            const heal = Math.floor(playerDamage * stats.lifesteal);
+            wbUser.hp = Math.min(wbUser.maxHp + stats.hpBonus, wbUser.hp + heal);
+            combatLog.push(`🩸 Hút máu: +${heal} HP`);
+        }
+        combatLog.push(`🩸 HP quái còn: ${Math.max(0, newMonsterHp)}/${wbUser.combatState.monsterMaxHp || monster.hp}`);
+
+        // Show current MP and skill cooldowns after using skill
+        if (skillId) {
+            combatLog.push(`💙 MP còn lại: ${wbUser.mp}/${wbUser.maxMp}`);
+            const activeCooldowns = Object.entries(wbUser.skillCooldowns || {}).filter(([_, cd]) => cd > 0);
+            if (activeCooldowns.length > 0) {
+                const cooldownText = activeCooldowns.map(([skill, cd]) => `${skill}(${cd})`).join(', ');
+                combatLog.push(`⏳ Cooldown: ${cooldownText}`);
+            }
+        }
     } else {
-        combatLog.push(`💥 Tổng sát thương lên quái: ${playerDamage}`);
+        combatLog.push('⛔ Bạn không thể hành động trong lượt này!');
     }
-    combatLog.push(`🩸 HP quái còn: ${Math.max(0, newMonsterHp)}/${wbUser.combatState.monsterMaxHp || monster.hp}`);
-    
-    // Show current MP and skill cooldowns after using skill
-    if (skillId) {
-        combatLog.push(`💙 MP còn lại: ${wbUser.mp}/${wbUser.maxMp}`);
-        const activeCooldowns = Object.entries(wbUser.skillCooldowns || {}).filter(([_, cd]) => cd > 0);
-        if (activeCooldowns.length > 0) {
-            const cooldownText = activeCooldowns.map(([skill, cd]) => `${skill}(${cd})`).join(', ');
-            combatLog.push(`⏳ Cooldown: ${cooldownText}`);
-        }
-    }
+
     // Check if monster is defeated
     if (newMonsterHp <= 0) {
         // === LOGIC CHIẾN THẮNG ===
@@ -151,41 +186,46 @@ export default async function handlePve({ userId, args }) {
         return combatLog.join('\n');
     }
     // Monster turn: nếu monster có skills, có xác suất dùng skill
-    let monsterSkillMsg = '';
-    const monsterSkills = monster.skills || [];
-    let monsterUsedSkill = null;
-    let monsterDamage = Math.max(1, (wbUser.combatState.monsterBuffedAttack || monster.attack) - stats.defense);
-    
-    if (monsterSkills.length > 0 && Math.random() < 0.5) { // 50% dùng skill nếu có
-        const skillId = monsterSkills[Math.floor(Math.random() * monsterSkills.length)];
-        const skill = wbManager.getSkill(skillId);
-        if (skill) {
-            monsterUsedSkill = skill;
-            const effectFn = skillEffects[skill.effect];
-            const effectState = { wbUser, stats, wbManager, monsterHp: newMonsterHp, damage: monsterDamage, skill, isMonster: true };
-            if (effectFn) {
-                await effectFn({ userId, monster, state: effectState });
-                monsterDamage = effectState.damage;
-                newMonsterHp = effectState.monsterHp;
-                monsterSkillMsg = effectState.monsterSkillMsg || '';
-            } else {
-                monsterSkillMsg = `${monster.name} dùng ${skill.name}!`;
+    if (!monsterStatus.skipTurn) {
+        let monsterSkillMsg = '';
+        const monsterSkills = monster.skills || [];
+        let monsterUsedSkill = null;
+        let monsterDamage = Math.max(1, (wbUser.combatState.monsterBuffedAttack || monster.attack) - Math.max(0, stats.defense - (wbUser.combatState.monsterArmorPenetration || 0)));
+
+        if (monsterSkills.length > 0 && Math.random() < 0.5) { // 50% dùng skill nếu có
+            const skillId = monsterSkills[Math.floor(Math.random() * monsterSkills.length)];
+            const skill = wbManager.getSkill(skillId);
+            if (skill) {
+                monsterUsedSkill = skill;
+                const effectFn = skillEffects[skill.effect];
+                const effectState = { wbUser, stats, wbManager, monsterHp: newMonsterHp, damage: monsterDamage, skill, isMonster: true };
+                if (effectFn) {
+                    await effectFn({ userId, monster, state: effectState });
+                    monsterDamage = effectState.damage;
+                    newMonsterHp = effectState.monsterHp;
+                    monsterSkillMsg = effectState.monsterSkillMsg || '';
+                } else {
+                    monsterSkillMsg = `${monster.name} dùng ${skill.name}!`;
+                }
             }
         }
-    }
-    
-    // Monster attacks player (if not healing)
-    const newPlayerHp = wbUser.hp - monsterDamage;
-    if (monsterSkillMsg) combatLog.push(monsterSkillMsg);
-    if (monsterDamage > 0) {
-        combatLog.push(`🩸 ${monster.name} tấn công bạn, gây ${monsterDamage} sát thương.`);
-    }
-    combatLog.push(`❤️ HP của bạn còn: ${Math.max(0, newPlayerHp)}/${wbUser.maxHp + stats.hpBonus}`);
-    // Check if player is defeated
-    if (newPlayerHp <= 0) {
-        // Check for revival stone with cooldown
-        const now = Date.now();
-        const revivalCooldown = 60000; // 1 minute cooldown
+
+        if (Math.random() < stats.dodge) {
+            monsterDamage = 0;
+            combatLog.push(`💨 Bạn né được đòn tấn công của ${monster.name}!`);
+        }
+
+        const newPlayerHp = wbUser.hp - monsterDamage;
+        if (monsterSkillMsg) combatLog.push(monsterSkillMsg);
+        if (monsterDamage > 0) {
+            combatLog.push(`🩸 ${monster.name} tấn công bạn, gây ${monsterDamage} sát thương.`);
+        }
+        combatLog.push(`❤️ HP của bạn còn: ${Math.max(0, newPlayerHp)}/${wbUser.maxHp + stats.hpBonus}`);
+        // Check if player is defeated
+        if (newPlayerHp <= 0) {
+            // Check for revival stone with cooldown
+            const now = Date.now();
+            const revivalCooldown = 60000; // 1 minute cooldown
         
         if (wbManager.hasItem(userId, 'revival_stone') && 
             (!wbUser.lastRevivalUse || now - wbUser.lastRevivalUse >= revivalCooldown)) {
@@ -211,12 +251,12 @@ ${combatLog.join('\n')}`;
         const xpLost = Math.min(Math.floor(wbUser.xp * 0.1), 50); // Cap XP loss at 50
         const newXP = Math.max(0, wbUser.xp - xpLost);
         const newLevel = calculateLevelFromXP(newXP);
-        
+
         let levelDownMessage = '';
         if (newLevel < wbUser.level) {
             const newStats = calculateStatsForLevel(newLevel);
             levelDownMessage = `\n📉 **Xuống cấp:** Level ${wbUser.level} → Level ${newLevel}`;
-            
+
             wbManager.updateUser(userId, {
                 level: newLevel,
                 xp: newXP,
@@ -236,19 +276,20 @@ ${combatLog.join('\n')}`;
             });
         }
 
-        const defeatMessage = `☠️ **THẤT BẠI!** ☠️
-Bạn đã bị ${monster.name} hạ gục.
-- Bạn bị mất ${xpLost} XP.
-- Bạn đã được hồi sinh tại thành với 1 HP.${levelDownMessage}`;
+        const defeatMessage = `☠️ **THẤT BẠI!** ☠️\nBạn đã bị ${monster.name} hạ gục.\n- Bạn bị mất ${xpLost} XP.\n- Bạn đã được hồi sinh tại thành với 1 HP.${levelDownMessage}`;
 
         return defeatMessage;
+        }
+        wbUser.hp = newPlayerHp;
+    } else {
+        combatLog.push(`${monster.name} không thể hành động!`);
     }
     // Decrease buff turns after combat turn
     wbManager.decreaseBuffTurns(userId);
     // Giảm cooldown skill
     wbManager.decreaseSkillCooldowns(userId);
     wbManager.updateUser(userId, {
-        hp: newPlayerHp,
+        hp: wbUser.hp,
         mp: wbUser.mp,
         skillCooldowns: wbUser.skillCooldowns,
         combatState: {
@@ -262,12 +303,12 @@ Bạn đã bị ${monster.name} hạ gục.
       const buffText = buffs.map(b => `${b.type === 'attack' ? '⚔️' : b.type === 'defense' ? '🛡️' : '🍀'} +${Math.round(b.amount * 100)}% (${b.turnsRemaining} lượt)`).join(', ');
       combatLog.push(`🔮 **Buff hiện tại:** ${buffText}`);
     }
-    
+
     // Show current MP if not at max
     if (wbUser.mp < wbUser.maxMp) {
         combatLog.push(`💙 **MP:** ${wbUser.mp}/${wbUser.maxMp}`);
     }
-    
+
     return combatLog.join('\n');
 }
 

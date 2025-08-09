@@ -134,6 +134,7 @@ export function resetCombatState() {
     monsterBuffedAttack: null,
     monsterBuffedDefense: null,
     monsterArmorPenetration: null,
-    mapId: null
+    mapId: null,
+    monsterStatusEffects: []
   };
 }
