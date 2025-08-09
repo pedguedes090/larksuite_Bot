@@ -284,8 +284,9 @@ async function handlePvpAutoCombat(player1Id, player2Id) {
   while (currentPlayer1Hp > 0 && currentPlayer2Hp > 0 && turnCount < maxTurns) {
     turnCount++;
     
-    // Random who attacks first each turn
-    const player1AttacksFirst = Math.random() < 0.5;
+    // Determine who attacks first based on speed
+    const totalSpeed = stats1.speed + stats2.speed;
+    const player1AttacksFirst = Math.random() < (totalSpeed === 0 ? 0.5 : stats1.speed / totalSpeed);
     
     if (player1AttacksFirst) {
       // Player 1 turn with skills
@@ -381,12 +382,16 @@ async function handlePvpAutoCombat(player1Id, player2Id) {
   winner.pvp.stats.totalFights++;
   loser.pvp.stats.losses++;
   loser.pvp.stats.totalFights++;
-  
-  // Rewards
+
   const winnerId = winner === player1 ? player1Id : player2Id;
+  const loserId = winner === player1 ? player2Id : player1Id;
+  wbManager.updateStatistic(winnerId, 'pvpWins');
+  wbManager.updateStatistic(loserId, 'pvpLosses');
+
+  // Rewards
   const xpReward = Math.floor(loser.level * 5 * XP_MULTIPLIER);
   const goldReward = loser.level * 10;
-  
+
   winner.xp += xpReward;
   userManager.updateMoney(winnerId, goldReward);
   
@@ -457,7 +462,7 @@ function calculatePvpTurnWithSkills(playerId, attackerStats, defenderStats, curr
     
     switch (usedSkill.effect) {
       case 'double_attack':
-        damage = Math.max(1, Math.floor(attackerStats.attack * 0.8) - defenderStats.defense);
+        damage = Math.max(1, Math.floor(attackerStats.attack * 0.8) - Math.max(0, defenderStats.defense - attackerStats.armorPen));
         skillMsg = `🌀 ${playerId} dùng ${usedSkill.name}! 2 đòn, mỗi đòn ${damage} sát thương.`;
         damage = damage * 2;
         break;
@@ -470,29 +475,39 @@ function calculatePvpTurnWithSkills(playerId, attackerStats, defenderStats, curr
       case 'buff_def_40_2':
         // Note: PVP buffs don't persist across turns in this simple system
         skillMsg = `🛡️ ${playerId} dùng ${usedSkill.name}! Tăng phòng thủ.`;
-        damage = Math.max(1, attackerStats.attack - defenderStats.defense);
+        damage = Math.max(1, attackerStats.attack - Math.max(0, defenderStats.defense - attackerStats.armorPen));
         break;
       case 'fireball':
-        damage = Math.max(1, Math.floor(attackerStats.attack * 1.5) - Math.floor(defenderStats.defense * 0.8));
+        damage = Math.max(1, Math.floor(attackerStats.magic * 1.5) - Math.floor(Math.max(0, defenderStats.magicResist - attackerStats.armorPen) * 0.8));
         skillMsg = `🔥 ${playerId} dùng ${usedSkill.name}! Gây ${damage} sát thương phép.`;
         break;
       case 'buff_atk_30_def_-20_3':
         skillMsg = `💢 ${playerId} dùng ${usedSkill.name}! Tăng tấn công, giảm phòng thủ.`;
-        damage = Math.max(1, attackerStats.attack - defenderStats.defense);
+        damage = Math.max(1, attackerStats.attack - Math.max(0, defenderStats.defense - attackerStats.armorPen));
         break;
       default:
         skillMsg = `${playerId} dùng ${usedSkill.name}!`;
-        damage = Math.max(1, attackerStats.attack - defenderStats.defense);
+        damage = Math.max(1, attackerStats.attack - Math.max(0, defenderStats.defense - attackerStats.armorPen));
     }
   } else {
     // Normal attack with crit chance
-    const baseDamage = Math.max(1, attackerStats.attack - defenderStats.defense);
+    const baseDamage = Math.max(1, attackerStats.attack - Math.max(0, defenderStats.defense - attackerStats.armorPen));
     const critChance = 0.15;
     const isCrit = Math.random() < critChance;
     damage = isCrit ? Math.floor(baseDamage * 1.5) : baseDamage;
     if (isCrit) skillMsg = `🎯 Critical Hit!`;
   }
   
+  if (Math.random() < defenderStats.dodge) {
+    damage = 0;
+    skillMsg += ' (trượt)';
+  }
+  if (damage > 0 && attackerStats.lifesteal > 0) {
+    const heal = Math.floor(damage * attackerStats.lifesteal);
+    hp = Math.min(maxHp, hp + heal);
+    skillMsg += ` (+${heal} HP)`;
+  }
+
   return {
     damage: damage,
     mp: mp,
@@ -502,7 +517,7 @@ function calculatePvpTurnWithSkills(playerId, attackerStats, defenderStats, curr
 }
 
 function calculatePvpDamage(attackerStats, defenderStats) {
-  const baseDamage = Math.max(1, attackerStats.attack - defenderStats.defense);
+  const baseDamage = Math.max(1, attackerStats.attack - Math.max(0, defenderStats.defense - attackerStats.armorPen));
   const critChance = 0.15; // 15% crit chance
   const isCrit = Math.random() < critChance;
   const finalDamage = isCrit ? Math.floor(baseDamage * 1.5) : baseDamage;

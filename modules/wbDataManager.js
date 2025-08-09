@@ -131,6 +131,12 @@ class WB_DataManager {
             mp: 50,
             baseAttack: 10,
             baseDefense: 5,
+            lifesteal: 0,
+            magic: 0,
+            magicResist: 0,
+            dodge: 0,
+            speed: 0,
+            armorPen: 0,
             inventory: [], // [{ itemId: 'string', quantity: number }]
             equipment: {
                 weapon: null,    // itemId or null
@@ -141,7 +147,8 @@ class WB_DataManager {
                 inCombat: false,
                 monsterId: null,
                 monsterHp: 0,
-                mapId: null
+                mapId: null,
+                monsterStatusEffects: []
             },
             cooldowns: {}, // { mapId: timestamp }
             dailyQuests: {
@@ -153,16 +160,35 @@ class WB_DataManager {
                 monstersKilled: 0,
                 bossesKilled: 0,
                 itemsFound: 0,
-                questsCompleted: 0
+                questsCompleted: 0,
+                pvpWins: 0,
+                pvpLosses: 0
             },
+            statusEffects: [],
             lastRevivalUse: 0  // Timestamp for revival stone cooldown
         };
         this.saveUsers();
     }
-    
+
+    // Ensure new statistics fields exist for existing users
+    const stats = this.users[userId].statistics;
+    if (stats.pvpWins === undefined) stats.pvpWins = 0;
+    if (stats.pvpLosses === undefined) stats.pvpLosses = 0;
+
+    // Ensure new combat fields exist for existing users
+    const u = this.users[userId];
+    if (u.lifesteal === undefined) u.lifesteal = 0;
+    if (u.magic === undefined) u.magic = 0;
+    if (u.magicResist === undefined) u.magicResist = 0;
+    if (u.dodge === undefined) u.dodge = 0;
+    if (u.speed === undefined) u.speed = 0;
+    if (u.armorPen === undefined) u.armorPen = 0;
+    if (!u.statusEffects) u.statusEffects = [];
+    if (!u.combatState.monsterStatusEffects) u.combatState.monsterStatusEffects = [];
+
     // Clean expired buffs
     this.cleanExpiredBuffs(userId);
-    
+
     return this.users[userId];
   }
 
@@ -182,12 +208,26 @@ class WB_DataManager {
     let totalAttack = user.baseAttack;
     let totalDefense = user.baseDefense;
     let totalHp = 0;
+    let totalLifesteal = user.lifesteal || 0;
+    let totalMagic = user.magic || 0;
+    let totalMagicResist = user.magicResist || 0;
+    let totalDodge = user.dodge || 0;
+    let totalSpeed = user.speed || 0;
+    let totalArmorPen = user.armorPen || 0;
     
     // Add weapon stats
     if (user.equipment.weapon) {
       const weapon = this.getItem(user.equipment.weapon);
-      if (weapon && weapon.attackBonus) {
-        totalAttack += weapon.attackBonus;
+      if (weapon) {
+        if (weapon.attackBonus) totalAttack += weapon.attackBonus;
+        if (weapon.defenseBonus) totalDefense += weapon.defenseBonus;
+        if (weapon.hpBonus) totalHp += weapon.hpBonus;
+        if (weapon.lifesteal) totalLifesteal += weapon.lifesteal;
+        if (weapon.magic) totalMagic += weapon.magic;
+        if (weapon.magicResist) totalMagicResist += weapon.magicResist;
+        if (weapon.dodge) totalDodge += weapon.dodge;
+        if (weapon.speed) totalSpeed += weapon.speed;
+        if (weapon.armorPen) totalArmorPen += weapon.armorPen;
       }
     }
     
@@ -197,6 +237,12 @@ class WB_DataManager {
       if (armor) {
         if (armor.defenseBonus) totalDefense += armor.defenseBonus;
         if (armor.hpBonus) totalHp += armor.hpBonus;
+        if (armor.lifesteal) totalLifesteal += armor.lifesteal;
+        if (armor.magic) totalMagic += armor.magic;
+        if (armor.magicResist) totalMagicResist += armor.magicResist;
+        if (armor.dodge) totalDodge += armor.dodge;
+        if (armor.speed) totalSpeed += armor.speed;
+        if (armor.armorPen) totalArmorPen += armor.armorPen;
       }
     }
     
@@ -213,12 +259,24 @@ class WB_DataManager {
     if (user.passiveEffects) {
       if (user.passiveEffects.atk) totalAttack = Math.floor(totalAttack * (1 + user.passiveEffects.atk));
       if (user.passiveEffects.def) totalDefense = Math.floor(totalDefense * (1 + user.passiveEffects.def));
+      if (user.passiveEffects.lifesteal) totalLifesteal += user.passiveEffects.lifesteal;
+      if (user.passiveEffects.magic) totalMagic += user.passiveEffects.magic;
+      if (user.passiveEffects.magicResist) totalMagicResist += user.passiveEffects.magicResist;
+      if (user.passiveEffects.dodge) totalDodge += user.passiveEffects.dodge;
+      if (user.passiveEffects.speed) totalSpeed += user.passiveEffects.speed;
+      if (user.passiveEffects.armorPen) totalArmorPen += user.passiveEffects.armorPen;
     }
 
     return {
       attack: totalAttack,
       defense: totalDefense,
-      hpBonus: totalHp
+      hpBonus: totalHp,
+      lifesteal: totalLifesteal,
+      magic: totalMagic,
+      magicResist: totalMagicResist,
+      dodge: totalDodge,
+      speed: totalSpeed,
+      armorPen: totalArmorPen
     };
   }
   
