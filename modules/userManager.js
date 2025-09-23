@@ -251,6 +251,48 @@ class UserManager {
     };
   }
 
+  // 📋 Lấy tất cả users
+  getAllUsers() {
+    return { ...this.users }; // Return a copy to prevent mutations
+  }
+
+  // 🔢 Đếm số lượng users
+  getUserCount() {
+    return Object.keys(this.users).length;
+  }
+
+  // ⏰ Lấy thời gian hoạt động cuối của user
+  getLastActivity(userId) {
+    if (!userId || typeof userId !== 'string') {
+      return null;
+    }
+    
+    const user = this.users[userId];
+    return user ? user.lastActive : null;
+  }
+
+  // 🗑️ Xóa users không hoạt động (admin only function)
+  cleanupInactiveUsers(dayThreshold = 30) {
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - dayThreshold);
+    
+    let cleanedCount = 0;
+    for (const [userId, user] of Object.entries(this.users)) {
+      const lastActive = new Date(user.lastActive);
+      if (lastActive < cutoffDate && user.role !== 1) { // Don't delete admins
+        delete this.users[userId];
+        cleanedCount++;
+      }
+    }
+    
+    if (cleanedCount > 0) {
+      this.saveUsers();
+      console.log(`🗑️ Cleaned up ${cleanedCount} inactive users (${dayThreshold} days threshold)`);
+    }
+    
+    return cleanedCount;
+  }
+
   // 🧹 Cleanup method for graceful shutdown
   async cleanup() {
     if (this.saveTimeout) {
