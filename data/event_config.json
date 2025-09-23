@@ -1,0 +1,41 @@
+{
+  "events": {
+    "im.message.receive_v1": {
+      "enabled": true,
+      "description": "Handle incoming messages",
+      "rateLimitMs": 1000
+    },
+    "im.chat.member.user.added_v1": {
+      "enabled": true,
+      "description": "Handle users joining chat",
+      "rateLimitMs": 5000,
+      "sendWelcome": true
+    },
+    "im.chat.member.user.deleted_v1": {
+      "enabled": true,
+      "description": "Handle users leaving chat",
+      "rateLimitMs": 5000
+    },
+    "im.message.message_read_v1": {
+      "enabled": false,
+      "description": "Track message read events",
+      "rateLimitMs": 500
+    },
+    "application.bot.menu_v6": {
+      "enabled": true,
+      "description": "Handle bot menu interactions",
+      "rateLimitMs": 2000
+    },
+    "contact.user.created_v3": {
+      "enabled": true,
+      "description": "Handle new user creation",
+      "rateLimitMs": 10000
+    }
+  },
+  "general": {
+    "logLevel": "info",
+    "enableStatistics": true,
+    "cleanupIntervalMs": 300000,
+    "maxHandledMessages": 10000
+  }
+}

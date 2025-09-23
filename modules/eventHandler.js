@@ -1,5 +1,6 @@
 // modules/eventHandler.js
 import UserManager from './userManager.js';
+import { getEventConfig } from './eventConfig.js';
 
 class EventHandler {
   constructor(client, commandHandler) {
@@ -8,18 +9,57 @@ class EventHandler {
     this.userManager = UserManager.getInstance();
     this.eventStats = new Map();
     this.handledMessages = new Map(); // Moved from index.js for better organization
+    this.eventConfig = getEventConfig();
+    this.rateLimitCache = new Map(); // For event-specific rate limiting
   }
 
   // Function to clean old handled messages
   cleanupHandledMessages() {
     const now = Date.now();
     const CLEANUP_THRESHOLD = 180000; // 3 minutes
+    const maxMessages = this.eventConfig.getMaxHandledMessages();
     
+    // Clean by age
     for (const [msgId, timestamp] of this.handledMessages.entries()) {
       if (now - timestamp > CLEANUP_THRESHOLD) {
         this.handledMessages.delete(msgId);
       }
     }
+    
+    // Clean by size if still too large
+    if (this.handledMessages.size > maxMessages) {
+      const entries = Array.from(this.handledMessages.entries());
+      entries.sort((a, b) => a[1] - b[1]); // Sort by timestamp
+      const toDelete = entries.slice(0, entries.length - maxMessages);
+      for (const [msgId] of toDelete) {
+        this.handledMessages.delete(msgId);
+      }
+    }
+  }
+
+  // Check rate limiting for events
+  isEventRateLimited(eventType, identifier) {
+    const rateLimit = this.eventConfig.getEventRateLimit(eventType);
+    const key = `${eventType}:${identifier}`;
+    const now = Date.now();
+    const lastTime = this.rateLimitCache.get(key) || 0;
+    
+    if (now - lastTime < rateLimit) {
+      return true;
+    }
+    
+    this.rateLimitCache.set(key, now);
+    
+    // Cleanup old entries occasionally
+    if (Math.random() < 0.01) {
+      for (const [k, timestamp] of this.rateLimitCache.entries()) {
+        if (now - timestamp > 60000) { // 1 minute old
+          this.rateLimitCache.delete(k);
+        }
+      }
+    }
+    
+    return false;
   }
 
   // Track event usage statistics
@@ -34,11 +74,25 @@ class EventHandler {
 
   // Enhanced message receive handler
   async handleMessageReceive(ctx) {
+    const eventType = 'im.message.receive_v1';
+    
+    // Check if event is enabled
+    if (!this.eventConfig.isEventEnabled(eventType)) {
+      return { status: 'ok' };
+    }
+
     const msgId = ctx.message.message_id;
+    const userId = ctx.sender?.sender_id?.user_id || 'unknown';
+    
+    // Check rate limiting
+    if (this.isEventRateLimited(eventType, userId)) {
+      return { status: 'ok' };
+    }
+
     const now = Date.now();
 
     // Track event
-    this.trackEvent('im.message.receive_v1');
+    this.trackEvent(eventType);
 
     // ⚠️ Nếu đã xử lý rồi thì bỏ qua
     if (this.handledMessages.has(msgId)) {
@@ -46,11 +100,8 @@ class EventHandler {
       return { status: 'ok' };
     }
 
-    this.handledMessages.set(msgId, now);
-
     // 📝 Ghi log with enhanced info
     const chatId = ctx.message.chat_id;
-    const userId = ctx.sender?.sender_id?.user_id || 'unknown';
     const messageType = ctx.message.msg_type || 'text';
     
     let text = '[Không có nội dung]';
@@ -105,15 +156,27 @@ class EventHandler {
 
   // Handle user joined chat event
   async handleUserJoinedChat(ctx) {
-    this.trackEvent('im.chat.member.user.added_v1');
+    const eventType = 'im.chat.member.user.added_v1';
+    
+    // Check if event is enabled
+    if (!this.eventConfig.isEventEnabled(eventType)) {
+      return { status: 'ok' };
+    }
+
+    this.trackEvent(eventType);
     
     try {
       const chatId = ctx.chat_id;
       const users = ctx.users || [];
       
+      // Check rate limiting
+      if (this.isEventRateLimited(eventType, chatId)) {
+        return { status: 'ok' };
+      }
+      
       console.log(`👋 Users joined chat ${chatId}:`, users.map(u => u.user_id));
 
-      // Register new users and send welcome message
+      // Register new users
       for (const user of users) {
         const userId = user.user_id;
         if (userId) {
@@ -122,8 +185,8 @@ class EventHandler {
         }
       }
 
-      // Send welcome message
-      if (users.length > 0) {
+      // Send welcome message if enabled
+      if (users.length > 0 && this.eventConfig.getSendWelcome()) {
         const welcomeMessage = `🎉 **Chào mừng bạn đến với Bot Game!**
 
 🎮 **Sử dụng lệnh sau để bắt đầu:**
@@ -152,11 +215,23 @@ class EventHandler {
 
   // Handle user left chat event
   async handleUserLeftChat(ctx) {
-    this.trackEvent('im.chat.member.user.deleted_v1');
+    const eventType = 'im.chat.member.user.deleted_v1';
+    
+    // Check if event is enabled
+    if (!this.eventConfig.isEventEnabled(eventType)) {
+      return { status: 'ok' };
+    }
+
+    this.trackEvent(eventType);
     
     try {
       const chatId = ctx.chat_id;
       const users = ctx.users || [];
+      
+      // Check rate limiting
+      if (this.isEventRateLimited(eventType, chatId)) {
+        return { status: 'ok' };
+      }
       
       console.log(`👋 Users left chat ${chatId}:`, users.map(u => u.user_id));
 
@@ -177,11 +252,23 @@ class EventHandler {
 
   // Handle message read events
   async handleMessageRead(ctx) {
-    this.trackEvent('im.message.message_read_v1');
+    const eventType = 'im.message.message_read_v1';
+    
+    // Check if event is enabled
+    if (!this.eventConfig.isEventEnabled(eventType)) {
+      return { status: 'ok' };
+    }
+
+    this.trackEvent(eventType);
     
     try {
       const chatId = ctx.chat_id;
       const userId = ctx.reader?.reader_id?.user_id;
+      
+      // Check rate limiting
+      if (userId && this.isEventRateLimited(eventType, userId)) {
+        return { status: 'ok' };
+      }
       
       if (userId) {
         // Register user activity
@@ -198,11 +285,23 @@ class EventHandler {
 
   // Handle bot menu interactions
   async handleBotMenu(ctx) {
-    this.trackEvent('application.bot.menu_v6');
+    const eventType = 'application.bot.menu_v6';
+    
+    // Check if event is enabled
+    if (!this.eventConfig.isEventEnabled(eventType)) {
+      return { status: 'ok' };
+    }
+
+    this.trackEvent(eventType);
     
     try {
       const userId = ctx.operator?.operator_id?.user_id;
       const menuKey = ctx.menu_key;
+      
+      // Check rate limiting
+      if (userId && this.isEventRateLimited(eventType, userId)) {
+        return { status: 'ok' };
+      }
       
       console.log(`🔘 Bot menu interaction: ${menuKey} by ${userId}`);
 
@@ -252,11 +351,23 @@ class EventHandler {
 
   // Handle contact user created (new user in organization)
   async handleContactUserCreated(ctx) {
-    this.trackEvent('contact.user.created_v3');
+    const eventType = 'contact.user.created_v3';
+    
+    // Check if event is enabled
+    if (!this.eventConfig.isEventEnabled(eventType)) {
+      return { status: 'ok' };
+    }
+
+    this.trackEvent(eventType);
     
     try {
       const user = ctx.object;
       const userId = user?.user_id;
+      
+      // Check rate limiting
+      if (userId && this.isEventRateLimited(eventType, userId)) {
+        return { status: 'ok' };
+      }
       
       if (userId) {
         console.log(`👤 New user created in organization: ${userId}`);
@@ -273,7 +384,7 @@ class EventHandler {
 
   // Get all event handlers configured for the dispatcher
   getEventHandlers() {
-    return {
+    const allHandlers = {
       'im.message.receive_v1': this.handleMessageReceive.bind(this),
       'im.chat.member.user.added_v1': this.handleUserJoinedChat.bind(this),
       'im.chat.member.user.deleted_v1': this.handleUserLeftChat.bind(this),
@@ -281,14 +392,30 @@ class EventHandler {
       'application.bot.menu_v6': this.handleBotMenu.bind(this),
       'contact.user.created_v3': this.handleContactUserCreated.bind(this)
     };
+
+    // Only return enabled handlers
+    const enabledHandlers = {};
+    for (const [eventType, handler] of Object.entries(allHandlers)) {
+      if (this.eventConfig.isEventEnabled(eventType)) {
+        enabledHandlers[eventType] = handler;
+      }
+    }
+
+    return enabledHandlers;
   }
 
   // Initialize cleanup interval
   startCleanupInterval() {
-    // Cleanup every 5 minutes
+    const interval = this.eventConfig.getCleanupInterval();
+    // Cleanup based on configuration
     setInterval(() => {
       this.cleanupHandledMessages();
-    }, 300000);
+    }, interval);
+  }
+
+  // Get event configuration
+  getEventConfig() {
+    return this.eventConfig;
   }
 }
 
