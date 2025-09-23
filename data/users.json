@@ -216,5 +216,13 @@
     "lastActive": "2025-07-24T16:14:56.968Z",
     "commandCount": 0,
     "role": 0
+  },
+  "testuser": {
+    "userId": "testuser",
+    "money": 1000,
+    "joinDate": "2025-09-23T01:40:46.254Z",
+    "lastActive": "2025-09-23T01:40:46.254Z",
+    "commandCount": 0,
+    "role": 0
   }
 }

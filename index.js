@@ -8,6 +8,8 @@ import CommandHandler from './modules/commandHandler.js';
 import UserManager from './modules/userManager.js';
 import EventHandler from './modules/eventHandler.js';
 import adminRoutes from './routes/admin.js';
+import authRoutes from './routes/auth.js';
+import commandRoutes from './routes/commands.js';
 import {
   APP_ID,
   APP_SECRET,
@@ -56,6 +58,12 @@ app.use('/dashboard', express.static(path.join(__dirname, 'public/dashboard')));
 
 // 🔐 Admin API routes
 app.use('/api/admin', adminRoutes);
+
+// 🔐 Authentication routes
+app.use('/api/auth', authRoutes);
+
+// 🎮 Command execution routes
+app.use('/api/commands', commandRoutes);
 
 // 📥 Log webhook requests (simplified)
 if (NODE_ENV === 'development') {

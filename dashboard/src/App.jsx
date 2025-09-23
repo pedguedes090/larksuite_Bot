@@ -14,7 +14,9 @@ import {
   Modal, 
   message,
   Spin,
-  Alert
+  Alert,
+  Avatar,
+  Dropdown
 } from 'antd';
 import {
   DashboardOutlined,
@@ -24,8 +26,13 @@ import {
   TeamOutlined,
   DollarOutlined,
   ReloadOutlined,
-  SafetyOutlined
+  SafetyOutlined,
+  CodeOutlined,
+  LogoutOutlined,
+  SyncOutlined
 } from '@ant-design/icons';
+import LoginPage from './LoginPage';
+import CommandInterface from './CommandInterface';
 
 const { Header, Sider, Content } = Layout;
 const { Title } = Typography;
@@ -37,42 +44,89 @@ function App() {
   const [stats, setStats] = useState({});
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
 
   useEffect(() => {
-    fetchData();
+    // Check for existing login
+    const savedToken = localStorage.getItem('authToken');
+    const savedUser = localStorage.getItem('user');
+    
+    if (savedToken && savedUser) {
+      setToken(savedToken);
+      setUser(JSON.parse(savedUser));
+      setIsAdmin(JSON.parse(savedUser).role === 1);
+    }
+    
+    if (savedToken) {
+      fetchData(savedToken);
+    } else {
+      setLoading(false);
+    }
   }, []);
 
-  const fetchData = async () => {
+  const handleLogin = (userData, authToken) => {
+    setUser(userData);
+    setToken(authToken);
+    setIsAdmin(userData.role === 1);
+    fetchData(authToken);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+    
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('user');
+    setUser(null);
+    setToken(null);
+    setIsAdmin(false);
+    setSelectedMenu('dashboard');
+    message.success('Đã đăng xuất thành công');
+  };
+
+  const fetchData = async (authToken = token) => {
     try {
       setLoading(true);
       
-      // Get admin key from URL parameters
+      // For admin features, check if user is admin and get admin key from URL
       const urlParams = new URLSearchParams(window.location.search);
       const adminKey = urlParams.get('adminKey') || 'admin123';
       
-      const [usersRes, statsRes] = await Promise.all([
-        fetch('/api/admin/users', {
-          headers: { 'X-Admin-Key': adminKey }
-        }),
-        fetch('/api/admin/stats', {
-          headers: { 'X-Admin-Key': adminKey }
-        })
-      ]);
-      
-      if (usersRes.ok && statsRes.ok) {
-        const usersData = await usersRes.json();
-        const statsData = await statsRes.json();
-        setUsers(usersData);
-        setStats(statsData);
-        setIsAdmin(true);
-      } else {
-        setIsAdmin(false);
-        message.error('Access denied. Admin privileges required.');
+      // Only fetch admin data if user is admin
+      if (user && user.role === 1) {
+        // Fetch users and stats with admin key
+        const [usersResponse, statsResponse] = await Promise.all([
+          fetch(`/api/admin/users`, {
+            headers: { 'X-Admin-Key': adminKey }
+          }),
+          fetch(`/api/admin/stats`, {
+            headers: { 'X-Admin-Key': adminKey }
+          })
+        ]);
+
+        if (usersResponse.ok && statsResponse.ok) {
+          const [usersData, statsData] = await Promise.all([
+            usersResponse.json(),
+            statsResponse.json()
+          ]);
+          
+          setUsers(usersData);
+          setStats(statsData);
+        }
       }
+      
     } catch (error) {
       console.error('Error fetching data:', error);
-      message.error('Failed to fetch data');
-      setIsAdmin(false);
+      message.error('Không thể tải dữ liệu');
     } finally {
       setLoading(false);
     }
@@ -216,16 +270,27 @@ function App() {
       label: 'Dashboard'
     },
     {
-      key: 'users',
-      icon: <TeamOutlined />,
-      label: 'User Management'
-    },
-    {
-      key: 'settings',
-      icon: <SettingOutlined />,
-      label: 'Settings'
+      key: 'commands',
+      icon: <CodeOutlined />,
+      label: 'Commands'
     }
   ];
+
+  // Add admin-only menu items
+  if (isAdmin) {
+    menuItems.push(
+      {
+        key: 'users',
+        icon: <TeamOutlined />,
+        label: 'User Management'
+      },
+      {
+        key: 'settings',
+        icon: <SettingOutlined />,
+        label: 'Settings'
+      }
+    );
+  }
 
   if (loading) {
     return (
@@ -235,26 +300,46 @@ function App() {
     );
   }
 
-  if (!isAdmin) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-100">
-        <Card className="w-96">
-          <Alert
-            message="Access Denied"
-            description="You need admin privileges to access this dashboard."
-            type="error"
-            showIcon
-            icon={<SafetyOutlined />}
-          />
-          <div className="mt-4 text-center">
-            <Button type="primary" onClick={fetchData} icon={<ReloadOutlined />}>
-              Retry
-            </Button>
-          </div>
-        </Card>
-      </div>
-    );
+  // Show login page if not authenticated
+  if (!user || !token) {
+    return <LoginPage onLogin={handleLogin} />;
   }
+
+  const userMenuItems = [
+    {
+      key: 'profile',
+      icon: <UserOutlined />,
+      label: 'Profile'
+    },
+    {
+      key: 'sync',
+      icon: <SyncOutlined />,
+      label: 'Sync Lark'
+    },
+    {
+      type: 'divider'
+    },
+    {
+      key: 'logout',
+      icon: <LogoutOutlined />,
+      label: 'Logout',
+      danger: true
+    }
+  ];
+
+  const handleUserMenuClick = ({ key }) => {
+    switch (key) {
+      case 'logout':
+        handleLogout();
+        break;
+      case 'sync':
+        // TODO: Implement Lark sync
+        message.info('Tính năng đồng bộ Lark sẽ được thêm vào');
+        break;
+      default:
+        break;
+    }
+  };
 
   const renderContent = () => {
     switch (selectedMenu) {
@@ -262,30 +347,23 @@ function App() {
         return (
           <div>
             <Title level={2} className="mb-6">Dashboard Overview</Title>
+            
+            {/* Personal stats for all users */}
             <Row gutter={[16, 16]} className="mb-6">
               <Col xs={24} sm={12} lg={6}>
                 <Card>
                   <Statistic
-                    title="Total Users"
-                    value={stats.totalUsers || 0}
-                    prefix={<TeamOutlined className="text-blue-500" />}
+                    title="Vai trò"
+                    value={user.role === 1 ? 'Admin' : 'User'}
+                    prefix={user.role === 1 ? <CrownOutlined className="text-yellow-500" /> : <UserOutlined className="text-blue-500" />}
                   />
                 </Card>
               </Col>
               <Col xs={24} sm={12} lg={6}>
                 <Card>
                   <Statistic
-                    title="Total Admins"
-                    value={stats.totalAdmins || 0}
-                    prefix={<CrownOutlined className="text-yellow-500" />}
-                  />
-                </Card>
-              </Col>
-              <Col xs={24} sm={12} lg={6}>
-                <Card>
-                  <Statistic
-                    title="Total Money"
-                    value={stats.totalMoney || 0}
+                    title="Số dư hiện tại"
+                    value={user.money || 0}
                     prefix={<DollarOutlined className="text-green-500" />}
                     suffix="xu"
                   />
@@ -294,23 +372,108 @@ function App() {
               <Col xs={24} sm={12} lg={6}>
                 <Card>
                   <Statistic
-                    title="Total Commands"
-                    value={stats.totalCommands || 0}
-                    prefix={<SettingOutlined className="text-purple-500" />}
+                    title="Trạng thái"
+                    value="Đang hoạt động"
+                    prefix={<SafetyOutlined className="text-green-500" />}
+                  />
+                </Card>
+              </Col>
+              <Col xs={24} sm={12} lg={6}>
+                <Card>
+                  <Statistic
+                    title="Lệnh khả dụng"
+                    value="Nhiều lệnh"
+                    prefix={<CodeOutlined className="text-purple-500" />}
                   />
                 </Card>
               </Col>
             </Row>
             
-            <Card title="Recent Users" className="mt-4">
-              <Table
-                dataSource={users.slice(0, 10)}
-                columns={userColumns}
-                rowKey="userId"
-                pagination={false}
-                size="small"
-              />
-            </Card>
+            {/* Admin-only system stats */}
+            {isAdmin && stats.totalUsers && (
+              <>
+                <Title level={3} className="mb-4">System Statistics</Title>
+                <Row gutter={[16, 16]} className="mb-6">
+                  <Col xs={24} sm={12} lg={6}>
+                    <Card>
+                      <Statistic
+                        title="Total Users"
+                        value={stats.totalUsers || 0}
+                        prefix={<TeamOutlined className="text-blue-500" />}
+                      />
+                    </Card>
+                  </Col>
+                  <Col xs={24} sm={12} lg={6}>
+                    <Card>
+                      <Statistic
+                        title="Total Admins"
+                        value={stats.totalAdmins || 0}
+                        prefix={<CrownOutlined className="text-yellow-500" />}
+                      />
+                    </Card>
+                  </Col>
+                  <Col xs={24} sm={12} lg={6}>
+                    <Card>
+                      <Statistic
+                        title="Total Money"
+                        value={stats.totalMoney || 0}
+                        prefix={<DollarOutlined className="text-green-500" />}
+                        suffix="xu"
+                      />
+                    </Card>
+                  </Col>
+                  <Col xs={24} sm={12} lg={6}>
+                    <Card>
+                      <Statistic
+                        title="Total Commands"
+                        value={stats.totalCommands || 0}
+                        prefix={<SettingOutlined className="text-purple-500" />}
+                      />
+                    </Card>
+                  </Col>
+                </Row>
+                
+                <Card title="Recent Users" className="mt-4">
+                  <Table
+                    dataSource={users.slice(0, 10)}
+                    columns={userColumns}
+                    rowKey="userId"
+                    pagination={false}
+                    size="small"
+                  />
+                </Card>
+              </>
+            )}
+            
+            {/* Quick start guide for regular users */}
+            {!isAdmin && (
+              <Card title="🚀 Bắt đầu sử dụng" className="mt-4">
+                <div className="text-center p-6">
+                  <Title level={4}>Chào mừng đến với Lark Bot Dashboard!</Title>
+                  <Paragraph>
+                    Bạn có thể sử dụng giao diện web để chạy các lệnh bot thay vì phải sử dụng app Lark.
+                  </Paragraph>
+                  <Space size="large">
+                    <Button 
+                      type="primary" 
+                      size="large"
+                      icon={<CodeOutlined />}
+                      onClick={() => setSelectedMenu('commands')}
+                    >
+                      Thử lệnh ngay
+                    </Button>
+                  </Space>
+                </div>
+              </Card>
+            )}
+          </div>
+        );
+      
+      case 'commands':
+        return (
+          <div>
+            <Title level={2} className="mb-6">🎮 Command Interface</Title>
+            <CommandInterface user={user} token={token} />
           </div>
         );
       
@@ -391,7 +554,22 @@ function App() {
             {collapsed ? '▶' : '◀'}
           </Button>
           <div className="flex items-center space-x-4">
-            <span className="text-gray-600">Welcome, Admin</span>
+            <span className="text-gray-600">
+              Xin chào, {user.userId}
+              {user.role === 1 && <Tag color="gold" className="ml-2">Admin</Tag>}
+            </span>
+            <Dropdown
+              menu={{ 
+                items: userMenuItems,
+                onClick: handleUserMenuClick
+              }}
+              placement="bottomRight"
+            >
+              <Avatar 
+                icon={<UserOutlined />} 
+                className="cursor-pointer bg-blue-500"
+              />
+            </Dropdown>
           </div>
         </Header>
         
