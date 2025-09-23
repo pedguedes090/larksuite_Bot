@@ -48,11 +48,12 @@ router.post('/register', async (req, res) => {
     const user = userManager.getUser(userId);
     
     // Store password hash (in production, use proper password hashing)
-    user.password = Buffer.from(password).toString('base64');
-    user.larkUserId = larkUserId || userId;
-    user.webAccess = true;
+    userManager.users[userId].password = Buffer.from(password).toString('base64');
+    userManager.users[userId].larkUserId = larkUserId || userId;
+    userManager.users[userId].webAccess = true;
     
-    userManager.saveUsers();
+    // Force save the updated user data
+    await userManager.saveUsers();
     
     res.json({ 
       success: true, 
@@ -79,11 +80,18 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
     
+    // Get raw user data directly from userManager.users
+    const rawUser = userManager.users[userId];
     const user = userManager.getUser(userId);
     
+    console.log('Debug raw user:', rawUser);
+    console.log('Debug getUser result:', user);
+    
     // Check password (in production, use proper password verification)
-    const storedPassword = user.password || '';
+    const storedPassword = rawUser.password || '';
     const providedPassword = Buffer.from(password).toString('base64');
+    
+    console.log('Debug login:', { userId, storedPassword, providedPassword, hasPassword: !!rawUser.password });
     
     if (storedPassword !== providedPassword) {
       return res.status(401).json({ error: 'Invalid credentials' });
