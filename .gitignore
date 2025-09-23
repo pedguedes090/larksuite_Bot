@@ -11,6 +11,10 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# Dashboard dependencies
+dashboard/node_modules/
+dashboard/dist/
+
 # Runtime data
 pids
 *.pid
