@@ -216,5 +216,40 @@
     "lastActive": "2025-07-24T16:14:56.968Z",
     "commandCount": 0,
     "role": 0
+  },
+  "testuser": {
+    "userId": "testuser",
+    "money": 1000,
+    "joinDate": "2025-09-23T01:40:46.254Z",
+    "lastActive": "2025-09-23T01:43:03.209Z",
+    "commandCount": 0,
+    "role": 0
+  },
+  "webtest": {
+    "userId": "webtest",
+    "money": 1000,
+    "joinDate": "2025-09-23T01:43:33.735Z",
+    "lastActive": "2025-09-23T01:43:39.694Z",
+    "commandCount": 0,
+    "role": 0
+  },
+  "webtest2": {
+    "userId": "webtest2",
+    "money": 1000,
+    "joinDate": "2025-09-23T01:44:04.284Z",
+    "lastActive": "2025-09-23T01:46:11.640Z",
+    "commandCount": 0,
+    "role": 0
+  },
+  "admin": {
+    "userId": "admin",
+    "money": 5000,
+    "joinDate": "2025-09-23T01:45:00.000Z",
+    "lastActive": "2025-09-23T01:47:22.728Z",
+    "commandCount": 0,
+    "role": 1,
+    "password": "YWRtaW4xMjM=",
+    "larkUserId": "admin_lark",
+    "webAccess": true
   }
 }
