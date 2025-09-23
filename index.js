@@ -1,10 +1,13 @@
 // index.js
 import express from 'express';
 import bodyParser from 'body-parser';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import * as lark from '@larksuiteoapi/node-sdk';
 import CommandHandler from './modules/commandHandler.js';
 import UserManager from './modules/userManager.js';
 import EventHandler from './modules/eventHandler.js';
+import adminRoutes from './routes/admin.js';
 import {
   APP_ID,
   APP_SECRET,
@@ -14,6 +17,9 @@ import {
   NODE_ENV,
   DEFAULT_ADMINS
 } from './config.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // 🚀 Khởi tạo các components
 const client = new lark.Client({
@@ -44,10 +50,19 @@ const dispatcher = new lark.EventDispatcher({
 const app = express();
 app.use(bodyParser.json());
 
+// 📁 Serve dashboard static files
+app.use('/assets', express.static(path.join(__dirname, 'public/dashboard/assets')));
+app.use('/dashboard', express.static(path.join(__dirname, 'public/dashboard')));
+
+// 🔐 Admin API routes
+app.use('/api/admin', adminRoutes);
+
 // 📥 Log webhook requests (simplified)
 if (NODE_ENV === 'development') {
   app.use((req, res, next) => {
-    console.log('📥 Webhook received');
+    if (req.path.startsWith('/webhook')) {
+      console.log('📥 Webhook received');
+    }
     next();
   });
 }
@@ -58,6 +73,11 @@ app.use('/webhook/event', lark.adaptExpress(dispatcher, { autoChallenge: true })
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', uptime: process.uptime() });
+});
+
+// Dashboard route
+app.get('/admin', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/dashboard/index.html'));
 });
 
 // 🚀 Chạy server
