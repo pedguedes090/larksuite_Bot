@@ -131,7 +131,9 @@ class UserManager {
         joinDate: new Date().toISOString(),
         lastActive: new Date().toISOString(),
         commandCount: 0,
-        role: isDefaultAdmin ? 1 : 0 // 1 = admin, 0 = user
+        role: isDefaultAdmin ? 1 : 0, // 1 = admin, 0 = user
+        hasFishingRod: false,
+        lastFishing: 0
       };
       this.saveUsers();
       console.log(`✨ Created new user: ${userId} ${isDefaultAdmin ? '(Admin)' : '(User)'}`);
@@ -223,6 +225,30 @@ class UserManager {
     this.users[userId].commandCount++;
     this.saveUsers();
     return this.users[userId].commandCount;
+  }
+
+  // 🎣 Cập nhật trạng thái cần câu
+  setFishingRod(userId, hasRod) {
+    if (!userId || typeof userId !== 'string') {
+      throw new Error('Invalid userId provided');
+    }
+
+    const user = this.getUser(userId);
+    this.users[userId].hasFishingRod = hasRod;
+    this.saveUsers();
+    return this.users[userId].hasFishingRod;
+  }
+
+  // ⏰ Cập nhật thời gian câu cá cuối
+  setLastFishing(userId, timestamp) {
+    if (!userId || typeof userId !== 'string') {
+      throw new Error('Invalid userId provided');
+    }
+
+    const user = this.getUser(userId);
+    this.users[userId].lastFishing = timestamp;
+    this.saveUsers();
+    return this.users[userId].lastFishing;
   }
 
   // 📈 Lấy top users theo tiền
